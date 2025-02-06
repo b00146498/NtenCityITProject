@@ -2,9 +2,12 @@
 
 @section('content')
     <section class="content-header">
-        <h1 class="pull-left">employees</h1>
-        <h1 class="pull-right">
-           <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px" href="{!! route('employees.create') !!}">Add New</a>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <h1 class="pull-left">Employee Profiles</h1>
+        <h1 class="pull-right" style="display: flex; justify-content: flex-end;">
+            <a class="btn btn-primary" style="background-color: #C96E04; border-color: #C96E04; color: white;">
+                <i class="glyphicon glyphicon-plus"></i> New Client
+            </a>
         </h1>
     </section>
     <div class="content">
@@ -15,9 +18,10 @@
         <div class="clearfix"></div>
         <div class="box box-primary">
             <div class="box-body">
-                    @include('employees.table')
+                @include('employees.table')
             </div>
         </div>
     </div>
 @endsection
+
 

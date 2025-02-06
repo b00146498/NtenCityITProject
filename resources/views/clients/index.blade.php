@@ -2,9 +2,14 @@
 
 @section('content')
     <section class="content-header">
-        <h1 class="pull-left">clients</h1>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <h1 class="pull-left">Client Profiles</h1>
         <h1 class="pull-right">
-           <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px" href="{!! route('clients.create') !!}">Add New</a>
+            <h1 class="pull-right" style="display: flex; justify-content: flex-end;">
+                <a class="btn btn-primary" style="background-color: #C96E04; border-color: #C96E04; color: white;">
+                    <i class="glyphicon glyphicon-plus"></i> New Client
+                </a>
+            </h1>
         </h1>
     </section>
     <div class="content">

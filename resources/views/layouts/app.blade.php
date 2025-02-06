@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{{ config('app.name') }}</title>
+        <title>Ntencity</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 
         <!-- Font Awesome -->
@@ -17,14 +17,18 @@
 
     <body>
         <!-- Bootstrap 5 Navbar -->
-        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <nav class="navbar navbar-expand-sm bg-light navbar-light">
           <div class="container-fluid">
-            <ul class="navbar-nav">
+            <!-- Logo on the left -->
+            <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" height="50">
+
+            <!-- Navbar links on the right -->
+            <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a class="nav-link" href=https://laravel.com/docs>Laravel Documentation</a>
+                <a class="nav-link" href="https://laravel.com/docs">Laravel Documentation</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href=https://laracasts.com/>Laravel Video Tutorials</a>
+                <a class="nav-link" href="https://laracasts.com/">Laravel Video Tutorials</a>
               </li>
             </ul>
           </div>
