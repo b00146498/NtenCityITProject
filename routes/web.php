@@ -17,11 +17,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
-Route::resource('employees', App\Http\Controllers\employeeController::class);
+require __DIR__.'/auth.php';
 
+Route::resource('employees', App\Http\Controllers\employeeController::class); 
 
-Route::resource('clients', App\Http\Controllers\clientController::class);
+Route::resource('clients', App\Http\Controllers\clientController::class); 
 
-
-Route::resource('practices', App\Http\Controllers\practiceController::class);
+Route::resource('practices', App\Http\Controllers\practiceController::class); 

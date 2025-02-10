@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Ntencity</title>
-    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -17,7 +19,7 @@
         .top-header {
             width: 100%;
             height: 60px;
-            background-color: #f8f9fa; /* Light background */
+            background-color: #f8f9fa;
             display: flex;
             align-items: center;
             padding: 0 20px;
@@ -25,18 +27,21 @@
         }
 
         .top-header img {
-            height: 40px; /* Adjust logo size */
+            height: 40px;
         }
 
         /* Sidebar styling */
         .sidebar {
             width: 250px;
-            height: calc(100vh - 60px); /* Full height minus the top header */
+            height: calc(100vh - 60px);
             position: fixed;
             left: 0;
-            top: 60px; /* Starts right below the top header */
-            background-color: rgba(212, 175, 55, 0.39); /* Light yellowish background */
+            top: 60px;
+            background-color: rgba(212, 175, 55, 0.39);
             padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .sidebar .nav-link {
@@ -45,11 +50,12 @@
             padding: 10px;
             display: flex;
             align-items: center;
-            border-radius: 5px; /* Small default rounding */
-            transition: all 0.3s ease-in-out; /* Smooth animation */
+            border-radius: 5px;
+            transition: all 0.3s ease-in-out;
         }
 
-        .sidebar .nav-link:hover {
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
             background-color: rgba(212, 175, 55, 0.40);
             border-radius: 15px;
             padding-left: 15px;
@@ -61,8 +67,8 @@
 
         /* Main content styling */
         .main-content {
-            margin-left: 250px; /* Same as sidebar width */
-            margin-top: 60px; /* Below the top header */
+            margin-left: 250px;
+            margin-top: 60px;
             padding: 20px;
         }
     </style>
@@ -70,39 +76,66 @@
 
 <body>
 
-    <!-- Top Header -->
-    <div class="top-header">
-        <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo">
-    </div>
+<!-- Top Header -->
+<div class="top-header">
+    <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo">
+</div>
 
-    <!-- Sidebar -->
-    <nav class="sidebar d-flex flex-column">
-        <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-home"></i> Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-calendar-alt"></i> Appointments</a></li>
-            <li class="nav-item"><a class="nav-link active" href="http://localhost:8000/clients"><i class="fas fa-users"></i> Clients</a></li>
-            <li class="nav-item"><a class="nav-link" href="http://localhost:8000/employees"><i class="fas fa-user-tie"></i> Employee</a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-bell"></i> Notifications</a></li>
-        </ul>
-        
-        <!-- Bottom links (Settings, Logout) -->
-        <div class="mt-auto">
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-cog"></i> Settings</a></li>
-                <li class="nav-item"><a class="nav-link text-danger" href="#"><i class="fas fa-sign-out-alt"></i> Log out</a></li>
-            </ul>
-        </div>
-    </nav>
+<!-- Sidebar -->
+<nav class="sidebar">
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">
+                <i class="fas fa-home"></i> Home
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->is('appointments') ? 'active' : '' }}" href="{{ url('/appointments') }}">
+                <i class="fas fa-calendar-alt"></i> Appointments
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->is('clients') ? 'active' : '' }}" href="{{ url('/clients') }}">
+                <i class="fas fa-users"></i> Clients
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->is('employees') ? 'active' : '' }}" href="{{ url('/employees') }}">
+                <i class="fas fa-user-tie"></i> Employee
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->is('notifications') ? 'active' : '' }}" href="{{ url('/notifications') }}">
+                <i class="fas fa-bell"></i> Notifications
+            </a>
+        </li>
+    </ul>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        @yield('content')
-    </div>
+    <!-- Bottom links -->
+    <ul class="nav flex-column mt-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url('/settings') }}">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger" href="{{ route('logout') }}">
+                <i class="fas fa-sign-out-alt"></i> Log out
+            </a>
+        </li>
+    </ul>
+</nav>
 
-    <!-- Webpack mix npm generated -->
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <script src="{{ asset('js/app.js') }}"></script>
-    @stack('js_scripts')
+<!-- Main Content -->
+<div class="main-content">
+    @yield('content')
+</div>
+
+<!-- Webpack mix npm generated -->
+<link rel="stylesheet" href="{{ asset('css/app.css') }}">
+<script src="{{ asset('js/app.js') }}"></script>
+
+@stack('js_scripts')
 
 </body>
 </html>
