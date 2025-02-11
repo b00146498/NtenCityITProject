@@ -110,20 +110,8 @@
             </a>
         </li>
     </ul>
+        @include('layouts.navAuth')
 
-    <!-- Bottom links -->
-    <ul class="nav flex-column mt-auto">
-        <li class="nav-item">
-            <a class="nav-link" href="{{ url('/settings') }}">
-                <i class="fas fa-cog"></i> Settings
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-danger" href="{{ route('logout') }}">
-                <i class="fas fa-sign-out-alt"></i> Log out
-            </a>
-        </li>
-    </ul>
 </nav>
 
 <!-- Main Content -->
