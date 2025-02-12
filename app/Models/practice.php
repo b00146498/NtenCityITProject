@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Class practice
+ * Class Practice
  * @package App\Models
  * @version February 5, 2025, 10:16 pm UTC
  *
@@ -19,21 +19,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $iban
  * @property string $bic
  */
-class practice extends Model
+class Practice extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes; // Corrected trait order
 
-    use HasFactory;
+    protected $table = 'practice'; // Explicitly define the table name
 
-    public $table = 'practice';
-    
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
-
-
-    protected $dates = ['deleted_at'];
-
-
+    protected $dates = ['deleted_at']; // Ensure SoftDeletes works correctly
 
     public $fillable = [
         'company_name',
@@ -46,7 +38,7 @@ class practice extends Model
     ];
 
     /**
-     * The attributes that should be casted to native types.
+     * The attributes that should be cast to native types.
      *
      * @var array
      */
@@ -62,7 +54,7 @@ class practice extends Model
     ];
 
     /**
-     * Validation rules
+     * Validation rules.
      *
      * @var array
      */
@@ -75,6 +67,4 @@ class practice extends Model
         'iban' => 'required|string|max:255',
         'bic' => 'required|string|max:255'
     ];
-
-    
 }

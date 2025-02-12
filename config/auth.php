@@ -34,13 +34,12 @@ return [
     | Supported: "session"
     |
     */
-
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
+'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'clients',
     ],
+],
 
     /*
     |--------------------------------------------------------------------------
@@ -58,12 +57,12 @@ return [
     | Supported: "database", "eloquent"
     |
     */
-
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
+'providers' => [
+    'clients' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Client::class,
+    ],
+],
 
         // 'users' => [
         //     'driver' => 'database',

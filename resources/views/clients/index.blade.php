@@ -6,7 +6,8 @@
         <h1 class="pull-left">Client Profiles</h1>
         <h1 class="pull-right">
             <h1 class="pull-right" style="display: flex; justify-content: flex-end;">
-                <a class="btn btn-primary" style="background-color: #C96E04; border-color: #C96E04; color: white;">
+                <a href="{{ route('clients.create') }}" class="btn btn-primary" 
+                   style="background-color: #C96E04; border-color: #C96E04; color: white;">
                     <i class="glyphicon glyphicon-plus"></i> New Client
                 </a>
             </h1>
@@ -20,7 +21,7 @@
         <div class="clearfix"></div>
         <div class="box box-primary">
             <div class="box-body">
-                    @include('clients.table')
+                @include('clients.table')
             </div>
         </div>
     </div>
