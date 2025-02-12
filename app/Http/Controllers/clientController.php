@@ -9,10 +9,11 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
+use App\Models\Practice; // Added to fetch practice names
 
 class clientController extends AppBaseController
 {
-    /** @var clientRepository $clientRepository*/
+    /** @var clientRepository $clientRepository */
     private $clientRepository;
 
     public function __construct(clientRepository $clientRepo)
@@ -22,35 +23,33 @@ class clientController extends AppBaseController
 
     /**
      * Display a listing of the client.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
     public function index(Request $request)
     {
         $clients = $this->clientRepository->all();
 
-        return view('clients.index')
-            ->with('clients', $clients);
+        return view('clients.index')->with('clients', $clients);
     }
 
     /**
      * Show the form for creating a new client.
-     *
-     * @return Response
      */
     public function create()
     {
-        return view('clients.create');
+        $practices = Practice::all(); // Fetch all practices
+    
+        // Automatically select the first available practice_id (if exists)
+        $practice_id = $practices->first() ? $practices->first()->id : null;
+    
+        return view('clients.create')->with([
+            'practices' => $practices,
+            'practice_id' => $practice_id // Pass this to the form
+        ]);
     }
+    
 
     /**
      * Store a newly created client in storage.
-     *
-     * @param CreateclientRequest $request
-     *
-     * @return Response
      */
     public function store(CreateclientRequest $request)
     {
@@ -65,10 +64,6 @@ class clientController extends AppBaseController
 
     /**
      * Display the specified client.
-     *
-     * @param int $id
-     *
-     * @return Response
      */
     public function show($id)
     {
@@ -76,7 +71,6 @@ class clientController extends AppBaseController
 
         if (empty($client)) {
             Flash::error('Client not found');
-
             return redirect(route('clients.index'));
         }
 
@@ -85,10 +79,6 @@ class clientController extends AppBaseController
 
     /**
      * Show the form for editing the specified client.
-     *
-     * @param int $id
-     *
-     * @return Response
      */
     public function edit($id)
     {
@@ -96,20 +86,19 @@ class clientController extends AppBaseController
 
         if (empty($client)) {
             Flash::error('Client not found');
-
             return redirect(route('clients.index'));
         }
 
-        return view('clients.edit')->with('client', $client);
+        $practices = Practice::all(); // Fetch practices for the dropdown
+
+        return view('clients.edit')->with([
+            'client' => $client,
+            'practices' => $practices
+        ]);
     }
 
     /**
      * Update the specified client in storage.
-     *
-     * @param int $id
-     * @param UpdateclientRequest $request
-     *
-     * @return Response
      */
     public function update($id, UpdateclientRequest $request)
     {
@@ -117,7 +106,6 @@ class clientController extends AppBaseController
 
         if (empty($client)) {
             Flash::error('Client not found');
-
             return redirect(route('clients.index'));
         }
 
@@ -130,12 +118,6 @@ class clientController extends AppBaseController
 
     /**
      * Remove the specified client from storage.
-     *
-     * @param int $id
-     *
-     * @throws \Exception
-     *
-     * @return Response
      */
     public function destroy($id)
     {
@@ -143,7 +125,6 @@ class clientController extends AppBaseController
 
         if (empty($client)) {
             Flash::error('Client not found');
-
             return redirect(route('clients.index'));
         }
 

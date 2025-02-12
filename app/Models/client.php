@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Class client
+ * Class Client
  * @package App\Models
  * @version February 5, 2025, 10:15 pm UTC
  *
@@ -25,25 +25,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $account_status
  * @property integer $practice_id
  */
-class client extends Model
+class Client extends Model
 {
-    use SoftDeletes;
-
-    use HasFactory;
+    use SoftDeletes, HasFactory;
 
     public $table = 'client';
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-
     protected $dates = ['deleted_at'];
-
     public $timestamps = true;
 
-
-
-    public $fillable = [
+    protected $fillable = [
         'first_name',
         'surname',
         'date_of_birth',
@@ -59,11 +53,6 @@ class client extends Model
         'practice_id'
     ];
 
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'first_name' => 'string',
@@ -81,11 +70,6 @@ class client extends Model
         'practice_id' => 'integer'
     ];
 
-    /**
-     * Validation rules
-     *
-     * @var array
-     */
     public static $rules = [
         'first_name' => 'required|string|max:50',
         'surname' => 'required|string|max:50',
@@ -102,5 +86,19 @@ class client extends Model
         'practice_id' => 'required|integer'
     ];
 
-    
+    /**
+     * Relationship: A client belongs to a practice.
+     */
+    public function practice()
+    {
+        return $this->belongsTo(Practice::class);
+    }
+
+    /**
+     * This function ensures the dropdowns display "First Name Last Name" instead of just IDs.
+     */
+    public function __toString()
+    {
+        return $this->first_name . ' ' . $this->surname;
+    }
 }

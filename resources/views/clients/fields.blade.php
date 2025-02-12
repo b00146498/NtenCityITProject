@@ -19,7 +19,7 @@
 <!-- Gender Field -->
 <div class="form-group col-sm-6">
     {!! Form::label('gender', 'Gender:') !!}
-    {!! Form::text('gender', null, ['class' => 'form-control']) !!}
+    {!! Form::select('gender', ['Male' => 'Male', 'Female' => 'Female'], null, ['class' => 'form-control']) !!}
 </div>
 
 <!-- Email Field -->
@@ -67,13 +67,17 @@
 <!-- Account Status Field -->
 <div class="form-group col-sm-6">
     {!! Form::label('account_status', 'Account Status:') !!}
-    {!! Form::text('account_status', null, ['class' => 'form-control']) !!}
+    {!! Form::select('account_status', ['Active' => 'Active', 'Inactive' => 'Inactive'], null, ['class' => 'form-control']) !!}
 </div>
 
-<!-- Practice Id Field -->
+<!-- Practice Dropdown (Replaces Practice ID) -->
 <div class="form-group col-sm-6">
-    {!! Form::label('practice_id', 'Practice Id:') !!}
-    {!! Form::number('practice_id', null, ['class' => 'form-control']) !!}
+    {!! Form::label('practice_id', 'Practice:') !!}
+    <select name="practice_id" class="form-control">
+        @foreach($practices as $practice)
+            <option value="{{ $practice->id }}">{{ $practice->company_name }}</option>
+        @endforeach
+    </select>
 </div>
 
 <!-- Submit Field -->

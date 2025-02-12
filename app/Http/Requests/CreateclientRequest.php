@@ -24,6 +24,12 @@ class CreateclientRequest extends FormRequest
      */
     public function rules()
     {
-        return client::$rules;
+        $rules = client::$rules;
+    
+        // Ensure practice_id is required and must exist in the practices table
+        $rules['practice_id'] = 'required|exists:practices,id';
+    
+        return $rules;
     }
+    
 }
