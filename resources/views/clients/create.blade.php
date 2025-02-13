@@ -3,11 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-<<<<<<< HEAD
-            Add new Client Profile
-=======
-            Create Client
->>>>>>> 055b33d67dd55b97234065329410eab37669e986
+            Create Client Profile
         </h1>
     </section>
     <div class="content">
@@ -18,11 +14,7 @@
                     {!! Form::open(['route' => 'clients.store']) !!}
 
                         @include('clients.fields')
-
                         
-
-                     
-
                     {!! Form::close() !!}
                 </div>
             </div>

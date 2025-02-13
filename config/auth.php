@@ -1,3 +1,4 @@
+
 <?php
 
 return [
@@ -34,12 +35,13 @@ return [
     | Supported: "session"
     |
     */
-'guards' => [
-    'web' => [
-        'driver' => 'session',
-        'provider' => 'clients',
+
+    'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
-],
 
     /*
     |--------------------------------------------------------------------------
@@ -57,18 +59,18 @@ return [
     | Supported: "database", "eloquent"
     |
     */
-'providers' => [
-    'clients' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\Client::class,
-    ],
-],
+
+    'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ],
 
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
-
+    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -7,11 +7,7 @@
         <h1 class="pull-right">
             <h1 class="pull-right" style="display: flex; justify-content: flex-end;">
                 <a href="{{ route('clients.create') }}" class="btn btn-primary" 
-<<<<<<< HEAD
                     style="background-color: #C96E04; border-color: #C96E04; color: white;">
-=======
-                   style="background-color: #C96E04; border-color: #C96E04; color: white;">
->>>>>>> 055b33d67dd55b97234065329410eab37669e986
                     <i class="glyphicon glyphicon-plus"></i> New Client
                 </a>
             </h1>
