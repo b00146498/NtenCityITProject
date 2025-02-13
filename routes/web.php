@@ -40,6 +40,11 @@ require __DIR__.'/auth.php';
 Route::resource('employees', App\Http\Controllers\employeeController::class); 
 
 Route::resource('clients', App\Http\Controllers\clientController::class); 
+use App\Http\Controllers\ClientController;
+
+Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
+Route::post('/clients/store', [ClientController::class, 'store'])->name('clients.store');
+
 
 Route::resource('practices', App\Http\Controllers\practiceController::class); 
 
