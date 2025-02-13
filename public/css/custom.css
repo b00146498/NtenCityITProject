@@ -1,0 +1,32 @@
+/* Change the background of the table */
+.table {
+    background-color: #FFF7ED !important;
+}
+
+/* Table header styling */
+.table-dark {
+    background-color: #C96E04 !important; 
+    color: white !important;
+}
+
+/* Table row hover effect */
+.table-hover tbody tr:hover {
+    background-color: #FFD8A8 !important; 
+}
+
+/* Custom button styling */
+.btn-warning {
+    background-color: #FFB347 !important; 
+    border-color: #FFA500 !important;
+    color: black !important;
+}
+
+.btn-danger {
+    background-color: #D9534F !important; 
+    border-color: #C82333 !important;
+}
+
+/* Add soft shadow to table */
+.shadow-lg {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}

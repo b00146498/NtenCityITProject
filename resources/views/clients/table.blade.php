@@ -1,5 +1,5 @@
-<table class="table table-responsive" id="clients-table">
-    <thead>
+<table class="table table-striped table-hover table-bordered shadow-lg">
+    <thead class="table-light">
         <th>First Name</th>
         <th>Surname</th>
         <th>Email</th>
