@@ -2,15 +2,8 @@
     <thead>
         <th>First Name</th>
         <th>Surname</th>
-        <th>Date Of Birth</th>
-        <th>Gender</th>
         <th>Email</th>
         <th>Contact Number</th>
-        <th>Street</th>
-        <th>City</th>
-        <th>County</th>
-        <th>Username</th>
-        <th>Password</th>
         <th>Account Status</th>
         <th>Practice Id</th>
         <th colspan="3">Action</th>
@@ -20,15 +13,8 @@
         <tr>
             <td>{!! $client->first_name !!}</td>
             <td>{!! $client->surname !!}</td>
-            <td>{!! $client->date_of_birth !!}</td>
-            <td>{!! $client->gender !!}</td>
             <td>{!! $client->email !!}</td>
             <td>{!! $client->contact_number !!}</td>
-            <td>{!! $client->street !!}</td>
-            <td>{!! $client->city !!}</td>
-            <td>{!! $client->county !!}</td>
-            <td>{!! $client->username !!}</td>
-            <td>{!! $client->password !!}</td>
             <td>{!! $client->account_status !!}</td>
             <td>{!! $client->practice_id !!}</td>
             <td>

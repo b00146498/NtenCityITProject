@@ -1,23 +1,25 @@
-<ul class="nav navbar-nav pull-right">
+<ul class="nav flex-column">
     @if(Auth::guest())
-        <li>
-            <a href="{{ route('register') }}">Register</a>
-            <span class="glyphicon glyphicon-pencil"></span>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->is('register') ? 'active' : '' }}" href="{{ route('register') }}">
+                <i class="fas fa-user-plus"></i> Register
+            </a>
         </li>
-        <li>
-            <a href="{{ route('login') }}">Login</a>
-            <span class="glyphicon glyphicon-log-in"></span>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->is('login') ? 'active' : '' }}" href="{{ route('login') }}">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
         </li>
     @else
-        <li>
+        <li class="nav-item">
             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf
             </form>
-            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                Logout <span class="glyphicon glyphicon-log-out"></span>
+            <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </li>
-
     @endif
 </ul>
+
 

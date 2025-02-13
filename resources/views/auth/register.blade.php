@@ -25,6 +25,22 @@
                 margin-bottom: 20px;
             }
 
+            .title {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                color: #333;
+                text-align: center;
+            }
+
+            .form-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #333;
+                text-align: left;
+            }
+
             input[type=text], input[type=email], input[type=password] {
                 width: 100%;
                 padding: 12px;
@@ -78,6 +94,7 @@
         <form method="POST" action="{{ route('register') }}">
             @csrf
 
+            <div class="form-title">Sign Up</div>
             <div>
                 <x-input id="name" class="block w-full" type="text" name="name" :value="old('name')" required autofocus placeholder="Name" />
             </div>

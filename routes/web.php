@@ -23,17 +23,16 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-Route::post('/logout', function (Request $request) {
-    Auth::logout();
-    $request->session()->invalidate(); // Invalidate session
-    $request->session()->regenerateToken(); // Prevent CSRF issues
-    return redirect('/login'); // Redirect to login page
-})->name('logout');
-
 Route::get('/login', function () {
-    return view('auth.login'); // Ensure this file exists: resources/views/auth/login.blade.php
+    return view('auth.login'); 
 })->name('login');
 
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate(); 
+    $request->session()->regenerateToken(); 
+    return redirect()->route('login'); 
+})->name('logout');
 
 
 require __DIR__.'/auth.php';

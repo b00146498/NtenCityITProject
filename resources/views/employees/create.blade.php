@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            employee
+            Add new Employee Profile
         </h1>
     </section>
     <div class="content">
