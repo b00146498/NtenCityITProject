@@ -49,4 +49,10 @@ Route::post('/clients/store', [ClientController::class, 'store'])->name('clients
 Route::resource('practices', App\Http\Controllers\practiceController::class); 
 
 
+use App\Http\Controllers\CalendarController;
+
+Route::get('/calendar/display', [CalendarController::class, 'display'])->name('calendar.display');
+
+
+
 
