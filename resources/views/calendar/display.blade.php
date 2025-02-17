@@ -1,41 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
+    <div id="calendar"></div>
 
-<link href="{{ asset('core/main.css')}}" rel='stylesheet' />
-<link href="{{ asset('daygrid/main.css')}}" rel='stylesheet' />
-<link href="{{ asset('timegrid/main.css')}}" rel='stylesheet' />
-<link href="{{ asset('list/main.css')}}" rel='stylesheet' />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
 
-<script src="{{ asset('core/main.js')}}"></script>
-<script src="{{ asset('interaction/main.js')}}"></script>
-<script src="{{ asset('daygrid/main.js')}}"></script>
-<script src="{{ asset('timegrid/main.js')}}"></script>
-<script src="{{ asset('list/main.js')}}"></script>
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: [ dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin ],
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                events: [
+                    { title: 'Event 1', start: '2025-02-18' },
+                    { title: 'Event 2', start: '2025-02-20', end: '2025-02-22' }
+                ]
+            });
 
-<div id="calendar"></div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            plugins: ['dayGrid', 'timeGrid', 'list', 'interaction'],
-            header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-            },
-            slotDuration: '00:10:00',
-            defaultDate: '{{ now()->toDateString() }}', // Uses Laravel to get today's date
-            editable: true,
-            eventLimit: true,
-            events: [
-                { title: 'Sample Event', start: '{{ now()->toDateString() }}' }
-            ]
+            calendar.render();
         });
-        calendar.render();
-    });
-</script>
-
+    </script>
 @endsection
- 
