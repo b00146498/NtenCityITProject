@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Controllers\DiaryEntryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,13 +46,21 @@ use App\Http\Controllers\ClientController;
 Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
 Route::post('/clients/store', [ClientController::class, 'store'])->name('clients.store');
 
-
 Route::resource('practices', App\Http\Controllers\practiceController::class); 
-
 
 use App\Http\Controllers\CalendarController;
 
 Route::get('/calendar/display', [CalendarController::class, 'display'])->name('calendar.display');
+
+Route::middleware('auth')->group(function () {
+    Route::get('clients/{client_id}/diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
+    Route::get('clients/{client_id}/diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
+    Route::post('diary-entries', [DiaryEntryController::class, 'store'])->name('diary-entries.store');
+    Route::get('diary-entries/{id}', [DiaryEntryController::class, 'show'])->name('diary-entries.show');
+    Route::get('diary-entries/{id}/edit', [DiaryEntryController::class, 'edit'])->name('diary-entries.edit');
+    Route::put('diary-entries/{id}', [DiaryEntryController::class, 'update'])->name('diary-entries.update');
+    Route::delete('diary-entries/{id}', [DiaryEntryController::class, 'destroy'])->name('diary-entries.destroy');
+});
 
 
 

@@ -14,7 +14,9 @@ class AddDeletedAtToPracticeTable extends Migration
     public function up()
     {
         Schema::table('practice', function (Blueprint $table) {
-            $table->softDeletes(); // Adds 'deleted_at' column for soft deletes
+            if (!Schema::hasColumn('practice', 'deleted_at')) { // ✅ Check if column exists
+                $table->softDeletes(); // Adds 'deleted_at' column for soft deletes
+            }
         });
     }
 
@@ -26,7 +28,10 @@ class AddDeletedAtToPracticeTable extends Migration
     public function down()
     {
         Schema::table('practice', function (Blueprint $table) {
-            $table->dropColumn('deleted_at'); // Removes 'deleted_at' column on rollback
+            if (Schema::hasColumn('practice', 'deleted_at')) { // ✅ Only drop if it exists
+                $table->dropColumn('deleted_at');
+            }
         });
     }
 }
+

@@ -101,4 +101,9 @@ class Client extends Model
     {
         return $this->first_name . ' ' . $this->surname;
     }
+    public function diaryEntries()
+    {
+        return $this->hasMany(DiaryEntry::class, 'client_id');
+    }
+
 }

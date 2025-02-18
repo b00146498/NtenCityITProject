@@ -116,5 +116,9 @@ class employee extends Model
         'practice_id' => 'required|integer'
     ];
 
-    
+    public function diaryEntries()
+    {
+        return $this->hasMany(DiaryEntry::class, 'employee_id');
+    }
+
 }

@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <h1 class="pull-left">Client Profiles</h1>
+        <h1 class="pull-left" style="font-weight: bold;">Client Profiles</h1>
         <h1 class="pull-right">
             <h1 class="pull-right" style="display: flex; justify-content: flex-end;">
                 <a href="{{ route('clients.create') }}" class="btn btn-primary" 
