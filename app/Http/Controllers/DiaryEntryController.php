@@ -12,30 +12,41 @@ class DiaryEntryController extends Controller
     /**
      * Display a listing of the diary entries for a client.
      */
-    public function index($client_id)
+    public function index($client_id = null)
     {
-        // Ensure the client exists
-        $client = Client::findOrFail($client_id);
-
-        // Fetch all diary entries for this client
-        $diaryEntries = $client->diaryEntries()->latest()->get();
+        if ($client_id) {
+            // If client_id is provided, fetch that client's diary entries
+            $client = Client::findOrFail($client_id);
+            $diaryEntries = $client->diaryEntries()->latest()->get();
+        } else {
+            // If no client_id, fetch all diary entries
+            $diaryEntries = DiaryEntry::latest()->get();
+            $client = null; // No specific client selected
+        }
 
         return view('diary_entries.index', compact('client', 'diaryEntries'));
     }
 
+
     /**
      * Show the form for creating a new diary entry.
      */
-    public function create($client_id)
+    public function create()
     {
-        $client = Client::findOrFail($client_id);
+       
+        $clients = Client::all();
 
-        return view('diary_entries.create', compact('client'));
+       
+        return view('diary_entries.create')->with('clients', $clients);
     }
 
+
+    
     /**
      * Store a newly created diary entry in storage.
      */
+
+
     public function store(Request $request)
     {
         $request->validate([

@@ -53,14 +53,40 @@ use App\Http\Controllers\CalendarController;
 Route::get('/calendar/display', [CalendarController::class, 'display'])->name('calendar.display');
 
 Route::middleware('auth')->group(function () {
-    Route::get('clients/{client_id}/diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
+    Route::get('diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
+    // ✅ View all diary entries
+    Route::get('diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
+
+    // ✅ View diary entries for a specific client
+    Route::get('clients/{client_id}/diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.client');
+
+    // ✅ Create a diary entry for a specific client
     Route::get('clients/{client_id}/diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
+
+    // ✅ Store a new diary entry
     Route::post('diary-entries', [DiaryEntryController::class, 'store'])->name('diary-entries.store');
+
+    // ✅ View a single diary entry
     Route::get('diary-entries/{id}', [DiaryEntryController::class, 'show'])->name('diary-entries.show');
+
+    // ✅ Edit a diary entry
     Route::get('diary-entries/{id}/edit', [DiaryEntryController::class, 'edit'])->name('diary-entries.edit');
+
+    // ✅ Update a diary entry
     Route::put('diary-entries/{id}', [DiaryEntryController::class, 'update'])->name('diary-entries.update');
+
+    // ✅ Delete a diary entry
     Route::delete('diary-entries/{id}', [DiaryEntryController::class, 'destroy'])->name('diary-entries.destroy');
+
+    
+
 });
+
+
+
+
+
+
 
 
 
