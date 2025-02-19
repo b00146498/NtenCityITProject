@@ -31,14 +31,19 @@ class DiaryEntryController extends Controller
     /**
      * Show the form for creating a new diary entry.
      */
-    public function create()
+    public function create($client_id = null)
     {
-       
-        $clients = Client::all();
-
-       
-        return view('diary_entries.create')->with('clients', $clients);
+        if ($client_id) {
+            // ✅ Fetch the specific client for a pre-selected form
+            $client = Client::findOrFail($client_id);
+            return view('diary_entries.create', compact('client'));
+        } else {
+            // ✅ Fetch all clients for a dropdown selection
+            $clients = Client::all();
+            return view('diary_entries.create', compact('clients'));
+        }
     }
+
 
 
     
