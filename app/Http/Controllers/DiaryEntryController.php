@@ -52,8 +52,8 @@ class DiaryEntryController extends Controller
 
     public function store(Request $request)
     {
-        echo Auth::id();
-        /*$diaryEntry = DiaryEntry::create([
+        //echo Auth::id();
+        $diaryEntry = DiaryEntry::create([
             'employee_id' => Auth::id(),
             'client_id' => $request->client_id,
             'entry_date' => now(),
@@ -62,7 +62,7 @@ class DiaryEntryController extends Controller
         $diaryEntry->save();
         //Log::info('Diary Entry Created:', $diaryEntry->toArray());
      
-        return redirect()->route('diary-entries.index')->with('success', 'Diary entry added.');*/
+        return redirect()->route('diary-entries.index')->with('success', 'Diary entry added.');
     }
      
     /**
