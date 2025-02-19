@@ -12,6 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
@@ -97,10 +98,14 @@
                 <i class="fas fa-calendar-alt"></i> Appointments
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->is('clients') ? 'active' : '' }}" href="{{ url('/clients') }}">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="clientsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-users"></i> Clients
             </a>
+            <ul class="dropdown-menu" aria-labelledby="clientsDropdown">
+                <li><a class="dropdown-item" href="{{ route('clients.index') }}">View Clients</a></li>
+                <li><a class="dropdown-item" href="{{ route('diary-entries.index') }}">Diary Entries</a></li>
+            </ul>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request()->is('employees') ? 'active' : '' }}" href="{{ url('/employees') }}">

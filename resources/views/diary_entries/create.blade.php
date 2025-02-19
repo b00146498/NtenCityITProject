@@ -37,7 +37,7 @@
 
         <!-- Yellow Lined Textbox -->
         <div class="diary-box mt-3 p-4">
-            <textarea name="content" class="lined-textarea" rows="12" placeholder="Write your entry here..." required></textarea>
+            <textarea name="content" class="lined-textarea" rows="12" required></textarea>
         </div>
 
         <!-- Centered Submit Button -->
@@ -96,6 +96,11 @@
 
     .save-btn:hover {
         background-color: #d4b066;
+    }
+   
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: bold !important;
+        font-size: 2rem !important; /* Adjust size */
     }
 </style>
 @endsection

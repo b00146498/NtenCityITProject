@@ -9,7 +9,6 @@
                 style="background-color: #C96E04; border-color: #C96E04; color: white;">
                 <i class="glyphicon glyphicon-plus"></i> New Employee
             </a>
-
         </h1>
     </section>
     <div class="content">
@@ -24,6 +23,13 @@
             </div>
         </div>
     </div>
+    <style>
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: bold !important;
+        font-size: 3rem !important; /* Adjust size */
+    }
+    </style>
+
 @endsection
 
 
