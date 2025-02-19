@@ -93,11 +93,13 @@
                 <i class="fas fa-home"></i> Home
             </a>
         </li>
+        @auth
         <li class="nav-item">
-            <a class="nav-link {{ request()->is('appointments') ? 'active' : '' }}" href="{{ url('/appointments') }}">
-                <i class="fas fa-calendar-alt"></i> Appointments
+            <a class="nav-link {{ request()->is('calendar/display') ? 'active' : '' }}" href="{{ url('/appointments') }}">
+                <i class="fas fa-calendar-alt"></i> Appointments 
             </a>
         </li>
+        @endauth 
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="clientsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-users"></i> Clients
