@@ -53,6 +53,7 @@ use App\Http\Controllers\CalendarController;
 Route::get('/calendar/display', [CalendarController::class, 'display'])->name('calendar.display');
 
 Route::middleware('auth')->group(function () {
+    
     Route::get('diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
     // ✅ View all diary entries
     Route::get('diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');

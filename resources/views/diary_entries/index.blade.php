@@ -17,7 +17,7 @@
             @foreach ($diaryEntries as $entry)
                 <tr>
                     <td>{{ $entry->id }}</td>
-                    <td>{{ $entry->client->name }}</td>
+                    <td>{{ $entry->client->first_name }}</td>
                     <td>{{ $entry->entry_date }}</td>
                     <td>
                         <a href="{{ route('diary-entries.show', $entry->id) }}" class="btn btn-primary">View</a>

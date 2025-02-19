@@ -20,7 +20,7 @@
         <!-- Client Selection -->
         @if(isset($client))
             <!-- Pre-selected Client -->
-            <h4 class="mt-2 text-muted">{{ $client->name }}</h4>
+            <h4 class="mt-2 text-muted">{{ $client->first_name }}</h4>
             <input type="hidden" name="client_id" value="{{ $client->id }}">
         @else
             <!-- Dropdown for Client Selection -->

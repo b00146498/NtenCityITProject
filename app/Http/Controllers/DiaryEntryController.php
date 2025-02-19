@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DiaryEntry;
 use App\Models\Client;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DiaryEntryController extends Controller
 {
@@ -34,42 +36,35 @@ class DiaryEntryController extends Controller
     public function create($client_id = null)
     {
         if ($client_id) {
-            // ✅ Fetch the specific client for a pre-selected form
+            //  Fetch the specific client for a pre-selected form
             $client = Client::findOrFail($client_id);
             return view('diary_entries.create', compact('client'));
         } else {
-            // ✅ Fetch all clients for a dropdown selection
+            //  Fetch all clients for a dropdown selection
             $clients = Client::all();
             return view('diary_entries.create', compact('clients'));
         }
     }
-
-
-
     
     /**
      * Store a newly created diary entry in storage.
      */
 
-
     public function store(Request $request)
     {
-        $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'content' => 'required|string',
-        ]);
-
-        DiaryEntry::create([
-            'employee_id' => Auth::id(), // Corrected: Use Auth::id() instead of Auth::user()->id
+        echo Auth::id();
+        /*$diaryEntry = DiaryEntry::create([
+            'employee_id' => Auth::id(),
             'client_id' => $request->client_id,
             'entry_date' => now(),
             'content' => $request->content,
         ]);
-
-        // Redirect to diary entries list instead of clients.show
-        return redirect()->route('diary-entries.index', $request->client_id)->with('success', 'Diary entry added.');
+        $diaryEntry->save();
+        //Log::info('Diary Entry Created:', $diaryEntry->toArray());
+     
+        return redirect()->route('diary-entries.index')->with('success', 'Diary entry added.');*/
     }
-
+     
     /**
      * Display the specified diary entry.
      */
