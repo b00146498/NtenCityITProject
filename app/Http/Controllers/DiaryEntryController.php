@@ -40,10 +40,6 @@ class DiaryEntryController extends Controller
         return view('diary_entries.index', compact('client', 'diaryEntries'));
     }
 
-
-    
-
-
     /**
      * Show the form for creating a new diary entry.
      */
@@ -125,7 +121,7 @@ class DiaryEntryController extends Controller
             'content' => $request->content,
         ]);
 
-        return redirect()->route('diary-entries.index', $diaryEntry->client_id)->with('success', 'Diary entry updated.');
+        return redirect()->route('diary-entries.index')->with('success', 'Updated Successfully!');
     }
 
     /**

@@ -2,24 +2,57 @@
 
 @section('content')
 <div class="container">
-    <h2>Client Progress Notes - {{ $diaryEntry->entry_date }}</h2>
+    <h2 class="fw-bold">View Client Progress Notes</h2><br>
 
+    <!-- Display Employee and Client -->
     <p><strong>Employee:</strong> {{ $diaryEntry->employee->emp_first_name }} {{ $diaryEntry->employee->emp_surname }}</p>
-    <p><strong>Client:</strong> {{ $diaryEntry->client->emp_first_name }} {{ $diaryEntry->client->emp_surname }}</p>
-    
-    <div class="card p-3">
-        <p>{{ $diaryEntry->content }}</p>
-    </div>
+    <p><strong>Client:</strong> {{ $diaryEntry->client->first_name }} {{ $diaryEntry->client->surname }}</p><br>
 
-    <a href="{{ route('diary-entries.index', $diaryEntry->client->id) }}" class="btn btn-secondary mt-3">Back to Entries</a>
+    <form action="{{ route('diary-entries.update', $diaryEntry->id) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @if ($diaryEntry->employee_id === Auth::user()->id)
-        <a href="{{ route('diary-entries.edit', $diaryEntry->id) }}" class="btn btn-warning">Edit</a>
-        <form action="{{ route('diary-entries.destroy', $diaryEntry->id) }}" method="POST" class="d-inline">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-    @endif
+        <div class="form-group">
+            <textarea name="content" class="form-control" rows="5" required>{{ $diaryEntry->content }}</textarea>
+        </div>
+
+        <!-- Centered Buttons -->
+        <div class="d-flex justify-content-start mt-3">
+            <a href="{{ route('diary-entries.index', $diaryEntry->client->id) }}" class="btn btn-primary me-3">
+                <i class="fas fa-arrow-left"></i> Back to Entries
+            </a>
+        </div>
+    </form>
 </div>
+
+<style>
+    /* Heading Styles */
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: bold !important;
+        font-size: 2rem !important; /* Adjust size */
+    }
+
+    /* Common Button Styles  */
+    .btn-primary {
+        background-color: #C96E04 !important; /* Orange */
+        color: white !important;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    /* Hover Effect */
+    .btn-primary:hover {
+        background-color: #A85C03 !important; /* Darker Orange */
+    }
+
+    /* Styled Textarea */
+    .form-control {
+        background-color: #FFF7ED !important; /* Soft Beige */
+    }
+</style>
 @endsection

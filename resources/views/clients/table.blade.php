@@ -5,7 +5,6 @@
         <th>Email</th>
         <th>Contact Number</th>
         <th>Account Status</th>
-        <th>Practice Id</th>
         <th colspan="3">Action</th>
     </thead>
     <tbody>
@@ -16,7 +15,6 @@
             <td>{!! $client->email !!}</td>
             <td>{!! $client->contact_number !!}</td>
             <td>{!! $client->account_status !!}</td>
-            <td>{!! $client->practice_id !!}</td>
             <td>
                 {!! Form::open(['route' => ['clients.destroy', $client->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>
