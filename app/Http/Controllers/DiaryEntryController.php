@@ -14,20 +14,34 @@ class DiaryEntryController extends Controller
     /**
      * Display a listing of the diary entries for a client.
      */
-    public function index($client_id = null)
+    public function index(Request $request, $client_id = null)
     {
         if ($client_id) {
-            // If client_id is provided, fetch that client's diary entries
+            // If client_id is provided, fetch that specific client's diary entries
             $client = Client::findOrFail($client_id);
-            $diaryEntries = $client->diaryEntries()->latest()->get();
+            $query = $client->diaryEntries()->latest();
         } else {
             // If no client_id, fetch all diary entries
-            $diaryEntries = DiaryEntry::latest()->get();
+            $query = DiaryEntry::latest();
             $client = null; // No specific client selected
         }
 
+        // Handle search filtering
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->whereHas('client', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%$search%")
+                ->orWhere('surname', 'like', "%$search%");
+            });
+        }
+
+        $diaryEntries = $query->get();
+
         return view('diary_entries.index', compact('client', 'diaryEntries'));
     }
+
+
+    
 
 
     /**

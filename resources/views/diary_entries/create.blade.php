@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <!-- Title Section -->
     <div class="d-flex align-items-center justify-content-between">
-        <h1 class="fw-bold">Diary Entry</h1>
+        <h1 class="fw-bold">Client Progress Notes</h1>
 
         <!-- Date Box -->
         <div class="date-box p-3 d-flex align-items-center shadow-sm">

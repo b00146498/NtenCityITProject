@@ -75,6 +75,36 @@
             margin-top: 60px;
             padding: 20px;
         }
+        /* Custom Styling for Dropdown */
+        .custom-dropdown {
+            background-color: #D4AF37; /* Solid Gold */
+            border-radius: 8px; /* Rounded corners */
+            border: 1px solid #B8860B; /* Deeper gold border */
+            padding: 5px 0; /* Inner spacing */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Soft shadow */
+        }
+
+        /* Styling for Dropdown Items */
+        .custom-dropdown-item {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333; /* Dark gray text */
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Hover Effect */
+        .custom-dropdown-item:hover {
+            background-color: #B8860B; /* Rich, solid gold */
+            color: white;
+            border-radius: 6px;
+        }
+
+        /* Active Effect */
+        .custom-dropdown-item:active {
+            background-color: #8B6508; /* Even deeper gold for click */
+        }
+
     </style>
 </head>
 
@@ -102,9 +132,9 @@
             <a class="nav-link dropdown-toggle" href="#" id="clientsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-users"></i> Clients
             </a>
-            <ul class="dropdown-menu" aria-labelledby="clientsDropdown">
-                <li><a class="dropdown-item" href="{{ route('clients.index') }}">View Clients</a></li>
-                <li><a class="dropdown-item" href="{{ route('diary-entries.index') }}">Diary Entries</a></li>
+            <ul class="dropdown-menu custom-dropdown" aria-labelledby="clientsDropdown">
+                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('clients.index') }}">View Client Profiles</a></li>
+                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('diary-entries.index') }}">Client Progress Notes</a></li>
             </ul>
         </li>
         <li class="nav-item">

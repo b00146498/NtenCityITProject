@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2>Edit Diary Entry</h2>
+    <h2>Edit Client Progress Notes</h2>
 
     <form action="{{ route('diary-entries.update', $diaryEntry->id) }}" method="POST">
         @csrf

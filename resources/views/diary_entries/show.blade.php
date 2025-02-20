@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2>Diary Entry - {{ $diaryEntry->entry_date }}</h2>
+    <h2>Client Progress Notes - {{ $diaryEntry->entry_date }}</h2>
 
     <p><strong>Employee:</strong> {{ $diaryEntry->employee->emp_first_name }} {{ $diaryEntry->employee->emp_surname }}</p>
     <p><strong>Client:</strong> {{ $diaryEntry->client->emp_first_name }} {{ $diaryEntry->client->emp_surname }}</p>
