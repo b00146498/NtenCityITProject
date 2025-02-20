@@ -4,15 +4,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\DiaryEntryController;
+use App\Http\Controllers\CalendarController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| Here is where you can register web routes for your application.
 |
 */
 
@@ -35,60 +34,29 @@ Route::post('/logout', function (Request $request) {
     return redirect()->route('login'); 
 })->name('logout');
 
-
 require __DIR__.'/auth.php';
 
-Route::resource('employees', App\Http\Controllers\employeeController::class); 
+Route::resource('employees', App\Http\Controllers\employeeController::class);
+Route::resource('clients', App\Http\Controllers\clientController::class);
+Route::resource('practices', App\Http\Controllers\practiceController::class);
 
-Route::resource('clients', App\Http\Controllers\clientController::class); 
-use App\Http\Controllers\ClientController;
+// ✅ Restrict Calendar Access to Authenticated Users
+Route::middleware(['auth'])->group(function () {
+    Route::get('/appointments', [CalendarController::class, 'display'])->name('appointments');
 
-Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
-Route::post('/clients/store', [ClientController::class, 'store'])->name('clients.store');
-
-Route::resource('practices', App\Http\Controllers\practiceController::class); 
-
-use App\Http\Controllers\CalendarController;
-
-Route::get('/calendar/display', [CalendarController::class, 'display'])->name('calendar.display');
-
-Route::middleware('auth')->group(function () {
-    
+    // Diary Entries (Restricted to Authenticated Users)
     Route::get('diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
-    // ✅ View all diary entries
     Route::get('diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
-
-    // ✅ View diary entries for a specific client
     Route::get('clients/{client_id}/diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.client');
-
-    // ✅ Create a diary entry for a specific client
     Route::get('clients/{client_id}/diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
-
-    // ✅ Store a new diary entry
     Route::post('diary-entries', [DiaryEntryController::class, 'store'])->name('diary-entries.store');
-
-    // ✅ View a single diary entry
     Route::get('diary-entries/{id}', [DiaryEntryController::class, 'show'])->name('diary-entries.show');
-
-    // ✅ Edit a diary entry
     Route::get('diary-entries/{id}/edit', [DiaryEntryController::class, 'edit'])->name('diary-entries.edit');
-
-    // ✅ Update a diary entry
     Route::put('diary-entries/{id}', [DiaryEntryController::class, 'update'])->name('diary-entries.update');
-
-    // ✅ Delete a diary entry
     Route::delete('diary-entries/{id}', [DiaryEntryController::class, 'destroy'])->name('diary-entries.destroy');
-
-    
-
 });
 
 
-
-
-
-
-
-
-
-
+Route::get('/calendar/display', 'App\Http\Controllers\CalendarController@display')
+    ->name('calendar.display')
+    ->middleware('auth'); // Restricts access to logged-in users
