@@ -5,12 +5,12 @@
     <h2>Client Progress Notes <i class="fa fa-paperclip"></i></h2>
     <br>
     <!-- Search Bar (Place it here, above the table) -->
-    <form method="GET" action="{{ route('diary-entries.index') }}" class="d-flex" style="max-width: 300px;">
+    <form method="GET" action="{{ route('diary-entries.index') }}" class="d-flex" style="max-width: 500px;">
         <div class="input-group">
             <input type="text" name="search" class="form-control" placeholder="Search by client name..." value="{{ request('search') }}">
             <button type="submit" class="btn search-btn">
                 <i class="fa fa-search"></i> <!-- Search Icon -->
-            </button>
+            </button><a href="{{ route('diary-entries.create') }}" class="btn btn-add-entry"><i class="fa fa-plus"></i> Add New Note</a>
         </div>
     </form>
     <br>
@@ -74,6 +74,20 @@
     /* Search Input Border (Optional) */
     .form-control {
         border: 1px solid #C96E04 !important;
+    }
+    .btn-add-entry {
+        background-color: #C96E04 !important; /* Orange Button */
+        border-color: #C96E04 !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .btn-add-entry:hover {
+        background-color: #A85C03 !important; /* Darker shade */
+        border-color: #A85C03 !important;
     }
 </style>
 

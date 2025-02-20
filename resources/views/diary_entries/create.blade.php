@@ -24,12 +24,11 @@
             <input type="hidden" name="client_id" value="{{ $client->id }}">
         @else
             <!-- Dropdown for Client Selection -->
-            <div class="form-group">
-                <label for="client_id">Select Client</label>
+            <div class="form-group" style="max-width: 300px;">
                 <select name="client_id" class="form-control" required>
-                    <option value="">-- Choose a Client --</option>
+                    <option value="">Choose a Client...</option>
                     @foreach($clients as $client)
-                        <option value="{{ $client->id }}">{{ $client->first_name }} {{ $client->surname}}</option>
+                        <option value="{{ $client->id }}">{{ $client->first_name }} {{ $client->surname }}</option>
                     @endforeach
                 </select>
             </div>
@@ -40,9 +39,17 @@
             <textarea name="content" class="lined-textarea" rows="12" required></textarea>
         </div>
 
-        <!-- Centered Submit Button -->
-        <div class="text-center mt-4">
-            <button type="submit" class="btn save-btn">Save Diary Entry</button>
+        <!-- Centered Buttons -->
+        <div class="text-center mt-4 d-flex justify-content-center">
+            <!-- Back to Entries Button -->
+            <a href="{{ route('diary-entries.index') }}" class="btn back-btn me-3">
+                <i class="fas fa-arrow-left"></i> Back to Entries
+            </a>
+
+            <!-- Save Diary Entry Button -->
+            <button type="submit" class="btn save-btn">
+                Save Diary Entry
+            </button>
         </div>
     </form>
 </div>
@@ -82,22 +89,40 @@
         font-size: 16px;
     }
 
-    /* Centered Button */
-    .save-btn {
-        background-color: #e5c67c;
-        color: black;
+    /* Back Button */
+    .back-btn {
+        background-color: #C96E04; /* Orange */
+        color: white;
         font-weight: bold;
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
         font-size: 18px;
         transition: 0.3s;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background-color: #A85C03; /* Darker orange */
+    }
+
+    /* Save Button */
+    .save-btn {
+        background-color: #C96E04; /* Orange */
+        color: white;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        transition: 0.3s;
+        text-decoration: none;
     }
 
     .save-btn:hover {
-        background-color: #d4b066;
+        background-color: #A85C03;
     }
-   
+
     h1, h2, h3, h4, h5, h6 {
         font-weight: bold !important;
         font-size: 2rem !important; /* Adjust size */

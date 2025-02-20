@@ -48,7 +48,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
     Route::get('diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
     Route::get('clients/{client_id}/diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.client');
-    Route::get('clients/{client_id}/diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
+    Route::get('clients/{client_id}/diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries-create');
     Route::post('diary-entries', [DiaryEntryController::class, 'store'])->name('diary-entries.store');
     Route::get('diary-entries/{id}', [DiaryEntryController::class, 'show'])->name('diary-entries.show');
     Route::get('diary-entries/{id}/edit', [DiaryEntryController::class, 'edit'])->name('diary-entries.edit');
