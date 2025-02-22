@@ -12,7 +12,7 @@ use Response;
 
 class AppointmentController extends AppBaseController
 {
-    /** @var AppointmentRepository $appointmentRepository*/
+    /** @var AppointmentRepository $appointmentRepository */
     private $appointmentRepository;
 
     public function __construct(AppointmentRepository $appointmentRepo)
@@ -29,10 +29,39 @@ class AppointmentController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $appointments = $this->appointmentRepository->all();
+        if ($request->ajax()) {
+            $appointments = $this->appointmentRepository->all()->map(function ($appointment) {
+                return [
+                    'id'    => $appointment->id,
+                    'title' => "Client #{$appointment->client_id} - {$appointment->status}",
+                    'start' => "{$appointment->booking_date}T{$appointment->start_time}",
+                    'end'   => "{$appointment->booking_date}T{$appointment->end_time}",
+                    'color' => $this->getStatusColor($appointment->status),
+                    'notes' => $appointment->notes
+                ];
+            });
 
-        return view('appointments.index')
-            ->with('appointments', $appointments);
+            return response()->json($appointments);
+        }
+
+        // Default view for normal page load
+        $appointments = $this->appointmentRepository->all();
+        return view('appointments.index')->with('appointments', $appointments);
+    }
+
+    /**
+     * Get status color for FullCalendar integration.
+     */
+    private function getStatusColor($status)
+    {
+        return match ($status) {
+            'confirmed'  => 'green',
+            'pending'    => 'yellow',
+            'checked-in' => 'blue',
+            'completed'  => 'gray',
+            'canceled'   => 'red',
+            default      => 'black',
+        };
     }
 
     /**
@@ -58,8 +87,11 @@ class AppointmentController extends AppBaseController
 
         $appointment = $this->appointmentRepository->create($input);
 
-        Flash::success('Appointment saved successfully.');
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Appointment created successfully!', 'appointment' => $appointment]);
+        }
 
+        Flash::success('Appointment saved successfully.');
         return redirect(route('appointments.index'));
     }
 
@@ -76,7 +108,6 @@ class AppointmentController extends AppBaseController
 
         if (empty($appointment)) {
             Flash::error('Appointment not found');
-
             return redirect(route('appointments.index'));
         }
 
@@ -96,7 +127,6 @@ class AppointmentController extends AppBaseController
 
         if (empty($appointment)) {
             Flash::error('Appointment not found');
-
             return redirect(route('appointments.index'));
         }
 
@@ -116,16 +146,12 @@ class AppointmentController extends AppBaseController
         $appointment = $this->appointmentRepository->find($id);
 
         if (empty($appointment)) {
-            Flash::error('Appointment not found');
-
-            return redirect(route('appointments.index'));
+            return response()->json(['error' => 'Appointment not found'], 404);
         }
 
         $appointment = $this->appointmentRepository->update($request->all(), $id);
 
-        Flash::success('Appointment updated successfully.');
-
-        return redirect(route('appointments.index'));
+        return response()->json(['success' => 'Appointment updated successfully!', 'appointment' => $appointment]);
     }
 
     /**
@@ -142,15 +168,11 @@ class AppointmentController extends AppBaseController
         $appointment = $this->appointmentRepository->find($id);
 
         if (empty($appointment)) {
-            Flash::error('Appointment not found');
-
-            return redirect(route('appointments.index'));
+            return response()->json(['error' => 'Appointment not found'], 404);
         }
 
         $this->appointmentRepository->delete($id);
 
-        Flash::success('Appointment deleted successfully.');
-
-        return redirect(route('appointments.index'));
+        return response()->json(['success' => 'Appointment deleted successfully!']);
     }
 }
