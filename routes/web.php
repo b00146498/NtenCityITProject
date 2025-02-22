@@ -60,3 +60,6 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/calendar/display', 'App\Http\Controllers\CalendarController@display')
     ->name('calendar.display')
     ->middleware('auth'); // Restricts access to logged-in users
+
+
+Route::resource('appointments', App\Http\Controllers\AppointmentController::class);
