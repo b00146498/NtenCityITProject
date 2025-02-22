@@ -23,7 +23,7 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Display a listing of the Appointment.
+     * Display a listing of the Appointments.
      * Handles both AJAX requests (JSON) and regular page loads.
      *
      * @param Request $request
@@ -46,14 +46,13 @@ class AppointmentController extends AppBaseController
             return response()->json($appointments);
         }
 
-        // Load the view with appointments
+        // Load the view for regular page loads
         $appointments = $this->appointmentRepository->all();
         return view('appointments.index')->with('appointments', $appointments);
     }
 
     /**
-     * Get status color for FullCalendar integration.
-     * Ensures safe handling of unknown statuses.
+     * Get color for FullCalendar based on status.
      *
      * @param string $status
      * @return string
@@ -71,19 +70,18 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Store a newly created Appointment in storage.
-     * Handles both AJAX and standard requests.
+     * Store a new Appointment in the database.
+     * Supports both AJAX and regular requests.
      *
      * @param Request $request
      * @return JsonResponse|Response
      */
     public function store(Request $request)
     {
-        // Validate incoming request
         $validator = Validator::make($request->all(), [
-            'client_id'   => 'required|exists:clients,id',
-            'employee_id' => 'required|exists:employees,id',
-            'practice_id' => 'required|exists:practices,id',
+            'client_id'    => 'required|exists:client,id',
+            'employee_id'  => 'required|exists:employee,id',
+            'practice_id'  => 'required|exists:practice,id',
             'booking_date' => 'required|date',
             'start_time'   => 'required|date_format:H:i:s',
             'end_time'     => 'required|date_format:H:i:s|after:start_time',
@@ -106,10 +104,10 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Show the form for editing the specified Appointment.
+     * Retrieve and return a single appointment for editing.
      *
      * @param int $id
-     * @return Response|JsonResponse
+     * @return JsonResponse|Response
      */
     public function edit($id)
     {
@@ -124,7 +122,7 @@ class AppointmentController extends AppBaseController
 
     /**
      * Update the specified Appointment in storage.
-     * Supports both AJAX and regular updates.
+     * Supports both AJAX and standard updates.
      *
      * @param int $id
      * @param Request $request
@@ -138,14 +136,29 @@ class AppointmentController extends AppBaseController
             return response()->json(['error' => 'Appointment not found'], 404);
         }
 
+        $validator = Validator::make($request->all(), [
+            'client_id'    => 'required|exists:client,id',
+            'employee_id'  => 'required|exists:employee,id',
+            'practice_id'  => 'required|exists:practice,id',
+            'booking_date' => 'required|date',
+            'start_time'   => 'required|date_format:H:i:s',
+            'end_time'     => 'required|date_format:H:i:s|after:start_time',
+            'status'       => 'nullable|string',
+            'notes'        => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Invalid input', 'messages' => $validator->errors()], 400);
+        }
+
         $appointment = $this->appointmentRepository->update($request->all(), $id);
 
         return response()->json(['success' => 'Appointment updated successfully!', 'appointment' => $appointment]);
     }
 
     /**
-     * Remove the specified Appointment from storage.
-     * Ensures appointment exists before deletion.
+     * Delete an appointment from the database.
+     * Ensures the appointment exists before deletion.
      *
      * @param int $id
      * @return JsonResponse|Response
