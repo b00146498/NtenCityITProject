@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Flash;
 use Response;
+use Carbon\Carbon;
 
 class AppointmentController extends AppBaseController
 {
@@ -23,7 +24,7 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Display a listing of the Appointments.
+     * Display a listing of Appointments.
      * Handles both AJAX requests (JSON) and regular page loads.
      *
      * @param Request $request
@@ -47,8 +48,7 @@ class AppointmentController extends AppBaseController
         }
 
         // Load the view for regular page loads
-        $appointments = $this->appointmentRepository->all();
-        return view('appointments.index')->with('appointments', $appointments);
+        return view('appointments.index');
     }
 
     /**
@@ -79,12 +79,12 @@ class AppointmentController extends AppBaseController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'client_id'    => 'required|exists:client,id',
-            'employee_id'  => 'required|exists:employee,id',
-            'practice_id'  => 'required|exists:practice,id',
+            'client_id'    => 'required|exists:clients,id',
+            'employee_id'  => 'required|exists:employees,id',
+            'practice_id'  => 'required|exists:practices,id',
             'booking_date' => 'required|date',
-            'start_time'   => 'required|date_format:H:i:s',
-            'end_time'     => 'required|date_format:H:i:s|after:start_time',
+            'start_time'   => 'required|date_format:H:i A',
+            'end_time'     => 'required|date_format:H:i A|after:start_time',
             'status'       => 'nullable|string',
             'notes'        => 'nullable|string',
         ]);
@@ -95,34 +95,43 @@ class AppointmentController extends AppBaseController
 
         $appointment = $this->appointmentRepository->create($request->all());
 
-        if ($request->ajax()) {
-            return response()->json(['success' => 'Appointment created successfully!', 'appointment' => $appointment]);
-        }
-
-        Flash::success('Appointment saved successfully.');
-        return redirect(route('appointments.index'));
+        return response()->json([
+            'success' => 'Appointment created successfully!',
+            'appointment' => $appointment
+        ]);
     }
 
     /**
-     * Retrieve and return a single appointment for editing.
+     * Fetch available time slots for a given date.
      *
-     * @param int $id
-     * @return JsonResponse|Response
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function edit($id)
+    public function getAvailableSlots(Request $request)
     {
-        $appointment = $this->appointmentRepository->find($id);
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+        ]);
 
-        if (empty($appointment)) {
-            return response()->json(['error' => 'Appointment not found'], 404);
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Invalid input', 'messages' => $validator->errors()], 400);
         }
 
-        return response()->json(['appointment' => $appointment]);
+        $date = Carbon::parse($request->date);
+        $timeSlots = [
+            "09:00 AM", "10:00 AM", "11:30 AM",
+            "12:00 PM", "02:00 PM", "03:30 PM",
+            "05:00 PM", "07:00 PM", "10:00 PM"
+        ];
+
+        return response()->json([
+            'date' => $date->toDateString(),
+            'timeSlots' => $timeSlots
+        ]);
     }
 
     /**
      * Update the specified Appointment in storage.
-     * Supports both AJAX and standard updates.
      *
      * @param int $id
      * @param Request $request
@@ -137,12 +146,12 @@ class AppointmentController extends AppBaseController
         }
 
         $validator = Validator::make($request->all(), [
-            'client_id'    => 'required|exists:client,id',
-            'employee_id'  => 'required|exists:employee,id',
-            'practice_id'  => 'required|exists:practice,id',
+            'client_id'    => 'required|exists:clients,id',
+            'employee_id'  => 'required|exists:employees,id',
+            'practice_id'  => 'required|exists:practices,id',
             'booking_date' => 'required|date',
-            'start_time'   => 'required|date_format:H:i:s',
-            'end_time'     => 'required|date_format:H:i:s|after:start_time',
+            'start_time'   => 'required|date_format:H:i A',
+            'end_time'     => 'required|date_format:H:i A|after:start_time',
             'status'       => 'nullable|string',
             'notes'        => 'nullable|string',
         ]);
@@ -153,12 +162,14 @@ class AppointmentController extends AppBaseController
 
         $appointment = $this->appointmentRepository->update($request->all(), $id);
 
-        return response()->json(['success' => 'Appointment updated successfully!', 'appointment' => $appointment]);
+        return response()->json([
+            'success' => 'Appointment updated successfully!',
+            'appointment' => $appointment
+        ]);
     }
 
     /**
      * Delete an appointment from the database.
-     * Ensures the appointment exists before deletion.
      *
      * @param int $id
      * @return JsonResponse|Response
