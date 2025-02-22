@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,6 +13,14 @@
 
     <!-- FullCalendar JS (After jQuery) -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+    <!-- Laravel Routes (Pass safely) -->
+    <script>
+        var appointmentsUrl = @json(route('appointments.index'));
+        var storeAppointmentUrl = @json(route('appointments.store'));
+        var deleteAppointmentUrl = @json(route('appointments.destroy', ':id'));
+        var csrfToken = @json(csrf_token());
+    </script>
 </head>
 <body>
 
@@ -27,14 +35,6 @@
                 console.error("❌ Calendar element not found!");
                 return;
             }
-
-            // Laravel Route URLs (Pass them from Blade)
-            var appointmentsUrl = "{{ route('appointments.index') }}";
-            var storeAppointmentUrl = "{{ route('appointments.store') }}";
-            var deleteAppointmentUrl = "{{ route('appointments.destroy', '') }}";
-
-            // CSRF Token (Required for Laravel POST/DELETE)
-            var csrfToken = "{{ csrf_token() }}";
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
@@ -53,6 +53,8 @@
                 },
                 editable: true,
                 selectable: true,
+
+                // ✅ Create an appointment when selecting a date
                 select: function(info) {
                     let client_id = prompt("Enter Client ID:");
                     let employee_id = prompt("Enter Employee ID:");
@@ -62,7 +64,7 @@
                         $.ajax({
                             url: storeAppointmentUrl,
                             type: "POST",
-                            data: JSON.stringify({
+                            data: {
                                 _token: csrfToken,
                                 client_id: client_id,
                                 employee_id: employee_id,
@@ -71,8 +73,7 @@
                                 start_time: "09:00:00",
                                 end_time: "10:00:00",
                                 status: "pending"
-                            }),
-                            contentType: "application/json",
+                            },
                             success: function(response) {
                                 if (response.success) {
                                     alert("✅ Appointment saved successfully!");
@@ -87,13 +88,16 @@
                         });
                     }
                 },
+
+                // ✅ Delete appointment on click
                 eventClick: function(info) {
                     if (confirm("Are you sure you want to delete this appointment?")) {
+                        let deleteUrl = deleteAppointmentUrl.replace(':id', info.event.id);
+
                         $.ajax({
-                            url: deleteAppointmentUrl.replace('', info.event.id),
+                            url: deleteUrl,
                             type: "DELETE",
-                            data: JSON.stringify({ _token: csrfToken }),
-                            contentType: "application/json",
+                            data: { _token: csrfToken },
                             success: function(response) {
                                 if (response.success) {
                                     alert("✅ Appointment deleted successfully!");

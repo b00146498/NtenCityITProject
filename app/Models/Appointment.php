@@ -5,11 +5,11 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 /**
  * Class Appointment
  * @package App\Models
- * @version February 22, 2025, 7:13 am UTC
  *
  * @property \App\Models\Client $client
  * @property \App\Models\Employee $employee
@@ -32,7 +32,7 @@ class Appointment extends Model
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'booking_date'];
 
     protected $fillable = [
         'client_id',
@@ -47,8 +47,6 @@ class Appointment extends Model
 
     /**
      * Attribute casting
-     *
-     * @var array
      */
     protected $casts = [
         'id'          => 'integer',
@@ -56,7 +54,7 @@ class Appointment extends Model
         'employee_id' => 'integer',
         'practice_id' => 'integer',
         'booking_date'=> 'date',
-        'start_time'  => 'string', // Time should be handled in Carbon for formatting
+        'start_time'  => 'string',
         'end_time'    => 'string',
         'status'      => 'string',
         'notes'       => 'string',
@@ -64,16 +62,14 @@ class Appointment extends Model
 
     /**
      * Validation rules
-     *
-     * @var array
      */
     public static $rules = [
-        'client_id'   => 'required|integer',
-        'employee_id' => 'required|integer',
-        'practice_id' => 'required|integer',
+        'client_id'   => 'required|exists:clients,id',
+        'employee_id' => 'required|exists:employees,id',
+        'practice_id' => 'required|exists:practices,id',
         'booking_date'=> 'required|date',
-        'start_time'  => 'required',
-        'end_time'    => 'required',
+        'start_time'  => 'required|date_format:H:i:s',
+        'end_time'    => 'required|date_format:H:i:s|after:start_time',
         'status'      => 'nullable|string',
         'notes'       => 'nullable|string',
     ];
@@ -101,7 +97,7 @@ class Appointment extends Model
      */
     public function getFormattedTimeAttribute()
     {
-        return date('h:i A', strtotime($this->start_time)) . ' - ' . date('h:i A', strtotime($this->end_time));
+        return Carbon::parse($this->start_time)->format('h:i A') . ' - ' . Carbon::parse($this->end_time)->format('h:i A');
     }
 
     /**
@@ -109,7 +105,7 @@ class Appointment extends Model
      */
     public function getStatusColor()
     {
-        return match ($this->status) {
+        return match (strtolower($this->status)) {
             'confirmed'  => 'green',
             'pending'    => 'yellow',
             'checked-in' => 'blue',
@@ -117,5 +113,18 @@ class Appointment extends Model
             'canceled'   => 'red',
             default      => 'black',
         };
+    }
+
+    /**
+     * Mutators to ensure correct input format
+     */
+    public function setStartTimeAttribute($value)
+    {
+        $this->attributes['start_time'] = Carbon::parse($value)->format('H:i:s');
+    }
+
+    public function setEndTimeAttribute($value)
+    {
+        $this->attributes['end_time'] = Carbon::parse($value)->format('H:i:s');
     }
 }
