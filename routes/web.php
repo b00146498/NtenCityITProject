@@ -5,14 +5,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\DiaryEntryController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\AppointmentController; // ✅ Added this
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application.
-|
 */
 
 Route::get('/', function () {
@@ -36,15 +34,20 @@ Route::post('/logout', function (Request $request) {
 
 require __DIR__.'/auth.php';
 
-Route::resource('employees', App\Http\Controllers\employeeController::class);
-Route::resource('clients', App\Http\Controllers\clientController::class);
-Route::resource('practices', App\Http\Controllers\practiceController::class);
+// ✅ CRUD Routes for Employees, Clients, and Practices
+Route::resource('employees', App\Http\Controllers\EmployeeController::class);
+Route::resource('clients', App\Http\Controllers\ClientController::class);
+Route::resource('practices', App\Http\Controllers\PracticeController::class);
 
-// ✅ Restrict Calendar Access to Authenticated Users
+// ✅ Restrict Calendar & Appointments Access to Authenticated Users
 Route::middleware(['auth'])->group(function () {
-    Route::get('/appointments', [CalendarController::class, 'display'])->name('appointments');
 
-    // Diary Entries (Restricted to Authenticated Users)
+    // ✅ FullCalendar Appointment Routes
+    Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+    Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
+
+    // ✅ Diary Entry Routes (Restricted to Authenticated Users)
     Route::get('diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
     Route::get('diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
     Route::get('clients/{client_id}/diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.client');
@@ -56,10 +59,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('diary-entries/{id}', [DiaryEntryController::class, 'destroy'])->name('diary-entries.destroy');
 });
 
-
-Route::get('/calendar/display', 'App\Http\Controllers\CalendarController@display')
+// ✅ Calendar Display Route (Using CalendarController)
+Route::get('/calendar/display', [CalendarController::class, 'display'])
     ->name('calendar.display')
-    ->middleware('auth'); // Restricts access to logged-in users
+    ->middleware('auth');
 
-
-Route::resource('appointments', App\Http\Controllers\AppointmentController::class);
+// ✅ Use AppointmentController for Full CRUD (Ensure it's included)
+Route::resource('appointments', AppointmentController::class);
