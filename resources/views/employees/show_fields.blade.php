@@ -1,102 +1,70 @@
-<!-- Emp First Name Field -->
-<div class="form-group">
-    {!! Form::label('emp_first_name', 'Emp First Name:') !!}
-    <p>{!! $employee->emp_first_name !!}</p>
-</div>
-
-<!-- Emp Surname Field -->
-<div class="form-group">
-    {!! Form::label('emp_surname', 'Emp Surname:') !!}
-    <p>{!! $employee->emp_surname !!}</p>
-</div>
-
-<!-- Date Of Birth Field -->
-<div class="form-group">
-    {!! Form::label('date_of_birth', 'Date Of Birth:') !!}
-    <p>{!! $employee->date_of_birth !!}</p>
-</div>
-
-<!-- Gender Field -->
-<div class="form-group">
-    {!! Form::label('gender', 'Gender:') !!}
-    <p>{!! $employee->gender !!}</p>
-</div>
-
-<!-- Contact Number Field -->
-<div class="form-group">
-    {!! Form::label('contact_number', 'Contact Number:') !!}
-    <p>{!! $employee->contact_number !!}</p>
-</div>
-
-<!-- Emergency Contact Field -->
-<div class="form-group">
-    {!! Form::label('emergency_contact', 'Emergency Contact:') !!}
-    <p>{!! $employee->emergency_contact !!}</p>
-</div>
-
-<!-- Email Field -->
-<div class="form-group">
-    {!! Form::label('email', 'Email:') !!}
-    <p>{!! $employee->email !!}</p>
-</div>
-
-<!-- Street Field -->
-<div class="form-group">
-    {!! Form::label('street', 'Street:') !!}
-    <p>{!! $employee->street !!}</p>
-</div>
-
-<!-- City Field -->
-<div class="form-group">
-    {!! Form::label('city', 'City:') !!}
-    <p>{!! $employee->city !!}</p>
-</div>
-
-<!-- County Field -->
-<div class="form-group">
-    {!! Form::label('county', 'County:') !!}
-    <p>{!! $employee->county !!}</p>
-</div>
-
-<!-- Pps Number Field -->
-<div class="form-group">
-    {!! Form::label('pps_number', 'Pps Number:') !!}
-    <p>{!! $employee->pps_number !!}</p>
-</div>
-
-<!-- Role Field -->
-<div class="form-group">
-    {!! Form::label('role', 'Role:') !!}
-    <p>{!! $employee->role !!}</p>
-</div>
-
-<!-- Iban Field -->
-<div class="form-group">
-    {!! Form::label('iban', 'Iban:') !!}
-    <p>{!! $employee->iban !!}</p>
-</div>
-
-<!-- Bic Field -->
-<div class="form-group">
-    {!! Form::label('bic', 'Bic:') !!}
-    <p>{!! $employee->bic !!}</p>
-</div>
-
-<!-- Username Field -->
-<div class="form-group">
-    {!! Form::label('username', 'Username:') !!}
-    <p>{!! $employee->username !!}</p>
-</div>
-
-<!-- Password Field -->
-<div class="form-group">
-    {!! Form::label('password', 'Password:') !!}
-    <p>{!! $employee->password !!}</p>
-</div>
-
-<!-- Practice Id Field -->
-<div class="form-group">
-    {!! Form::label('practice_id', 'Practice Id:') !!}
-    <p>{!! $employee->practice_id !!}</p>
-</div>
-
+<table class="table table-bordered table-sm">
+    <tbody>
+        <tr>
+            <th>First Name</th>
+            <td>{!! $employee->emp_first_name !!}</td>
+        </tr>
+        <tr>
+            <th>Surname</th>
+            <td>{!! $employee->emp_surname !!}</td>
+        </tr>
+        <tr>
+            <th>Date of Birth</th>
+            <td>{!! \Carbon\Carbon::parse($employee->date_of_birth)->format('d/m/Y') !!}</td>
+        </tr>
+        <tr>
+            <th>Gender</th>
+            <td>{!! $employee->gender !!}</td>
+        </tr>
+        <tr>
+            <th>Contact Number</th>
+            <td>{!! $employee->contact_number !!}</td>
+        </tr>
+        <tr>
+            <th>Emergency Contact</th>
+            <td>{!! $employee->emergency_contact !!}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{!! $employee->email !!}</td>
+        </tr>
+        <tr>
+            <th>Street</th>
+            <td>{!! $employee->street !!}</td>
+        </tr>
+        <tr>
+            <th>City</th>
+            <td>{!! $employee->city !!}</td>
+        </tr>
+        <tr>
+            <th>County</th>
+            <td>{!! $employee->county !!}</td>
+        </tr>
+        <tr>
+            <th>PPS Number</th>
+            <td>{!! $employee->pps_number !!}</td>
+        </tr>
+        <tr>
+            <th>Role</th>
+            <td>{!! $employee->role !!}</td>
+        </tr>
+        <tr>
+            <th>IBAN</th>
+            <td>{!! $employee->iban !!}</td>
+        </tr>
+        <tr>
+            <th>BIC</th>
+            <td>{!! $employee->bic !!}</td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td>{!! $employee->username !!}</td>
+        </tr>
+        @if ($employee->practice)
+        <tr>
+            <th>Practice</th>
+            <td>{!! $employee->practice->company_name !!}</td>
+        </tr>
+        @endif
+    </tbody>
+</table>
