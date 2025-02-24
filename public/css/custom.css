@@ -30,3 +30,85 @@
 .shadow-lg {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+
+.card {
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.card-header {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #C9A74C !important; /* Gold header */
+    color: white !important;
+    padding: 15px;
+}
+
+.btn-success {
+    background-color: #28a745 !important;
+    border-radius: 20px !important;
+}
+
+.btn-outline-dark {
+    border-radius: 20px !important;
+}
+
+.form-control, .form-select {
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+
+.card {
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.card-header {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #C9A74C !important; /* Gold header */
+    color: white !important;
+    padding: 15px;
+}
+
+.btn-outline-dark {
+    border-radius: 20px !important;
+}
+
+.table {
+    background-color: #FFF7ED; /* Soft Beige */
+    border-radius: 8px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    color: #333;
+    padding: 12px;
+}
+
+.table td {
+    padding: 12px;
+}
+
+.badge-success {
+    background-color: #28a745 !important;
+}
+
+.badge-danger {
+    background-color: #dc3545 !important;
+}
+
+.table-sm th, .table-sm td {
+    padding: 6px !important; /* Reduce cell padding */
+    font-size: 15px !important; /* Reduce text size */
+}
+
+.small-text {
+    font-size: 15px !important; /* Make "Practice" field smaller */
+}
+
+
+
