@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book an Appointment</title>
+    <title>Appointments Calendar</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,6 +21,7 @@
     <script>
         var appointmentsUrl = @json(route('appointments.index'));
         var storeAppointmentUrl = @json(route('appointments.store'));
+        var deleteAppointmentUrl = @json(route('appointments.destroy', ':id'));
         var csrfToken = @json(csrf_token());
     </script>
 
@@ -52,11 +53,6 @@
         <button id="book-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg mt-4">
             Book Now
         </button>
-
-        <!-- View My Appointments Button -->
-        <a href="{{ route('appointments.client') }}" class="block text-center text-blue-500 mt-4 underline">
-            View My Appointments
-        </a>
     </div>
 
     <script>
@@ -71,7 +67,7 @@
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 selectable: true,
-                editable: false,
+                editable: true,
 
                 // ✅ Fetch appointments from Laravel
                 events: function(fetchInfo, successCallback, failureCallback) {
@@ -93,7 +89,6 @@
                 select: function(info) {
                     let selectedDate = info.startStr;
                     loadTimeSlots(selectedDate);
-                    $("#book-btn").data("selected-date", selectedDate);
                 }
             });
 
@@ -124,10 +119,8 @@
             // ✅ Book Appointment
             $("#book-btn").on("click", function() {
                 let selectedTime = $(this).data("selected-time");
-                let selectedDate = $(this).data("selected-date");
-
-                if (!selectedTime || !selectedDate) {
-                    alert("Please select a date and time slot.");
+                if (!selectedTime) {
+                    alert("Please select a time slot.");
                     return;
                 }
 
@@ -144,7 +137,7 @@
                             client_id: client_id,
                             employee_id: employee_id,
                             practice_id: practice_id,
-                            booking_date: selectedDate,
+                            booking_date: $("#calendar").fullCalendar('getDate').format('YYYY-MM-DD'),
                             start_time: selectedTime,
                             end_time: "10:00 AM",
                             status: "pending"

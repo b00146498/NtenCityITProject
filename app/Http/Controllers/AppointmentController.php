@@ -8,7 +8,6 @@ use App\Repositories\AppointmentRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Flash;
 use Response;
@@ -16,6 +15,7 @@ use Carbon\Carbon;
 
 class AppointmentController extends AppBaseController
 {
+    /** @var AppointmentRepository */
     private $appointmentRepository;
 
     public function __construct(AppointmentRepository $appointmentRepo)
@@ -24,7 +24,11 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Display a listing of Appointments for Admins/Professionals.
+     * Display a listing of Appointments.
+     * Handles both AJAX requests (JSON) and regular page loads.
+     *
+     * @param Request $request
+     * @return JsonResponse|Response
      */
     public function index(Request $request)
     {
@@ -43,22 +47,15 @@ class AppointmentController extends AppBaseController
             return response()->json($appointments);
         }
 
+        // Load the view for regular page loads
         return view('appointments.index');
     }
 
     /**
-     * Display a listing of the client's own appointments.
-     */
-    public function clientAppointments()
-    {
-        $clientId = Auth::id(); // Assuming clients are authenticated
-        $appointments = $this->appointmentRepository->model()::where('client_id', $clientId)->get();
-
-        return view('appointments.client', compact('appointments'));
-    }
-
-    /**
-     * Get color for FullCalendar based on appointment status.
+     * Get color for FullCalendar based on status.
+     *
+     * @param string $status
+     * @return string
      */
     private function getStatusColor($status)
     {
@@ -73,7 +70,11 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Store a new client appointment.
+     * Store a new Appointment in the database.
+     * Supports both AJAX and regular requests.
+     *
+     * @param Request $request
+     * @return JsonResponse|Response
      */
     public function store(Request $request)
     {
@@ -102,6 +103,9 @@ class AppointmentController extends AppBaseController
 
     /**
      * Fetch available time slots for a given date.
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function getAvailableSlots(Request $request)
     {
@@ -127,7 +131,11 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Update an appointment.
+     * Update the specified Appointment in storage.
+     *
+     * @param int $id
+     * @param Request $request
+     * @return JsonResponse|Response
      */
     public function update($id, Request $request)
     {
@@ -161,9 +169,12 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Cancel an appointment.
+     * Delete an appointment from the database.
+     *
+     * @param int $id
+     * @return JsonResponse|Response
      */
-    public function cancel($id)
+    public function destroy($id)
     {
         $appointment = $this->appointmentRepository->find($id);
 
@@ -171,8 +182,8 @@ class AppointmentController extends AppBaseController
             return response()->json(['error' => 'Appointment not found'], 404);
         }
 
-        $appointment->update(['status' => 'canceled']);
+        $this->appointmentRepository->delete($id);
 
-        return response()->json(['success' => 'Appointment canceled successfully!']);
+        return response()->json(['success' => 'Appointment deleted successfully!']);
     }
 }

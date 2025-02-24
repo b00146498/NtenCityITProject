@@ -27,7 +27,7 @@ class Appointment extends Model
 {
     use SoftDeletes, HasFactory;
 
-    public $table = 'appointments';
+    protected $table = 'appointments'; // ✅ Ensure correct table reference
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
@@ -64,9 +64,9 @@ class Appointment extends Model
      * Validation rules
      */
     public static $rules = [
-        'client_id'   => 'required|exists:clients,id',
-        'employee_id' => 'required|exists:employees,id',
-        'practice_id' => 'required|exists:practices,id',
+        'client_id'   => 'required|exists:client,id', // ✅ Fixed table reference
+        'employee_id' => 'required|exists:employee,id', // ✅ Fixed table reference
+        'practice_id' => 'required|exists:practice,id', // ✅ Fixed table reference
         'booking_date'=> 'required|date',
         'start_time'  => 'required|date_format:H:i:s',
         'end_time'    => 'required|date_format:H:i:s|after:start_time',
@@ -79,17 +79,17 @@ class Appointment extends Model
      */
     public function client()
     {
-        return $this->belongsTo(\App\Models\Client::class, 'client_id');
+        return $this->belongsTo(\App\Models\Client::class, 'client_id', 'id');
     }
 
     public function employee()
     {
-        return $this->belongsTo(\App\Models\Employee::class, 'employee_id');
+        return $this->belongsTo(\App\Models\Employee::class, 'employee_id', 'id');
     }
 
     public function practice()
     {
-        return $this->belongsTo(\App\Models\Practice::class, 'practice_id');
+        return $this->belongsTo(\App\Models\Practice::class, 'practice_id', 'id');
     }
 
     /**
@@ -128,3 +128,4 @@ class Appointment extends Model
         $this->attributes['end_time'] = Carbon::parse($value)->format('H:i:s');
     }
 }
+
