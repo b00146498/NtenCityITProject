@@ -8,6 +8,7 @@ use App\Repositories\AppointmentRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Flash;
 use Response;
@@ -23,7 +24,7 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Display client-focused appointments.
+     * Display a listing of Appointments for Admins/Professionals.
      */
     public function index(Request $request)
     {
@@ -43,6 +44,17 @@ class AppointmentController extends AppBaseController
         }
 
         return view('appointments.index');
+    }
+
+    /**
+     * Display a listing of the client's own appointments.
+     */
+    public function clientAppointments()
+    {
+        $clientId = Auth::id(); // Assuming clients are authenticated
+        $appointments = $this->appointmentRepository->model()::where('client_id', $clientId)->get();
+
+        return view('appointments.client', compact('appointments'));
     }
 
     /**
