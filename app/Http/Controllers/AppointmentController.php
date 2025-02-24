@@ -15,7 +15,6 @@ use Carbon\Carbon;
 
 class AppointmentController extends AppBaseController
 {
-    /** @var AppointmentRepository */
     private $appointmentRepository;
 
     public function __construct(AppointmentRepository $appointmentRepo)
@@ -24,11 +23,7 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Display a listing of Appointments.
-     * Handles both AJAX requests (JSON) and regular page loads.
-     *
-     * @param Request $request
-     * @return JsonResponse|Response
+     * Display client-focused appointments.
      */
     public function index(Request $request)
     {
@@ -47,15 +42,11 @@ class AppointmentController extends AppBaseController
             return response()->json($appointments);
         }
 
-        // Load the view for regular page loads
         return view('appointments.index');
     }
 
     /**
-     * Get color for FullCalendar based on status.
-     *
-     * @param string $status
-     * @return string
+     * Get color for FullCalendar based on appointment status.
      */
     private function getStatusColor($status)
     {
@@ -70,11 +61,7 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Store a new Appointment in the database.
-     * Supports both AJAX and regular requests.
-     *
-     * @param Request $request
-     * @return JsonResponse|Response
+     * Store a new client appointment.
      */
     public function store(Request $request)
     {
@@ -103,9 +90,6 @@ class AppointmentController extends AppBaseController
 
     /**
      * Fetch available time slots for a given date.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getAvailableSlots(Request $request)
     {
@@ -131,11 +115,7 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Update the specified Appointment in storage.
-     *
-     * @param int $id
-     * @param Request $request
-     * @return JsonResponse|Response
+     * Update an appointment.
      */
     public function update($id, Request $request)
     {
@@ -169,12 +149,9 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Delete an appointment from the database.
-     *
-     * @param int $id
-     * @return JsonResponse|Response
+     * Cancel an appointment.
      */
-    public function destroy($id)
+    public function cancel($id)
     {
         $appointment = $this->appointmentRepository->find($id);
 
@@ -182,8 +159,8 @@ class AppointmentController extends AppBaseController
             return response()->json(['error' => 'Appointment not found'], 404);
         }
 
-        $this->appointmentRepository->delete($id);
+        $appointment->update(['status' => 'canceled']);
 
-        return response()->json(['success' => 'Appointment deleted successfully!']);
+        return response()->json(['success' => 'Appointment canceled successfully!']);
     }
 }
