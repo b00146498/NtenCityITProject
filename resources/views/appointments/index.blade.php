@@ -36,6 +36,18 @@
             margin: 20px auto;
         }
         
+        /* Selected date styling */
+        .fc-day-selected {
+            background-color: rgba(59, 130, 246, 0.1) !important;
+            border: 2px solid #3b82f6 !important;
+        }
+        
+        /* Selected time slot styling */
+        .time-slot-selected {
+            background-color: #3b82f6 !important;
+            color: white !important;
+        }
+        
         /* Mobile Appointment Edition View */
         .mobile-view {
             max-width: 360px;
@@ -44,6 +56,35 @@
             border-radius: 1rem;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+            max-width: 300px;
+        }
+        
+        .toast-success {
+            background-color: #4caf50;
+        }
+        
+        .toast-error {
+            background-color: #f44336;
+        }
+        
+        .toast-show {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         .status-bar {
@@ -233,6 +274,31 @@
                             failureCallback(xhr);
                         }
                     });
+            
+            // ✅ Notification system
+            function showNotification(message, type) {
+                // Remove any existing notifications
+                $('.toast-notification').remove();
+                
+                // Create new notification
+                const notification = $(`<div class="toast-notification toast-${type}">${message}</div>`);
+                $('body').append(notification);
+                
+                // Show notification
+                setTimeout(() => {
+                    notification.addClass('toast-show');
+                }, 100);
+                
+                // Auto hide after 4 seconds
+                setTimeout(() => {
+                    notification.removeClass('toast-show');
+                    
+                    // Remove from DOM after fade out
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 4000);
+            }
                 },
 
                 // ✅ Select a date to show available time slots
@@ -250,27 +316,64 @@
             function loadTimeSlots(date) {
                 console.log("📆 Loading time slots for:", date);
                 
+                // Get the selected doctor if any
+                let doctorId = $('#doctor-select').val() || null;
+                
                 $.ajax({
                     url: getAvailableSlotsUrl,
                     type: "GET",
-                    data: { date: date },
+                    data: { 
+                        date: date,
+                        employee_id: doctorId
+                    },
                     success: function(response) {
+                        console.log("Time slots response:", response); // Debug
+                        
                         let timeSlots = response.timeSlots;
                         let timeSlotsContainer = $("#time-slots");
                         timeSlotsContainer.empty();
                         
-                        timeSlots.forEach(slot => {
-                            let btn = $(`<button class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg">${slot}</button>`);
-                            btn.on("click", function() {
-                                $(".bg-blue-500").removeClass("bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
-                                $(this).removeClass("bg-gray-200 text-gray-800").addClass("bg-blue-500 text-white");
-                                selectedTime = slot;
+                        if (!timeSlots || timeSlots.length === 0) {
+                            timeSlotsContainer.append('<p class="col-span-3 text-center py-4 text-gray-500">No available time slots for this date.</p>');
+                            return;
+                        }
+                        
+                        // Check if timeSlots is an array of strings (old format) or objects (new format)
+                        if (typeof timeSlots[0] === 'string') {
+                            // Old format
+                            timeSlots.forEach(slot => {
+                                let btn = $(`<button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">${slot}</button>`);
+                                btn.on("click", function() {
+                                    $(".bg-blue-500").removeClass("bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
+                                    $(this).removeClass("bg-gray-200 text-gray-800").addClass("bg-blue-500 text-white");
+                                    selectedTime = slot;
+                                });
+                                timeSlotsContainer.append(btn);
                             });
-                            timeSlotsContainer.append(btn);
-                        });
+                        } else {
+                            // New format with availability status
+                            timeSlots.forEach(slot => {
+                                if (slot.available) {
+                                    let btn = $(`<button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">${slot.time}</button>`);
+                                    btn.on("click", function() {
+                                        $(".bg-blue-500").removeClass("bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
+                                        $(this).removeClass("bg-gray-200 text-gray-800").addClass("bg-blue-500 text-white");
+                                        selectedTime = slot.time;
+                                    });
+                                    timeSlotsContainer.append(btn);
+                                } else {
+                                    // Create a disabled button for booked slots
+                                    let disabledBtn = $(`<button class="bg-gray-100 text-gray-400 px-4 py-2 rounded-lg cursor-not-allowed opacity-60" disabled>${slot.time}</button>`);
+                                    timeSlotsContainer.append(disabledBtn);
+                                }
+                            });
+                        }
                     },
                     error: function(xhr) {
                         console.error("❌ Error fetching time slots:", xhr.responseText);
+                        $("#time-slots").empty().append(
+                            '<p class="col-span-3 text-center py-4 text-red-500">Error loading time slots. Please try again.</p>'
+                        );
                     }
                 });
             }
@@ -302,6 +405,7 @@
                         $('.day').removeClass('selected');
                         $(this).addClass('selected');
                         let newDate = $(this).data('date');
+                        selectedDate = newDate; // Update the selectedDate global variable
                         loadMobileTimeSlots(newDate);
                     });
                     
@@ -315,40 +419,90 @@
             
             // ✅ Load mobile time slots
             function loadMobileTimeSlots(date) {
+                // Get the selected doctor
+                let doctorId = $('#doctor-select').val() || null;
+                
                 $.ajax({
                     url: getAvailableSlotsUrl,
                     type: "GET",
-                    data: { date: date },
+                    data: { 
+                        date: date,
+                        employee_id: doctorId
+                    },
                     success: function(response) {
+                        console.log("Mobile time slots response:", response); // Debug
+                        
                         let timeSlots = response.timeSlots;
                         let container = $("#mobile-time-slots");
                         container.empty();
                         
-                        timeSlots.forEach(slot => {
-                            // Calculate end time (1 hour later)
-                            let startTime = new Date(`2025-01-01 ${slot}`);
-                            let endTime = new Date(startTime);
-                            endTime.setHours(endTime.getHours() + 1);
-                            
-                            let formattedEndTime = endTime.toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true
+                        if (!timeSlots || timeSlots.length === 0) {
+                            container.append('<p class="text-center py-4 text-gray-500">No available time slots for this date.</p>');
+                            return;
+                        }
+                        
+                        // Check if timeSlots is an array of strings (old format) or objects (new format)
+                        if (typeof timeSlots[0] === 'string') {
+                            // Old format - simple time strings
+                            timeSlots.forEach(slot => {
+                                // Calculate end time (1 hour later)
+                                let startTime = new Date(`2025-01-01 ${slot}`);
+                                let endTime = new Date(startTime);
+                                endTime.setHours(endTime.getHours() + 1);
+                                
+                                let formattedEndTime = endTime.toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    hour12: true
+                                });
+                                
+                                let timeSlotEl = $(`<div class="time-slot-mobile">${slot} - ${formattedEndTime}</div>`);
+                                
+                                timeSlotEl.on('click', function() {
+                                    $('.time-slot-mobile').removeClass('selected');
+                                    $(this).addClass('selected');
+                                    selectedTime = slot;
+                                });
+                                
+                                container.append(timeSlotEl);
                             });
-                            
-                            let timeSlotEl = $(`<div class="time-slot-mobile">${slot} - ${formattedEndTime}</div>`);
-                            
-                            timeSlotEl.on('click', function() {
-                                $('.time-slot-mobile').removeClass('selected');
-                                $(this).addClass('selected');
-                                selectedTime = slot;
+                        } else {
+                            // New format with availability information
+                            timeSlots.forEach(slot => {
+                                // Calculate end time (1 hour later)
+                                let startTime = new Date(`2025-01-01 ${slot.time}`);
+                                let endTime = new Date(startTime);
+                                endTime.setHours(endTime.getHours() + 1);
+                                
+                                let formattedEndTime = endTime.toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    hour12: true
+                                });
+                                
+                                if (slot.available) {
+                                    let timeSlotEl = $(`<div class="time-slot-mobile">${slot.time} - ${formattedEndTime}</div>`);
+                                    
+                                    timeSlotEl.on('click', function() {
+                                        $('.time-slot-mobile').removeClass('selected');
+                                        $(this).addClass('selected');
+                                        selectedTime = slot.time;
+                                    });
+                                    
+                                    container.append(timeSlotEl);
+                                } else {
+                                    // Create a disabled slot for booked times
+                                    let disabledSlot = $(`<div class="time-slot-mobile opacity-50 bg-gray-100 cursor-not-allowed">${slot.time} - ${formattedEndTime} <span class="text-red-500 float-right">Unavailable</span></div>`);
+                                    container.append(disabledSlot);
+                                }
                             });
-                            
-                            container.append(timeSlotEl);
-                        });
+                        }
                     },
                     error: function(xhr) {
                         console.error("❌ Error fetching time slots:", xhr.responseText);
+                        $("#mobile-time-slots").empty().append(
+                            '<p class="text-center py-4 text-red-500">Error loading time slots. Please try again.</p>'
+                        );
                     }
                 });
             }
@@ -360,6 +514,19 @@
                 generateDaySelector(year, month);
             });
 
+            // When doctor changes, refresh time slots
+            $('#doctor-select').on('change', function() {
+                if (selectedDate) {
+                    loadTimeSlots(selectedDate);
+                }
+                
+                // Also reload mobile time slots if in that view
+                let selectedDay = $('.day.selected');
+                if (selectedDay.length) {
+                    loadMobileTimeSlots(selectedDay.data('date'));
+                }
+            });
+            
             // ✅ Book Appointment Button - Switch to second wireframe
             $("#book-btn").on("click", function() {
                 if (!selectedDate || !selectedTime) {
@@ -369,11 +536,40 @@
                 
                 // Populate month and year selects based on selected date
                 let dateObj = new Date(selectedDate);
+                
+                // Set month and year in the select inputs
                 $('#month-select').val(dateObj.getMonth() + 1); // Month is 0-indexed
                 $('#year-select').val(dateObj.getFullYear());
                 
                 // Generate days
                 generateDaySelector(dateObj.getFullYear(), dateObj.getMonth() + 1);
+                
+                // Find and select the correct day automatically
+                setTimeout(() => {
+                    const selectedDay = dateObj.getDate();
+                    $('.day').each(function() {
+                        const dayNumber = parseInt($(this).find('.day-number').text());
+                        if (dayNumber === selectedDay) {
+                            $('.day').removeClass('selected');
+                            $(this).addClass('selected');
+                            
+                            // Load time slots for this day
+                            loadMobileTimeSlots($(this).data('date'));
+                        }
+                    });
+                    
+                    // If we have a selected time, automatically select it
+                    if (selectedTime) {
+                        setTimeout(() => {
+                            $('.time-slot-mobile').each(function() {
+                                if ($(this).text().startsWith(selectedTime)) {
+                                    $('.time-slot-mobile').removeClass('selected');
+                                    $(this).addClass('selected');
+                                }
+                            });
+                        }, 500);
+                    }
+                }, 500);
                 
                 // No need to load dropdowns anymore
                 
@@ -410,6 +606,14 @@
                 $('#confirm-doctor').text(doctorName);
                 $('#confirm-date').text(formattedDate);
                 $('#confirm-time').text(time + ' / ' + dayOfWeek);
+                
+                // Display the selected date and time prominently at the top of the confirmation screen
+                $('#confirmation-header').html(`
+                    <div class="mb-2 text-center">
+                        <div class="text-sm text-gray-600">Selected Date & Time</div>
+                        <div class="text-xl font-bold">${formattedDate} at ${time}</div>
+                    </div>
+                `);
             }
             
             function formatDate(date) {
@@ -499,14 +703,23 @@
                             $('#appointment-edition').addClass('hidden');
                             $('#confirmation-view').removeClass('hidden');
                             
+                            // Show success toast notification
+                            showNotification("✅ Appointment booked successfully!", "success");
+                            
                             calendar.refetchEvents();
                         } else {
-                            alert("❌ Failed to save appointment.");
+                            showNotification("❌ Failed to save appointment.", "error");
                         }
                     },
                     error: function(xhr) {
                         console.error("❌ Error:", xhr.responseText);
-                        alert("❌ Error: " + (xhr.responseJSON ? xhr.responseJSON.error : "Failed to book appointment"));
+                        
+                        let errorMessage = "Failed to book appointment";
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        }
+                        
+                        showNotification("❌ Error: " + errorMessage, "error");
                     }
                 });
             });
@@ -533,6 +746,10 @@
         </div>
         
         <div class="p-4">
+            <div id="confirmation-header">
+                <!-- Selected date and time will be displayed here -->
+            </div>
+            
             <div class="bg-yellow-50 rounded-lg p-4 mb-4">
                 <div id="confirm-doctor" class="font-bold text-lg mb-2">Dr. Andrew</div>
                 
