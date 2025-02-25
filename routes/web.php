@@ -5,13 +5,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\DiaryEntryController;
 use App\Http\Controllers\CalendarController;
-use App\Http\Controllers\AppointmentController; // ✅ Added this
+use App\Http\Controllers\AppointmentController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
+/* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,14 +18,16 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::get('/login', function () {
-    return view('auth.login'); 
+    return view('auth.login');
 })->name('login');
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
-    $request->session()->invalidate(); 
-    $request->session()->regenerateToken(); 
-    return redirect()->route('login'); 
+    $request->session()->invalidate();
+    
+    $request->session()->regenerateToken();
+    
+    return redirect()->route('login');
 })->name('logout');
 
 require __DIR__.'/auth.php';
@@ -41,12 +39,15 @@ Route::resource('practices', App\Http\Controllers\PracticeController::class);
 
 // ✅ Restrict Calendar & Appointments Access to Authenticated Users
 Route::middleware(['auth'])->group(function () {
-
+    
     // ✅ FullCalendar Appointment Routes
     Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
     Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
-
+    
+    // ✅ NEW ROUTE: Get available time slots
+    Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
+    
     // ✅ Diary Entry Routes (Restricted to Authenticated Users)
     Route::get('diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
     Route::get('diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
