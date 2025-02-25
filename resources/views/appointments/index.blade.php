@@ -393,6 +393,65 @@
                 $('#appointment-edition').addClass('hidden');
                 $('#calendar-view').removeClass('hidden');
             });
+            
+            // ✅ Functions for confirmation view
+            function updateConfirmationView(date, time, doctorId) {
+                // Format the date
+                let dateObj = new Date(date);
+                let formattedDate = formatDate(dateObj);
+                
+                // Get day of week
+                let dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dateObj.getDay()];
+                
+                // Get the doctor name
+                let doctorName = $('#doctor-select option:selected').text();
+                
+                // Update confirmation view
+                $('#confirm-doctor').text(doctorName);
+                $('#confirm-date').text(formattedDate);
+                $('#confirm-time').text(time + ' / ' + dayOfWeek);
+            }
+            
+            function formatDate(date) {
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                
+                let day = date.getDate();
+                let month = months[date.getMonth()];
+                let year = date.getFullYear();
+                
+                // Add ordinal suffix to day
+                let suffix = getOrdinalSuffix(day);
+                
+                return day + suffix + ' ' + month + ', ' + year;
+            }
+            
+            function getOrdinalSuffix(day) {
+                if (day > 3 && day < 21) return 'th';
+                switch (day % 10) {
+                    case 1:  return 'st';
+                    case 2:  return 'nd';
+                    case 3:  return 'rd';
+                    default: return 'th';
+                }
+            }
+            
+            // ✅ Confirmation view buttons
+            $('#back-from-confirm, #cancel-confirm').on('click', function() {
+                $('#confirmation-view').addClass('hidden');
+                $('#calendar-view').removeClass('hidden');
+            });
+            
+            $('#edit-confirm').on('click', function() {
+                $('#confirmation-view').addClass('hidden');
+                $('#appointment-edition').removeClass('hidden');
+            });
+            
+            $('#pay-btn').on('click', function() {
+                alert('Payment processing would happen here!');
+                // After payment, return to calendar
+                $('#confirmation-view').addClass('hidden');
+                $('#calendar-view').removeClass('hidden');
+            });
 
             // ✅ Save Appointment
             $("#save-btn").on("click", function() {
@@ -433,12 +492,14 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            alert("✅ Appointment booked successfully!");
-                            calendar.refetchEvents();
+                            // Show confirmation view instead of alert
+                            updateConfirmationView(selectedDateStr, startTime, doctor_id);
                             
-                            // Return to calendar view
+                            // Hide appointment edition and show confirmation
                             $('#appointment-edition').addClass('hidden');
-                            $('#calendar-view').removeClass('hidden');
+                            $('#confirmation-view').removeClass('hidden');
+                            
+                            calendar.refetchEvents();
                         } else {
                             alert("❌ Failed to save appointment.");
                         }
@@ -451,6 +512,65 @@
             });
         });
     </script>
+
+    <!-- Appointment Confirmation View -->
+    <div id="confirmation-view" class="mobile-view mt-6 hidden">
+        <div class="status-bar">
+            <span class="status-time">9:45</span>
+            <div class="status-icons">
+                <span class="status-icon">📶</span>
+                <span class="status-icon">🔋</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center p-4 border-b">
+            <button id="back-from-confirm" class="text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <h1 class="text-center text-lg font-medium flex-1">Appointment</h1>
+        </div>
+        
+        <div class="p-4">
+            <div class="bg-yellow-50 rounded-lg p-4 mb-4">
+                <div id="confirm-doctor" class="font-bold text-lg mb-2">Dr. Andrew</div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Location</div>
+                    <div>The Spire, O'Connell Street</div>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Date</div>
+                    <div id="confirm-date">8th January, 2025</div>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Time</div>
+                    <div id="confirm-time">13:30 / Tuesday</div>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Appointment Type</div>
+                    <div>Weekly check-in <span class="float-right">€105</span></div>
+                </div>
+                
+                <div class="border-t border-gray-300 mt-3 pt-2">
+                    <div class="font-bold">Total: <span class="float-right">€105</span></div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between mb-4">
+                <button id="cancel-confirm" class="px-8 py-2 border border-red-500 text-red-500 rounded-full">Cancel</button>
+                <button id="edit-confirm" class="px-8 py-2 border border-green-500 text-green-500 rounded-full">Edit</button>
+            </div>
+            
+            <button id="pay-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg">
+                Pay for Appointment
+            </button>
+        </div>
+    </div>
 
 </body>
 </html>
