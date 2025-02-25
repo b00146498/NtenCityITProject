@@ -61,9 +61,9 @@ class AppointmentController extends AppBaseController
 
         // Modified validation to handle time format with AM/PM
         $validator = Validator::make($request->all(), [
-            'client_id'    => 'required|exists:clients,id',
-            'employee_id'  => 'required|exists:employees,id',
-            'practice_id'  => 'required|exists:practices,id',
+            'client_id'    => 'required',
+            'employee_id'  => 'required',
+            'practice_id'  => 'required',
             'booking_date' => 'required|date',
             'start_time'   => 'required',
             'end_time'     => 'required',
@@ -133,9 +133,9 @@ class AppointmentController extends AppBaseController
         }
 
         $validator = Validator::make($request->all(), [
-            'client_id'    => 'required|exists:clients,id',
-            'employee_id'  => 'required|exists:employees,id',
-            'practice_id'  => 'required|exists:practices,id',
+            'client_id'    => 'required',
+            'employee_id'  => 'required',
+            'practice_id'  => 'required',
             'booking_date' => 'required|date',
             'start_time'   => 'required',
             'end_time'     => 'required',

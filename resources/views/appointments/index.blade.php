@@ -176,26 +176,14 @@
                 
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-sm text-gray-700 mb-1">Client</label>
-                        <select id="client-select" class="w-full border rounded p-2">
-                            <option value="">Select Client</option>
-                            <!-- Client options will be loaded dynamically -->
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm text-gray-700 mb-1">Employee</label>
-                        <select id="employee-select" class="w-full border rounded p-2">
-                            <option value="">Select Employee</option>
-                            <!-- Employee options will be loaded dynamically -->
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm text-gray-700 mb-1">Practice</label>
-                        <select id="practice-select" class="w-full border rounded p-2">
-                            <option value="">Select Practice</option>
-                            <!-- Practice options will be loaded dynamically -->
+                        <label class="block text-sm text-gray-700 mb-1">Doctor</label>
+                        <select id="doctor-select" class="w-full border rounded p-2">
+                            <option value="">Select Doctor</option>
+                            <option value="1">Dr. John Smith</option>
+                            <option value="2">Dr. Sarah Johnson</option>
+                            <option value="3">Dr. Michael Lee</option>
+                            <option value="4">Dr. Emily Rodriguez</option>
+                            <option value="5">Dr. Robert Chen</option>
                         </select>
                     </div>
                     
@@ -256,59 +244,7 @@
 
             calendar.render();
 
-            // ✅ Load all clients, employees, and practices
-            function loadDropdownOptions() {
-                // Load clients
-                $.ajax({
-                    url: listClientsUrl,
-                    type: "GET",
-                    success: function(response) {
-                        let clientSelect = $("#client-select");
-                        clientSelect.find('option:not(:first)').remove();
-                        
-                        response.forEach(client => {
-                            clientSelect.append(`<option value="${client.id}">${client.name}</option>`);
-                        });
-                    },
-                    error: function(xhr) {
-                        console.error("❌ Error loading clients:", xhr.responseText);
-                    }
-                });
-                
-                // Load employees
-                $.ajax({
-                    url: listEmployeesUrl,
-                    type: "GET",
-                    success: function(response) {
-                        let employeeSelect = $("#employee-select");
-                        employeeSelect.find('option:not(:first)').remove();
-                        
-                        response.forEach(employee => {
-                            employeeSelect.append(`<option value="${employee.id}">${employee.name}</option>`);
-                        });
-                    },
-                    error: function(xhr) {
-                        console.error("❌ Error loading employees:", xhr.responseText);
-                    }
-                });
-                
-                // Load practices
-                $.ajax({
-                    url: listPracticesUrl,
-                    type: "GET",
-                    success: function(response) {
-                        let practiceSelect = $("#practice-select");
-                        practiceSelect.find('option:not(:first)').remove();
-                        
-                        response.forEach(practice => {
-                            practiceSelect.append(`<option value="${practice.id}">${practice.name}</option>`);
-                        });
-                    },
-                    error: function(xhr) {
-                        console.error("❌ Error loading practices:", xhr.responseText);
-                    }
-                });
-            }
+            // No need to load dropdown options as we're using static doctors list
 
             // ✅ Load available time slots dynamically
             function loadTimeSlots(date) {
@@ -439,8 +375,7 @@
                 // Generate days
                 generateDaySelector(dateObj.getFullYear(), dateObj.getMonth() + 1);
                 
-                // Load dropdowns
-                loadDropdownOptions();
+                // No need to load dropdowns anymore
                 
                 // Show appointment edition view
                 $('#calendar-view').addClass('hidden');
@@ -461,13 +396,11 @@
 
             // ✅ Save Appointment
             $("#save-btn").on("click", function() {
-                let client_id = $('#client-select').val();
-                let employee_id = $('#employee-select').val();
-                let practice_id = $('#practice-select').val();
+                let doctor_id = $('#doctor-select').val();
                 let notes = $('#notes-input').val();
                 
-                if (!client_id || !employee_id || !practice_id) {
-                    alert("Please select client, employee and practice.");
+                if (!doctor_id) {
+                    alert("Please select a doctor.");
                     return;
                 }
                 
@@ -489,9 +422,9 @@
                     type: "POST",
                     data: {
                         _token: csrfToken,
-                        client_id: client_id,
-                        employee_id: employee_id,
-                        practice_id: practice_id,
+                        client_id: 1, // Default client ID
+                        employee_id: doctor_id,
+                        practice_id: 1, // Default practice ID
                         booking_date: selectedDateStr,
                         start_time: startTime,
                         end_time: endTime,
