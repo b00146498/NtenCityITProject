@@ -110,5 +110,34 @@
     font-size: 15px !important; /* Make "Practice" field smaller */
 }
 
+.card {
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.card-header {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #C9A74C !important; /* Gold header */
+    color: white !important;
+    padding: 15px;
+}
+
+.btn-success {
+    background-color: #28a745 !important;
+    border-radius: 20px !important;
+}
+
+.btn-outline-dark {
+    border-radius: 20px !important;
+}
+
+.form-control, .form-select {
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+
 
 
