@@ -40,12 +40,19 @@
         .fc-day-selected {
             background-color: rgba(59, 130, 246, 0.1) !important;
             border: 2px solid #3b82f6 !important;
+            position: relative;
+            z-index: 1;
         }
         
         /* Selected time slot styling */
         .time-slot-selected {
             background-color: #3b82f6 !important;
             color: white !important;
+        }
+        
+        /* Explicitly override FullCalendar's date hover effect */
+        .fc-highlight {
+            background-color: transparent !important;
         }
         
         /* Mobile Appointment Edition View */
@@ -309,11 +316,43 @@
             });
 
             calendar.render();
+            
+            // Debug helper to check what's clickable
+            console.log("Calendar rendered, adding debugging helpers");
+            setTimeout(() => {
+                // Log all calendar day cells for debugging
+                console.log("Calendar day cells:", $('.fc-daygrid-day').length);
+                
+                // Make calendar days more obviously clickable
+                $('.fc-daygrid-day').css('cursor', 'pointer');
+            }, 1000);
 
             // No need to load dropdown options as we're using static doctors list
 
-            // ✅ Load available time slots dynamically
+            // After calendar renders, add class to all calendar day cells for better selection
+            setTimeout(() => {
+                $('.fc-daygrid-day').addClass('selectable-day');
+                
+                // Add click handler directly to calendar days
+                $(document).on('click', '.selectable-day', function() {
+                    let dateAttr = $(this).data('date');
+                    if (dateAttr) {
+                        $(".fc-day").removeClass("fc-day-selected");
+                        $(this).addClass("fc-day-selected");
+                        
+                        selectedDate = dateAttr;
+                        console.log("Date selected via delegation:", selectedDate);
+                        
+                        // Load time slots for this date
+                        loadTimeSlots(selectedDate);
+                    }
+                });
+            }, 1000);
             function loadTimeSlots(date) {
+                if (!date) {
+                    console.error("❌ No date provided to loadTimeSlots");
+                    return;
+                }
                 console.log("📆 Loading time slots for:", date);
                 
                 // Get the selected doctor if any
