@@ -120,5 +120,10 @@ class employee extends Model
     {
         return $this->hasMany(DiaryEntry::class, 'employee_id');
     }
+    public function practice()
+    {
+        return $this->belongsTo(Practice::class, 'practice_id');
+    }
+
 
 }

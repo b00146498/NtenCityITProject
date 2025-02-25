@@ -6,6 +6,7 @@ use App\Http\Requests\CreateemployeeRequest;
 use App\Http\Requests\UpdateemployeeRequest;
 use App\Repositories\employeeRepository;
 use App\Http\Controllers\AppBaseController;
+use App\Models\Practice;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
@@ -96,12 +97,14 @@ class employeeController extends AppBaseController
 
         if (empty($employee)) {
             Flash::error('Employee not found');
-
             return redirect(route('employees.index'));
         }
 
-        return view('employees.edit')->with('employee', $employee);
+        $practices = Practice::all(); // Fetch all practices for dropdown
+
+        return view('employees.edit', compact('employee', 'practices'));
     }
+
 
     /**
      * Update the specified employee in storage.

@@ -61,7 +61,7 @@
 
     <!-- Password -->
     <div class="col-md-6 mb-3">
-        {!! Form::label('password', 'Password (Leave blank to keep current):', ['class' => 'form-label fw-bold']) !!}
+        {!! Form::label('password', 'Password (must fill in):', ['class' => 'form-label fw-bold']) !!}
         {!! Form::password('password', ['class' => 'form-control']) !!}
     </div>
 

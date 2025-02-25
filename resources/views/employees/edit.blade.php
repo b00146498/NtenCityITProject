@@ -1,23 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="content-header">
-        <h1>
-            Edit Employee Details
-        </h1>
-    </section>
-    <div class="content">
-       @include('basic-template::common.errors')
-       <div class="box box-primary">
-           <div class="box-body">
-               <div class="row">
-                   {!! Form::model($employee, ['route' => ['employees.update', $employee->id], 'method' => 'patch']) !!}
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between">
+            <h4>Edit Employee Details</h4>
+            <a href="{{ route('employees.index') }}" class="text-white text-decoration-none">✖ Close</a>
+        </div>
+        <div class="card-body">
+            @include('basic-template::common.errors')
 
-                        @include('employees.fields')
+            {!! Form::model($employee, ['route' => ['employees.update', $employee->id], 'method' => 'patch']) !!}
+            
+            @include('employees.fields')
 
-                   {!! Form::close() !!}
-               </div>
-           </div>
-       </div>
+            <!-- Submit Button Section -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ route('employees.index') }}" class="btn btn-outline-dark px-4 py-2">Cancel</a>
+                {!! Form::submit('Save Changes', ['class' => 'btn btn-success px-4 py-2']) !!}
+            </div>
+
+            {!! Form::close() !!}
+        </div>
     </div>
+</div>
 @endsection
