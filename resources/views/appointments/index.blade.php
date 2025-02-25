@@ -50,6 +50,12 @@
             color: white !important;
         }
         
+        /* Make calendar navigation buttons more obvious */
+        .fc-header-toolbar button {
+            cursor: pointer !important;
+            opacity: 1 !important;
+        }
+        
         /* Explicitly override FullCalendar's date hover effect */
         .fc-highlight {
             background-color: transparent !important;
@@ -315,22 +321,32 @@
                 }
             });
 
+            // Function to update calendar cell events after navigation
+            function updateCalendarCellEvents() {
+                // Make all days clickable
+                $('.fc-daygrid-day').addClass('selectable-day');
+                $('.fc-daygrid-day').css('cursor', 'pointer');
+                
+                console.log("Calendar cells updated:", $('.fc-daygrid-day').length);
+            }
+            
+            // ✅ Initialize the calendar with all events enabled
             calendar.render();
             
-            // Debug helper to check what's clickable
-            console.log("Calendar rendered, adding debugging helpers");
-            setTimeout(() => {
-                // Log all calendar day cells for debugging
-                console.log("Calendar day cells:", $('.fc-daygrid-day').length);
-                
-                // Make calendar days more obviously clickable
-                $('.fc-daygrid-day').css('cursor', 'pointer');
-            }, 1000);
+            // Set up event listeners after calendar is rendered
+            calendar.on('datesSet', function() {
+                console.log("Calendar dates changed, updating cell events");
+                setTimeout(updateCalendarCellEvents, 100);
+            });
+            
+            // Initial setup
+            setTimeout(updateCalendarCellEvents, 1000);
 
             // No need to load dropdown options as we're using static doctors list
 
             // After calendar renders, add class to all calendar day cells for better selection
             setTimeout(() => {
+                // Make all days clickable
                 $('.fc-daygrid-day').addClass('selectable-day');
                 
                 // Add click handler directly to calendar days
@@ -346,6 +362,24 @@
                         // Load time slots for this date
                         loadTimeSlots(selectedDate);
                     }
+                });
+                
+                // Ensure the calendar navigation buttons work
+                $('.fc-prev-button, .fc-next-button, .fc-today-button').on('click', function() {
+                    console.log("Calendar navigation clicked");
+                    
+                    // Reset selected date to ensure clean state
+                    selectedDate = '';
+                    selectedTime = '';
+                    
+                    // Reset highlighting
+                    $(".fc-day").removeClass("fc-day-selected");
+                    $(".time-slot").removeClass("time-slot-selected bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
+                    
+                    // After navigation, re-add the selectable class to the new days
+                    setTimeout(() => {
+                        $('.fc-daygrid-day').addClass('selectable-day');
+                    }, 200);
                 });
             }, 1000);
             function loadTimeSlots(date) {
@@ -418,27 +452,40 @@
             }
 
             // ✅ Generate days for selector
-            function generateDaySelector(year, month) {
+            function generateDaySelector(year, month, selectedDay) {
                 let container = $('#days-container');
                 container.empty();
                 
-                let date = new Date(year, month - 1, 1);
-                let currentDay = date.getDay() === 0 ? 7 : date.getDay(); // Convert Sunday from 0 to 7
+                let currentDate = new Date(year, month - 1, 1);
+                let daysInMonth = new Date(year, month, 0).getDate();
                 
-                // Create 4 days starting from Monday of current week
-                let monday = new Date(date);
-                monday.setDate(monday.getDate() - currentDay + 1);
+                // Find the day to center around (the selected day)
+                let centerDay = selectedDay || Math.min(15, daysInMonth);
                 
+                // Calculate start day (2 days before center, but ensure it's in the month)
+                let startDay = Math.max(1, centerDay - 2);
+                
+                // Create 4 days starting from startDay
                 for (let i = 0; i < 4; i++) {
-                    let day = new Date(monday);
-                    day.setDate(monday.getDate() + i);
+                    let dayNum = startDay + i;
+                    
+                    // Skip if we exceed days in month
+                    if (dayNum > daysInMonth) break;
+                    
+                    let dayDate = new Date(year, month - 1, dayNum);
+                    let formattedDate = dayDate.toISOString().split('T')[0];
                     
                     let dayEl = $(`
-                        <div class="day" data-date="${day.toISOString().split('T')[0]}">
-                            <div class="day-number">${day.getDate()}</div>
-                            <div class="day-name">${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day.getDay()]}</div>
+                        <div class="day" data-date="${formattedDate}">
+                            <div class="day-number">${dayNum}</div>
+                            <div class="day-name">${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayDate.getDay()]}</div>
                         </div>
                     `);
+                    
+                    // Mark as selected if it matches selectedDay
+                    if (dayNum === selectedDay) {
+                        dayEl.addClass('selected');
+                    }
                     
                     dayEl.on('click', function() {
                         $('.day').removeClass('selected');
@@ -451,13 +498,23 @@
                     container.append(dayEl);
                 }
                 
-                // Select first day by default
-                $('.day:first-child').addClass('selected');
-                loadMobileTimeSlots($('.day:first-child').data('date'));
+                // Load time slots for the selected day
+                let selectedDayEl = $('.day.selected');
+                if (selectedDayEl.length) {
+                    let dateStr = selectedDayEl.data('date');
+                    loadMobileTimeSlots(dateStr);
+                }
             }
             
             // ✅ Load mobile time slots
             function loadMobileTimeSlots(date) {
+                if (!date) {
+                    console.error("No date provided to loadMobileTimeSlots");
+                    return;
+                }
+                
+                console.log("Loading mobile time slots for:", date);
+                
                 // Get the selected doctor
                 let doctorId = $('#doctor-select').val() || null;
                 
@@ -546,11 +603,23 @@
                 });
             }
 
-            // ✅ Handle month/year changes
+            // When month/year changes, regenerate day selector
             $('#month-select, #year-select').on('change', function() {
-                let year = $('#year-select').val();
-                let month = $('#month-select').val();
-                generateDaySelector(year, month);
+                let year = parseInt($('#year-select').val());
+                let month = parseInt($('#month-select').val());
+                
+                // Get currently selected day if possible
+                let selectedDayEl = $('.day.selected');
+                let selectedDay = selectedDayEl.length ? 
+                    parseInt(selectedDayEl.find('.day-number').text()) : null;
+                
+                // Check if selected day is valid in new month
+                let daysInNewMonth = new Date(year, month, 0).getDate();
+                if (selectedDay && selectedDay > daysInNewMonth) {
+                    selectedDay = daysInNewMonth; // Adjust if month doesn't have as many days
+                }
+                
+                generateDaySelector(year, month, selectedDay);
             });
 
             // When doctor changes, refresh time slots
