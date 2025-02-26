@@ -5,6 +5,7 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\User;
 
 /**
  * Class Client
@@ -50,7 +51,8 @@ class Client extends Model
         'username',
         'password',
         'account_status',
-        'practice_id'
+        'practice_id',
+        'userid'
     ];
 
     protected $casts = [
@@ -67,7 +69,8 @@ class Client extends Model
         'username' => 'string',
         'password' => 'string',
         'account_status' => 'string',
-        'practice_id' => 'integer'
+        'practice_id' => 'integer',
+        'userid' => 'string'
     ];
 
     public static $rules = [
@@ -83,7 +86,8 @@ class Client extends Model
         'username' => 'required|string|max:50',
         'password' => 'required|string|max:255',
         'account_status' => 'required|string',
-        'practice_id' => 'required|integer'
+        'practice_id' => 'required|integer',
+        'uuserid' => 'required|string|exists:users,id'
     ];
 
     /**
@@ -91,8 +95,9 @@ class Client extends Model
      */
     public function practice()
     {
-        return $this->belongsTo(Practice::class);
+        return $this->belongsTo(Practice::class, 'practice_id', 'id');
     }
+
 
     /**
      * This function ensures the dropdowns display "First Name Last Name" instead of just IDs.
@@ -104,6 +109,10 @@ class Client extends Model
     public function diaryEntries()
     {
         return $this->hasMany(DiaryEntry::class, 'client_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(\App\User::class,'userid','id');
     }
 
 }

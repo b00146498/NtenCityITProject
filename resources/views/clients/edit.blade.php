@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4">
+<div class="container mt-1">
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between">
             <h4>Edit Client Details</h4>

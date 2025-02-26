@@ -29,7 +29,8 @@ class clientRepository extends BaseRepository
         'username',
         'password',
         'account_status',
-        'practice_id'
+        'practice_id',
+        'userid'
     ];
 
     /**

@@ -9,7 +9,8 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
-use App\Models\Practice; // Added to fetch practice names
+use App\Models\Practice; 
+use Illuminate\Support\Facades\Auth;
 
 class clientController extends AppBaseController
 {
@@ -36,16 +37,20 @@ class clientController extends AppBaseController
      */
     public function create()
     {
-        $practices = Practice::all(); // Fetch all practices
-    
-        // Automatically select the first available practice_id (if exists)
+        $practices = Practice::all(); // ✅ Fetch all practices
+        
+        // ✅ Use `$practices` instead of `$practice`
         $practice_id = $practices->first() ? $practices->first()->id : null;
-    
+
+        $client = new \App\Models\Client();
+
         return view('clients.create')->with([
-            'practices' => $practices,
-            'practice_id' => $practice_id // Pass this to the form
+            'client' => $client, // ✅ Pass empty client
+            'practices' => $practices, // ✅ Fix variable name
+            'practice_id' => $practice_id 
         ]);
     }
+
     
 
     /**
@@ -53,7 +58,19 @@ class clientController extends AppBaseController
      */
     public function store(CreateclientRequest $request)
     {
+        $user = Auth::user(); // Get logged-in user
+
+        // Split the user's full name into first name & surname
+        $nameParts = explode(' ', $user->name, 2);
+        $firstName = $nameParts[0]; // First word is first name
+        $surname = isset($nameParts[1]) ? $nameParts[1] : ''; // Everything else is surname
+
+        // Get all request input and modify first_name & surname
         $input = $request->all();
+        $input['first_name'] = $firstName; // 
+        $input['surname'] = $surname; // 
+        $input['email'] = $user->email; // 
+        $input['userid'] = $user->id; // 
 
         $client = $this->clientRepository->create($input);
 
@@ -133,5 +150,18 @@ class clientController extends AppBaseController
         Flash::success('Client deleted successfully.');
 
         return redirect(route('clients.index'));
+    }
+    public function getLoggedInClientDetails()
+    {
+        if (!Auth::guest()){
+            $user = Auth::user();
+            echo "Userid is " . $user->id;
+            echo "Client id is " . $user->client->id;
+            echo "The client's name is " . $user->client->first_name . " ";
+            echo $user->client->surname;
+        }
+        else {
+            echo "not logged in ";
+        }
     }
 }

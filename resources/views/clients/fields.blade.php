@@ -1,14 +1,14 @@
 <div class="row">
-    <!-- First Name -->
-    <div class="col-md-6 mb-3">
-        {!! Form::label('first_name', 'First Name:', ['class' => 'form-label fw-bold']) !!}
-        {!! Form::text('first_name', null, ['class' => 'form-control', 'required']) !!}
+    <!-- First Name Field -->
+    <div class="form-group col-md-6">
+        {!! Form::label('first_name', 'First Name:') !!}
+        {!! Form::text('first_name', old('first_name', $client->first_name ?? ''), ['class' => 'form-control']) !!}
     </div>
 
-    <!-- Surname -->
-    <div class="col-md-6 mb-3">
-        {!! Form::label('surname', 'Surname:', ['class' => 'form-label fw-bold']) !!}
-        {!! Form::text('surname', null, ['class' => 'form-control', 'required']) !!}
+    <!-- Surname Field -->
+    <div class="form-group col-md-6">
+        {!! Form::label('surname', 'Surname:') !!}
+        {!! Form::text('surname', old('surname', $client->surname ?? ''), ['class' => 'form-control']) !!}
     </div>
 
     <!-- Date of Birth -->
@@ -81,5 +81,10 @@
                 </option>
             @endforeach
         </select>
+    </div>
+    <!-- Submit & Cancel Buttons -->
+    <div class="col-md-12 text-center mt-3">
+        {!! Form::submit('Save Client', ['class' => 'btn btn-primary px-4 py-2']) !!}
+        <a href="{{ route('clients.index') }}" class="btn btn-outline-secondary px-4 py-2">Cancel</a>
     </div>
 </div>

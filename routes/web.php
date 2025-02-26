@@ -67,3 +67,5 @@ Route::get('/calendar/display', [CalendarController::class, 'display'])
 
 // ✅ Use AppointmentController for Full CRUD (Ensure it's included)
 Route::resource('appointments', AppointmentController::class);
+
+Route::get('/loggedInClient','App\Http\Controllers\clientController@getLoggedInClientDetails');
