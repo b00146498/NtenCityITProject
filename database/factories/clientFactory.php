@@ -34,7 +34,11 @@ class clientFactory extends Factory
         'username' => $this->faker->word,
         'password' => $this->faker->word,
         'account_status' => $this->faker->word,
-        'practice_id' => $this->faker->randomDigitNotNull
+        'practice_id' => $this->faker->randomDigitNotNull,
+        'created_at' => $this->faker->date('Y-m-d H:i:s'),
+        'updated_at' => $this->faker->date('Y-m-d H:i:s'),
+        'deleted_at' => $this->faker->date('Y-m-d H:i:s'),
+        'userid' => $this->faker->word
         ];
     }
 }

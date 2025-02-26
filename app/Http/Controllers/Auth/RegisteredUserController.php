@@ -49,6 +49,13 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        //return redirect(RouteServiceProvider::HOME);
+        return redirect()->route('client.new',['userid'=>$user->id]); 
+        /*if ($request->role=="client"){
+            return redirect()->route('client.new',['userid'=>$user->id]);
+        }
+        else if ($request->role=="employee"){
+            return redirect()->route('employee.new',['userid'=>$user->id]);
+        }*/
     }
 }

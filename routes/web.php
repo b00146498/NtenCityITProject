@@ -69,3 +69,7 @@ Route::get('/calendar/display', [CalendarController::class, 'display'])
 Route::resource('appointments', AppointmentController::class);
 
 Route::get('/loggedInClient','App\Http\Controllers\clientController@getLoggedInClientDetails');
+
+Route::get('/client/new/{userid}', 'App\Http\Controllers\clientController@new')->name('client.new');
+
+Route::resource('customers', App\Http\Controllers\customerController::class);

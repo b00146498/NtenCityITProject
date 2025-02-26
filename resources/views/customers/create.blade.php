@@ -3,18 +3,19 @@
 @section('content')
     <section class="content-header">
         <h1>
-            Create Client Profile
+            customer
         </h1>
     </section>
     <div class="content">
         @include('basic-template::common.errors')
         <div class="box box-primary">
+
             <div class="box-body">
                 <div class="row">
-                    {!! Form::open(['route' => 'clients.store']) !!}
+                    {!! Form::open(['route' => 'customers.store']) !!}
 
-                        @include('clients.fields')
-                        
+                        @include('customers.fields')
+
                     {!! Form::close() !!}
                 </div>
             </div>

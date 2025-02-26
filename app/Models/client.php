@@ -5,12 +5,11 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\User;
 
 /**
- * Class Client
+ * Class client
  * @package App\Models
- * @version February 5, 2025, 10:15 pm UTC
+ * @version February 26, 2025, 3:36 pm UTC
  *
  * @property string $first_name
  * @property string $surname
@@ -25,20 +24,25 @@ use App\Models\User;
  * @property string $password
  * @property string $account_status
  * @property integer $practice_id
+ * @property integer $userid
  */
-class Client extends Model
+class client extends Model
 {
-    use SoftDeletes, HasFactory;
+    use SoftDeletes;
+
+    use HasFactory;
 
     public $table = 'client';
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-    protected $dates = ['deleted_at'];
-    public $timestamps = true;
 
-    protected $fillable = [
+    protected $dates = ['deleted_at'];
+
+
+
+    public $fillable = [
         'first_name',
         'surname',
         'date_of_birth',
@@ -55,6 +59,11 @@ class Client extends Model
         'userid'
     ];
 
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
     protected $casts = [
         'id' => 'integer',
         'first_name' => 'string',
@@ -70,9 +79,14 @@ class Client extends Model
         'password' => 'string',
         'account_status' => 'string',
         'practice_id' => 'integer',
-        'userid' => 'string'
+        'userid' => 'integer'
     ];
 
+    /**
+     * Validation rules
+     *
+     * @var array
+     */
     public static $rules = [
         'first_name' => 'required|string|max:50',
         'surname' => 'required|string|max:50',
@@ -87,32 +101,8 @@ class Client extends Model
         'password' => 'required|string|max:255',
         'account_status' => 'required|string',
         'practice_id' => 'required|integer',
-        'uuserid' => 'required|string|exists:users,id'
+        'userid' => 'nullable'
     ];
 
-    /**
-     * Relationship: A client belongs to a practice.
-     */
-    public function practice()
-    {
-        return $this->belongsTo(Practice::class, 'practice_id', 'id');
-    }
-
-
-    /**
-     * This function ensures the dropdowns display "First Name Last Name" instead of just IDs.
-     */
-    public function __toString()
-    {
-        return $this->first_name . ' ' . $this->surname;
-    }
-    public function diaryEntries()
-    {
-        return $this->hasMany(DiaryEntry::class, 'client_id');
-    }
-    public function user()
-    {
-        return $this->belongsTo(\App\User::class,'userid','id');
-    }
-
+    
 }

@@ -3,9 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\client;
+use App\Models\customer;
 
-class CreateclientRequest extends FormRequest
+class CreatecustomerRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,6 +24,6 @@ class CreateclientRequest extends FormRequest
      */
     public function rules()
     {
-        return client::$rules;
+        return customer::$rules;
     }
 }

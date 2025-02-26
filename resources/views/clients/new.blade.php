@@ -13,7 +13,7 @@
                 <div class="row">
                     {!! Form::open(['route' => 'clients.store']) !!}
 
-                        @include('clients.fields')
+                        @include('clients.newfields')
                         
                     {!! Form::close() !!}
                 </div>
