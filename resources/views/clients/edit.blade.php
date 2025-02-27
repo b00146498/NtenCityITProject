@@ -1,23 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="content-header">
-        <h1>
-            client
-        </h1>
-    </section>
-    <div class="content">
-       @include('basic-template::common.errors')
-       <div class="box box-primary">
-           <div class="box-body">
-               <div class="row">
-                   {!! Form::model($client, ['route' => ['clients.update', $client->id], 'method' => 'patch']) !!}
+<div class="container mt-1">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between">
+            <h1>
+            Edit Client Details
+            </h1>
+            <a href="{{ route('clients.index') }}" class="text-white text-decoration-none">✖ Close</a>
+        </div>
+        <div class="card-body">
+            @include('basic-template::common.errors')
+       
+            {!! Form::model($client, ['route' => ['clients.update', $client->id], 'method' => 'patch']) !!}
 
-                        @include('clients.fields')
+            @include('clients.fields')
 
-                   {!! Form::close() !!}
-               </div>
-           </div>
-       </div>
+            {!! Form::close() !!}
+        </div>
     </div>
+</div>
 @endsection
+

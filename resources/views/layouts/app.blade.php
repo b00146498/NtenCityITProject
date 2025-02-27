@@ -20,14 +20,19 @@
 
     <style>
         /* Top header styling */
-        .top-header {
-            width: 100%;
-            height: 60px;
-            background-color: #f8f9fa;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            border-bottom: 1px solid #ddd;
+        .top-header{
+        position: fixed; /* Keeps it fixed at the top */
+        top: 0; 
+        left: 0;
+        width: 100%; 
+        height: 60px;
+        display: flex;
+        z-index: 1000; 
+        background-color: #f8f9fa; 
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+        align-items: center;
+        padding: 0 20px;
+        border-bottom: 1px solid #ddd;
         }
 
         .top-header img {

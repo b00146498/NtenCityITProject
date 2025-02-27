@@ -65,10 +65,15 @@
         {!! Form::text('pps_number', null, ['class' => 'form-control']) !!}
     </div>
 
-    <!-- Role -->
+    <!-- Role Dropdown -->
     <div class="col-md-6 mb-3">
         {!! Form::label('role', 'Role:', ['class' => 'form-label fw-bold']) !!}
-        {!! Form::text('role', null, ['class' => 'form-control']) !!}
+        {!! Form::select('role', [
+            'Professional' => 'Professional',
+            'Manager' => 'Manager',
+            'Staff' => 'Staff',
+            'Receptionist' => 'Receptionist'
+        ], null, ['class' => 'form-select', 'placeholder' => 'Select Role', 'required']) !!}
     </div>
 
     <!-- IBAN -->

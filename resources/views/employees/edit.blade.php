@@ -14,13 +14,6 @@
             
             @include('employees.fields')
 
-
-            <!-- Submit Button Section -->
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{{ route('employees.index') }}" class="btn btn-outline-dark px-4 py-2">Cancel</a>
-                {!! Form::submit('Save Changes', ['class' => 'btn btn-success px-4 py-2']) !!}
-            </div>
-
             {!! Form::close() !!}
         </div>
     </div>

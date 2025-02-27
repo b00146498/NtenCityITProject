@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateclientRequest;
 use App\Repositories\clientRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
+use App\Models\Practice;
 use Flash;
 use Response;
 
@@ -124,8 +125,11 @@ class clientController extends AppBaseController
             return redirect(route('clients.index'));
         }
 
-        return view('clients.edit')->with('client', $client);
+        $practices = Practice::all();
+
+        return view('clients.edit', compact('client', 'practices'));
     }
+
 
     /**
      * Update the specified client in storage.
