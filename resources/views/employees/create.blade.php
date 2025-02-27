@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            Add new Employee Profile
+            Add Employee Profile
         </h1>
     </section>
     <div class="content">
@@ -21,4 +21,10 @@
             </div>
         </div>
     </div>
+    <style>
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: bold !important;
+        font-size: 2rem !important; /* Adjust size */
+    }
+    </style>
 @endsection

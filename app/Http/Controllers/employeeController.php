@@ -43,7 +43,11 @@ class employeeController extends AppBaseController
      */
     public function create()
     {
-        return view('employees.create');
+        $practices = Practice::all(); // Fetch all practices from the database
+
+        return view('employees.create')->with([
+            'practices' => $practices, // ✅ Pass practices to the view
+        ]);
     }
 
     /**

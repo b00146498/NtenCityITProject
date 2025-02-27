@@ -82,8 +82,40 @@
             @endforeach
         </select>
     </div>
-    <div class="form-group col-sm-12">
-        {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
-        <a href="{!! route('customers.index') !!}" class="btn btn-default">Cancel</a>
+    <!-- Centered Buttons -->
+    <div class="d-flex justify-content-center mt-3">
+        <a href="{{ route('employees.index') }}" class="btn btn-primary me-3">
+            <i class="fas fa-arrow-left"></i> Back to Employees
+        </a>
+        <button type="submit" class="btn btn-primary">Save Details</button>
     </div>
 </div>
+
+<style>
+    /* Heading Styles */
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: bold !important;
+        font-size: 2rem !important; /* Adjust size */
+    }
+
+    /* Common Button Styles (Back & Update) */
+    .btn-primary {
+        background-color: #C96E04 !important; /* Orange */
+        color: white !important;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    /* Hover Effect */
+    .btn-primary:hover {
+        background-color: #A85C03 !important; /* Darker Orange */
+    }
+    .form-control {
+        background-color: #FFF7ED !important;
+    }
+</style>
