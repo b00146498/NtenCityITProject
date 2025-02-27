@@ -76,8 +76,19 @@ class AppointmentController extends AppBaseController
             return response()->json(['error' => 'Invalid input', 'messages' => $validator->errors()], 400);
         }
 
-        // Convert times if needed
+        // Format the data for database insertion
         $data = $request->all();
+        
+        // Convert AM/PM times to 24-hour format if needed
+        if (strpos($data['start_time'], 'AM') !== false || strpos($data['start_time'], 'PM') !== false) {
+            $startDateTime = Carbon::parse($data['start_time']);
+            $data['start_time'] = $startDateTime->format('H:i:s');
+        }
+        
+        if (strpos($data['end_time'], 'AM') !== false || strpos($data['end_time'], 'PM') !== false) {
+            $endDateTime = Carbon::parse($data['end_time']);
+            $data['end_time'] = $endDateTime->format('H:i:s');
+        }
         
         // Format has now been standardized to a format your database expects
         try {
