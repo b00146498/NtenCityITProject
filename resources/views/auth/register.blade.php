@@ -96,7 +96,7 @@
 
             <div class="form-title">Sign Up</div>
             <div>
-                <x-input id="name" class="block w-full" type="text" name="name" :value="old('name')" required autofocus placeholder="Name" />
+                <x-input id="name" class="block w-full" type="text" name="name" :value="old('name')" required autofocus placeholder="Full Name" />
             </div>
 
             <div class="mt-4">
@@ -110,6 +110,7 @@
             <div class="mt-4">
                 <x-input id="password_confirmation" class="block w-full" type="password" name="password_confirmation" required placeholder="Confirm Password" />
             </div>
+            
 
             <button type="submit">Register</button>
 

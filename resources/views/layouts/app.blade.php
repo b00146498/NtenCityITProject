@@ -116,8 +116,16 @@
 <body>
 
 <!-- Top Header -->
-<div class="top-header">
-    <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo">
+<div class="top-header d-flex justify-content-between align-items-center px-3">
+    <!-- Logo on the Left -->
+    <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
+
+    <!-- User Name on the Right -->
+    @auth
+        <div class="user-info">
+            <i class="fas fa-user"></i> {{ Auth::user()->name }}
+        </div>
+    @endauth
 </div>
 
 <!-- Sidebar -->

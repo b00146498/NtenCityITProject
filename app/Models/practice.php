@@ -67,4 +67,5 @@ class Practice extends Model
         'iban' => 'required|string|max:255',
         'bic' => 'required|string|max:255'
     ];
+    
 }
