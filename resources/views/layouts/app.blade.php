@@ -124,11 +124,16 @@
             </a>
         </li>
         @auth
-        <li class="nav-item">
-            <a class="nav-link {{ request()->is('calendar/display') ? 'active' : '' }}" href="{{ url('/appointments') }}">
-                <i class="fas fa-calendar-alt"></i> Appointments 
-            </a>
-        </li>
+        <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="appointmentsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-calendar-alt"></i> Appointments
+    </a>
+    <ul class="dropdown-menu custom-dropdown" aria-labelledby="appointmentsDropdown">
+        <li><a class="dropdown-item custom-dropdown-item" href="{{ url('/appointments') }}">View Appointments</a></li>
+        <li><a class="dropdown-item custom-dropdown-item" href="{{ url('/calendar/display') }}">Employee Appointment</a></li>
+    </ul>
+</li>
+
         @endauth 
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="clientsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

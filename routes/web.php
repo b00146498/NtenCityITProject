@@ -73,3 +73,9 @@ Route::get('/loggedInClient','App\Http\Controllers\clientController@getLoggedInC
 Route::get('/client/new/{userid}', 'App\Http\Controllers\clientController@new')->name('client.new');
 
 Route::resource('customers', App\Http\Controllers\customerController::class);
+
+
+// Web Routes in Laravel
+Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index')->middleware('auth');
+Route::get('/appointments/calendar', [CalendarController::class, 'display'])->name('calendar.display')->middleware('auth');
+Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create')->middleware('auth');
