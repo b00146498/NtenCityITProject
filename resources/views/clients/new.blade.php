@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            Create Client Profile
+            Create Client Profile Form
         </h1>
     </section>
     <div class="content">
