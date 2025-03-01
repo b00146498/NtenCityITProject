@@ -4,16 +4,18 @@
 <div class="container">
     <h2>Client Progress Notes <i class="fa fa-paperclip"></i></h2>
     <br>
-    <!-- Search Bar (Place it here, above the table) -->
-    <form method="GET" action="{{ route('diary-entries.index') }}" class="d-flex" style="max-width: 500px;">
-        <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search by client name..." value="{{ request('search') }}">
-            <button type="submit" class="btn search-btn">
+    <!-- Search Bar & Add New Note Button in One Line -->
+    <div class="d-flex align-items-center gap-2 mb-3" style="max-width: 600px;">
+        <div class="input-group" style="flex-grow: 1;">
+            <input type="text" id="searchInput" class="form-control search-input" placeholder="Search by client name..." autocomplete="off">
+            <button class="btn search-btn">
                 <i class="fa fa-search"></i> <!-- Search Icon -->
-            </button><a href="{{ route('diary-entries.create') }}" class="btn btn-add-entry"><i class="fa fa-plus"></i> Add New Note</a>
+            </button>
         </div>
-    </form>
-    <br>
+        <a href="{{ route('diary-entries.create') }}" class="btn btn-add-entry">
+            <i class="fa fa-plus"></i> Add New Note
+        </a>
+    </div>
 
 
     <table class="table">
@@ -50,56 +52,58 @@
         font-size: 2rem !important; /* Adjust size */
     }
 
-    /* Optional: Style the search bar */
-    #searchInput {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-    /* Custom Button Styling */
-    .search-btn {
-        background-color: #C96E04 !important; /* Orange Button */
-        border-color: #C96E04 !important; /* Matching Border */
-        color: white !important; /* White Icon/Text */
-    }
 
-    /* Hover Effect */
-    .search-btn:hover {
-        background-color: #A85C03 !important; /* Slightly Darker Orange */
-        border-color: #A85C03 !important;
-    }
+/* Custom Search Button */
+.search-btn {
+    background-color: #C96E04 !important; /* Orange Button */
+    border-color: #C96E04 !important; /* Matching Border */
+    color: white !important; /* White Icon/Text */
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
 
-    /* Search Input Border (Optional) */
-    .form-control {
-        border: 1px solid #C96E04 !important;
-    }
-    .btn-add-entry {
-        background-color: #C96E04 !important; /* Orange Button */
-        border-color: #C96E04 !important;
-        color: white !important;
-        font-weight: bold;
-        padding: 10px 15px;
-        border-radius: 5px;
-        text-decoration: none;
-    }
+/* Hover Effect */
+.search-btn:hover {
+    background-color: #A85C03 !important; /* Slightly Darker Orange */
+    border-color: #A85C03 !important;
+}
 
-    .btn-add-entry:hover {
-        background-color: #A85C03 !important; /* Darker shade */
-        border-color: #A85C03 !important;
-    }
+/* Ensure Button is on One Line */
+.btn-add-entry {
+    white-space: nowrap; /* Prevents text from wrapping */
+    background-color: #C96E04 !important;
+    border-color: #C96E04 !important;
+    color: white !important;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+/* Adjust Search Bar Width to Prevent Overflow */
+.search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #C96E04 !important;
+    border-radius: 5px;
+}
+
+.btn-add-entry:hover {
+    background-color: #A85C03 !important;
+    border-color: #A85C03 !important;
+}
 </style>
 
-<!-- JavaScript for live search -->
 <script>
     document.getElementById('searchInput').addEventListener('keyup', function () {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll("#diaryTable tr");
 
         rows.forEach(row => {
-            let clientName = row.querySelector(".client-name").textContent.toLowerCase();
-            if (clientName.includes(filter)) {
+            let clientName = row.querySelector(".client-name")?.textContent.toLowerCase();
+            if (clientName && clientName.includes(filter)) {
                 row.style.display = "";
             } else {
                 row.style.display = "none";
@@ -107,5 +111,6 @@
         });
     });
 </script>
+
 
 @endsection

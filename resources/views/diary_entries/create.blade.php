@@ -17,22 +17,16 @@
     <form action="{{ route('diary-entries.store') }}" method="POST">
         @csrf
 
-        <!-- Client Selection -->
-        @if(isset($client))
-            <!-- Pre-selected Client -->
-            <h4 class="mt-2 text-muted">{{ $client->first_name }}</h4>
-            <input type="hidden" name="client_id" value="{{ $client->id }}">
-        @else
-            <!-- Dropdown for Client Selection -->
-            <div class="form-group" style="max-width: 300px;">
-                <select name="client_id" class="form-control" required>
-                    <option value="">Choose a Client...</option>
-                    @foreach($clients as $client)
-                        <option value="{{ $client->id }}">{{ $client->first_name }} {{ $client->surname }}</option>
-                    @endforeach
-                </select>
+        <!-- Client Selection via Live Search -->
+        <div class="form-group position-relative" style="max-width: 400px;">
+            <label for="client-search" class="fw-bold">Search Client:</label>
+            <div class="input-group">
+                <input type="text" id="client-search" class="form-control search-input" placeholder="Type client name..." autocomplete="off">
+                <button class="btn search-btn"><i class="fa fa-search"></i></button>
             </div>
-        @endif
+            <input type="hidden" name="client_id" id="selected-client-id">
+            <div id="client-list" class="list-group shadow-sm position-absolute w-100 bg-white"></div>
+        </div>
 
         <!-- Yellow Lined Textbox -->
         <div class="diary-box mt-3 p-4">
@@ -127,5 +121,81 @@
         font-weight: bold !important;
         font-size: 2rem !important; /* Adjust size */
     }
+    /* Match Search Box Styling */
+    .search-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #C96E04 !important;
+        border-radius: 5px;
+    }
+
+    /* Custom Search Button */
+    .search-btn {
+        background-color: #C96E04 !important; /* Orange Button */
+        border-color: #C96E04 !important; /* Matching Border */
+        color: white !important; /* White Icon/Text */
+        font-weight: bold;
+        padding: 10px 15px;
+        border-radius: 5px;
+    }
+
+    /* Hover Effect */
+    .search-btn:hover {
+        background-color: #A85C03 !important; /* Slightly Darker Orange */
+        border-color: #A85C03 !important;
+    }
+
+    /* Ensure Dropdown Appears Above Other Elements */
+    #client-list {
+        position: absolute;
+        z-index: 1050;
+        width: 100%;
+        background-color: white;
+        border: 1px solid #ccc;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+
 </style>
+
+<!-- Live Search AJAX -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchInput = document.getElementById("client-search");
+        let clientList = document.getElementById("client-list");
+
+        searchInput.addEventListener("keyup", function () {
+            let query = this.value;
+
+            if (query.length > 1) {
+                fetch(`/search-clients?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        clientList.innerHTML = "";
+                        if (data.length > 0) {
+                            data.forEach(client => {
+                                let item = document.createElement("a");
+                                item.href = "#";
+                                item.classList.add("list-group-item", "list-group-item-action");
+                                item.textContent = `${client.first_name} ${client.surname}`;
+                                item.onclick = function () {
+                                    searchInput.value = `${client.first_name} ${client.surname}`;
+                                    document.getElementById("selected-client-id").value = client.id;
+                                    clientList.innerHTML = "";
+                                };
+                                clientList.appendChild(item);
+                            });
+                        } else {
+                            clientList.innerHTML = `<div class="list-group-item">No results found</div>`;
+                        }
+                    });
+            } else {
+                clientList.innerHTML = "";
+            }
+        });
+    });
+</script>
 @endsection

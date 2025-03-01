@@ -58,7 +58,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('diary-entries/{id}/edit', [DiaryEntryController::class, 'edit'])->name('diary-entries.edit');
     Route::put('diary-entries/{id}', [DiaryEntryController::class, 'update'])->name('diary-entries.update');
     Route::delete('diary-entries/{id}', [DiaryEntryController::class, 'destroy'])->name('diary-entries.destroy');
+    Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 });
+Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 
 // ✅ Calendar Display Route (Using CalendarController)
 Route::get('/calendar/display', [CalendarController::class, 'display'])

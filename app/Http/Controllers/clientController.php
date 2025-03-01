@@ -8,6 +8,7 @@ use App\Repositories\clientRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use App\Models\Practice;
+use App\Models\Client;
 use Flash;
 use Response;
 
@@ -181,4 +182,17 @@ class clientController extends AppBaseController
 
         return redirect(route('clients.index'));
     }
+    public function searchClients(Request $request)
+    {
+        $query = $request->query('query');
+
+        // Fetch clients matching the search query
+        $clients = Client::where('first_name', 'LIKE', "%{$query}%")
+                        ->orWhere('surname', 'LIKE', "%{$query}%")
+                        ->orderBy('first_name', 'asc')
+                        ->get(['id', 'first_name', 'surname']);
+
+        return response()->json($clients);
+    }
+
 }
