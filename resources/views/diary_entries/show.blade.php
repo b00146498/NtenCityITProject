@@ -4,9 +4,16 @@
 <div class="container">
     <h2 class="fw-bold">View Client Progress Notes</h2><br>
 
-    <!-- Display Employee and Client -->
-    <p><strong>Employee:</strong> {{ $diaryEntry->employee->emp_first_name }} {{ $diaryEntry->employee->emp_surname }}</p>
-    <p><strong>Client:</strong> {{ $diaryEntry->client->first_name }} {{ $diaryEntry->client->surname }}</p><br>
+    <p>
+        <strong>Employee:</strong> 
+        @if($diaryEntry->employee)
+            {{ $diaryEntry->employee->emp_first_name }} {{ $diaryEntry->employee->emp_surname }}
+        @else
+            <span class="text-danger">No employee assigned</span>
+        @endif
+    </p>
+
+<p><strong>Client:</strong> {{ $diaryEntry->client->first_name }} {{ $diaryEntry->client->surname }}</p>
 
     <form action="{{ route('diary-entries.update', $diaryEntry->id) }}" method="POST">
         @csrf
