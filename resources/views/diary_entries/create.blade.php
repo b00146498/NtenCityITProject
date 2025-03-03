@@ -17,6 +17,7 @@
     <form action="{{ route('diary-entries.store') }}" method="POST">
         @csrf
 
+        
         <!-- Client Selection via Live Search -->
         <div class="form-group position-relative" style="max-width: 400px;">
             <label for="client-search" class="fw-bold">Search Client:</label>
