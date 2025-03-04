@@ -32,23 +32,23 @@ Route::post('/logout', function (Request $request) {
 
 require __DIR__.'/auth.php';
 
-// ✅ CRUD Routes for Employees, Clients, and Practices
+// CRUD Routes for Employees, Clients, and Practices
 Route::resource('employees', App\Http\Controllers\EmployeeController::class);
 Route::resource('clients', App\Http\Controllers\ClientController::class);
 Route::resource('practices', App\Http\Controllers\PracticeController::class);
 
-// ✅ Restrict Calendar & Appointments Access to Authenticated Users
+// Restrict Calendar & Appointments Access to Authenticated Users
 Route::middleware(['auth'])->group(function () {
     
-    // ✅ FullCalendar Appointment Routes
+    // FullCalendar Appointment Routes
     Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
     Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
     Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy');
     
-    // ✅ NEW ROUTE: Get available time slots
+    // NEW ROUTE: Get available time slots
     Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
     
-    // ✅ Diary Entry Routes (Restricted to Authenticated Users)
+    // Diary Entry Routes (Restricted to Authenticated Users)
     Route::get('diary-entries/create', [DiaryEntryController::class, 'create'])->name('diary-entries.create');
     Route::get('diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.index');
     Route::get('clients/{client_id}/diary-entries', [DiaryEntryController::class, 'index'])->name('diary-entries.client');
@@ -62,7 +62,7 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 
-// ✅ Calendar Display Route (Using CalendarController)
+// Calendar Display Route (Using CalendarController)
 Route::get('/calendar/display', [CalendarController::class, 'display'])
     ->name('calendar.display')
     ->middleware('auth');
@@ -73,7 +73,7 @@ Route::resource('appointments', AppointmentController::class);
 Route::get('/loggedInClient','App\Http\Controllers\clientController@getLoggedInClientDetails');
 
 Route::get('/client/new/{userid}', 'App\Http\Controllers\clientController@new')->name('client.new');
-
+Route::get('/employee/new/{userid}', 'App\Http\Controllers\employeeController@new')->name('employee.new');
 Route::resource('customers', App\Http\Controllers\customerController::class);
 
 

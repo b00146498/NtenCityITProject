@@ -110,7 +110,15 @@
             <div class="mt-4">
                 <x-input id="password_confirmation" class="block w-full" type="password" name="password_confirmation" required placeholder="Confirm Password" />
             </div>
-            
+            <!-- Role Dropdown -->
+            <div class="mt-4">
+                <label for="role" class="form-title">Select Role:</label>
+                <select name="role" id="role" required>
+                    <option value="">Choose Role...</option>
+                    <option value="client">Client</option>
+                    <option value="employee">Employee</option>
+                </select>
+            </div>
 
             <button type="submit">Register</button>
 

@@ -37,12 +37,14 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => 'required|in:client,employee'
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role,
         ]);
 
         event(new Registered($user));
@@ -50,12 +52,15 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         //return redirect(RouteServiceProvider::HOME);
-        return redirect()->route('client.new',['userid'=>$user->id]); 
+        //return redirect()->route('client.new',['userid'=>$user->id]); 
         /*if ($request->role=="client"){
             return redirect()->route('client.new',['userid'=>$user->id]);
         }
         else if ($request->role=="employee"){
             return redirect()->route('employee.new',['userid'=>$user->id]);
         }*/
+        return $user->role === 'client' 
+        ? redirect()->route('client.new',['userid'=>$user->id])
+        : redirect()->route('employee.new',['userid'=>$user->id]);
     }
 }
