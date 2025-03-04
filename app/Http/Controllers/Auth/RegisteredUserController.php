@@ -63,4 +63,6 @@ class RegisteredUserController extends Controller
         ? redirect()->route('client.new',['userid'=>$user->id])
         : redirect()->route('employee.new',['userid'=>$user->id]);
     }
+    
 }
+

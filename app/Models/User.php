@@ -45,4 +45,8 @@ class User extends Authenticatable
     {
         return $this->hasOne(\App\Models\Client::class, 'userid');
     }
+    public function employee()
+    {
+        return $this->hasOne(\App\Models\Employee::class, 'userid');
+    }
 }

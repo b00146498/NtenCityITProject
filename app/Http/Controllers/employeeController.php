@@ -8,6 +8,7 @@ use App\Repositories\employeeRepository;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Practice;
 use Illuminate\Http\Request;
+use App\Models\Employee;
 use Flash;
 use Response;
 
@@ -160,4 +161,24 @@ class employeeController extends AppBaseController
 
         return redirect(route('employees.index'));
     }
+    public function new($userid)
+    {
+        $practices = \App\Models\Practice::all();
+        
+        $practice_id = $practices->first()->id;
+        
+        return view('employees.create')->with([
+            //'client' => $client, 
+            'practices' => $practices, 
+            'userid' => $userid 
+        ]);
+        //return view('employees.create');
+    }
+    /**
+     * Store a newly created client in storage.
+     *
+     * @param CreateclientRequest $request
+     *
+     * @return Response
+     */
 }

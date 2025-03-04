@@ -5,6 +5,7 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class employee
@@ -124,6 +125,9 @@ class employee extends Model
     {
         return $this->belongsTo(Practice::class, 'practice_id');
     }
-
+    public function user()
+    {
+        return $this->belongsTo(\App\User::class,'userid','id');
+    }
 
 }

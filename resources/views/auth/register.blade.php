@@ -112,13 +112,12 @@
             </div>
             <!-- Role Dropdown -->
             <div class="mt-4">
-                <label for="role" class="form-title">Select Role:</label>
-                <select name="role" id="role" required>
-                    <option value="">Choose Role...</option>
+                <label for="role" class="block font-medium text-sm text-gray-700">Role:</label>
+                <select id="role" name="role" class="form-control" required>
                     <option value="client">Client</option>
                     <option value="employee">Employee</option>
                 </select>
-            </div>
+            </div> 
 
             <button type="submit">Register</button>
 
