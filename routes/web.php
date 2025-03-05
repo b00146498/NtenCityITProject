@@ -76,6 +76,9 @@ Route::get('/client/new/{userid}', 'App\Http\Controllers\clientController@new')-
 Route::get('/employee/new/{userid}', 'App\Http\Controllers\employeeController@new')->name('employee.new');
 Route::resource('customers', App\Http\Controllers\customerController::class);
 
+Route::get('/employee/new/{userid}', [App\Http\Controllers\EmployeeController::class, 'new'])->name('employee.new');
+
+
 
 // Web Routes in Laravel
 Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index')->middleware('auth');

@@ -58,6 +58,25 @@ class employeeController extends AppBaseController
      *
      * @return Response
      */
+
+    public function new($userid)
+    {
+        $practices = \App\Models\Practice::all();
+        
+        $practice_id = $practices->first()->id;
+        
+        return view('employees.new')->with([ 
+            'practices' => $practices, 
+            'userid' => $userid 
+        ]);
+    }
+    /**
+     * Store a newly created client in storage.
+     *
+     * @param CreateclientRequest $request
+     *
+     * @return Response
+     */
     public function store(CreateemployeeRequest $request)
     {
         $input = $request->all();
@@ -160,19 +179,6 @@ class employeeController extends AppBaseController
         Flash::success('Employee deleted successfully.');
 
         return redirect(route('employees.index'));
-    }
-    public function new($userid)
-    {
-        $practices = \App\Models\Practice::all();
-        
-        $practice_id = $practices->first()->id;
-        
-        return view('employees.create')->with([
-            //'client' => $client, 
-            'practices' => $practices, 
-            'userid' => $userid 
-        ]);
-        //return view('employees.create');
     }
     /**
      * Store a newly created client in storage.

@@ -64,7 +64,8 @@ class employee extends Model
         'bic',
         'username',
         'password',
-        'practice_id'
+        'practice_id',
+        'userid'
     ];
 
     /**
@@ -90,7 +91,8 @@ class employee extends Model
         'bic' => 'string',
         'username' => 'string',
         'password' => 'string',
-        'practice_id' => 'integer'
+        'practice_id' => 'integer',
+        'userid' => 'integer'
     ];
 
     /**
@@ -115,7 +117,8 @@ class employee extends Model
         'bic' => 'required|string|max:255',
         'username' => 'required|string|max:50',
         'password' => 'required|string|max:255',
-        'practice_id' => 'required|integer'
+        'practice_id' => 'required|integer',
+        'userid' => 'nullable'
     ];
 
     public function diaryEntries()
