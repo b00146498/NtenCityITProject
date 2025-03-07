@@ -99,6 +99,12 @@ class AppointmentController extends AppBaseController
                 return response()->json(['error' => 'Failed to create appointment'], 500);
             }
 
+            // Get client details for notifications
+            $client = \App\Models\Client::find($appointment->client_id);
+            
+            // Send confirmation notification
+            $this->sendAppointmentConfirmation($appointment, $client);
+
             Log::info('✅ Appointment Successfully Created', $appointment->toArray());
 
             return response()->json([
@@ -253,5 +259,79 @@ class AppointmentController extends AppBaseController
         $this->appointmentRepository->delete($id);
 
         return response()->json(['success' => 'Appointment deleted successfully!']);
+    }
+    
+    /**
+     * Send appointment confirmation to client
+     */
+    private function sendAppointmentConfirmation($appointment, $client)
+    {
+        if (!$client) {
+            Log::error('Cannot send confirmation: Client not found for ID ' . $appointment->client_id);
+            return;
+        }
+
+        // Get doctor/employee name
+        $doctor = \App\Models\Employee::find($appointment->employee_id);
+        $doctorName = $doctor ? $doctor->emp_first_name . ' ' . $doctor->emp_surname : 'your doctor';
+        
+        // Format appointment details
+        $date = Carbon::parse($appointment->booking_date)->format('l, F j, Y');
+        $startTime = Carbon::parse($appointment->start_time)->format('g:i A');
+        
+        // Email notification
+        if ($client->email) {
+            try {
+                // Check if the Mail class and mailable exist
+                if (class_exists('\Mail') && class_exists('\App\Mail\AppointmentConfirmation')) {
+                    \Mail::to($client->email)->send(new \App\Mail\AppointmentConfirmation(
+                        $client->first_name,
+                        $doctorName,
+                        $date,
+                        $startTime,
+                        $appointment->id
+                    ));
+                    Log::info('Appointment confirmation email sent to: ' . $client->email);
+                } else {
+                    // Fallback if the mailable doesn't exist yet
+                    Log::info('Would send email to ' . $client->email . ' with appointment details for ' . $date . ' at ' . $startTime);
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to send confirmation email: ' . $e->getMessage());
+            }
+        }
+        
+        // SMS notification (placeholder for future implementation)
+        if ($client->contact_number) {
+            try {
+                // Log the intent (will be replaced with actual SMS code later)
+                Log::info('Would send SMS to ' . $client->contact_number . ': Your appointment with ' . 
+                    $doctorName . ' is confirmed for ' . $date . ' at ' . $startTime . '. Ref: #' . $appointment->id);
+                
+                // Uncomment and configure when SMS service is ready
+                /*
+                $message = "Your appointment with {$doctorName} is confirmed for {$date} at {$startTime}. Ref: #{$appointment->id}";
+                
+                // If using a service class
+                app(\App\Services\SmsService::class)->send($client->contact_number, $message);
+                
+                // Or directly with a provider like Twilio
+                $twilioSid = config('services.twilio.sid');
+                $twilioToken = config('services.twilio.token');
+                $twilioFrom = config('services.twilio.from');
+                
+                $twilio = new \Twilio\Rest\Client($twilioSid, $twilioToken);
+                $twilio->messages->create(
+                    $client->contact_number,
+                    [
+                        'from' => $twilioFrom,
+                        'body' => $message
+                    ]
+                );
+                */
+            } catch (\Exception $e) {
+                Log::error('Failed to send confirmation SMS: ' . $e->getMessage());
+            }
+        }
     }
 }
