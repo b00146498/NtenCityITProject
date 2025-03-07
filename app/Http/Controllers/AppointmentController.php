@@ -143,78 +143,6 @@ class AppointmentController extends AppBaseController
             'date' => $date->toDateString(),
             'timeSlots' => $timeSlots
         ]);
-        
-        /* 
-        // Uncomment this code when you're ready to implement the availability checking
-        // This is the advanced implementation that checks real database availability
-        
-        // Define all possible time slots
-        $allTimeSlots = [
-            "09:00 AM" => ["start" => "09:00:00", "end" => "10:00:00"],
-            "10:00 AM" => ["start" => "10:00:00", "end" => "11:00:00"],
-            "11:30 AM" => ["start" => "11:30:00", "end" => "12:30:00"],
-            "12:00 PM" => ["start" => "12:00:00", "end" => "13:00:00"],
-            "02:00 PM" => ["start" => "14:00:00", "end" => "15:00:00"],
-            "03:30 PM" => ["start" => "15:30:00", "end" => "16:30:00"],
-            "05:00 PM" => ["start" => "17:00:00", "end" => "18:00:00"],
-            "07:00 PM" => ["start" => "19:00:00", "end" => "20:00:00"],
-            "10:00 PM" => ["start" => "22:00:00", "end" => "23:00:00"]
-        ];
-        
-        // Query for existing appointments on the selected date
-        $query = $this->appointmentRepository->makeModel()
-            ->newQuery()
-            ->where('booking_date', $date->toDateString())
-            ->where('status', '!=', 'canceled');
-            
-        // If a specific employee (doctor) is selected, filter by that employee
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-        
-        $existingAppointments = $query->get(['start_time', 'end_time', 'employee_id']);
-        
-        // Convert existing appointments to array of unavailable slots
-        $bookedSlots = [];
-        foreach ($existingAppointments as $appointment) {
-            $startTime = Carbon::parse($appointment->start_time)->format('H:i:s');
-            foreach ($allTimeSlots as $displayTime => $timeRange) {
-                // If this slot overlaps with an existing appointment, mark it as booked
-                if ($startTime === $timeRange['start']) {
-                    if (!isset($bookedSlots[$displayTime])) {
-                        $bookedSlots[$displayTime] = [];
-                    }
-                    $bookedSlots[$displayTime][] = $appointment->employee_id;
-                }
-            }
-        }
-        
-        // Build the response with available and unavailable slots
-        $result = [];
-        foreach ($allTimeSlots as $displayTime => $timeRange) {
-            $isBooked = false;
-            $bookedByDoctor = null;
-            
-            // Check if this slot is booked by the selected doctor
-            if ($request->filled('employee_id') && 
-                isset($bookedSlots[$displayTime]) && 
-                in_array($request->employee_id, $bookedSlots[$displayTime])) {
-                $isBooked = true;
-                $bookedByDoctor = $request->employee_id;
-            }
-            
-            $result[] = [
-                'time' => $displayTime, 
-                'available' => !$isBooked,
-                'booked_by_doctor' => $bookedByDoctor
-            ];
-        }
-        
-        return response()->json([
-            'date' => $date->toDateString(),
-            'timeSlots' => $result
-        ]);
-        */
     }
 
     public function update($id, Request $request)
@@ -307,31 +235,40 @@ class AppointmentController extends AppBaseController
                 // Log the intent (will be replaced with actual SMS code later)
                 Log::info('Would send SMS to ' . $client->contact_number . ': Your appointment with ' . 
                     $doctorName . ' is confirmed for ' . $date . ' at ' . $startTime . '. Ref: #' . $appointment->id);
-                
-                // Uncomment and configure when SMS service is ready
-                /*
-                $message = "Your appointment with {$doctorName} is confirmed for {$date} at {$startTime}. Ref: #{$appointment->id}";
-                
-                // If using a service class
-                app(\App\Services\SmsService::class)->send($client->contact_number, $message);
-                
-                // Or directly with a provider like Twilio
-                $twilioSid = config('services.twilio.sid');
-                $twilioToken = config('services.twilio.token');
-                $twilioFrom = config('services.twilio.from');
-                
-                $twilio = new \Twilio\Rest\Client($twilioSid, $twilioToken);
-                $twilio->messages->create(
-                    $client->contact_number,
-                    [
-                        'from' => $twilioFrom,
-                        'body' => $message
-                    ]
-                );
-                */
             } catch (\Exception $e) {
                 Log::error('Failed to send confirmation SMS: ' . $e->getMessage());
             }
+        }
+    }
+
+    public function payAppointment($id)
+    {
+        try {
+            // Find the appointment
+            $appointment = $this->appointmentRepository->find($id);
+
+            if (empty($appointment)) {
+                return response()->json(['error' => 'Appointment not found'], 404);
+            }
+
+            // Update appointment status 
+            $appointment->status = 'confirmed';
+            $this->appointmentRepository->update($appointment->toArray(), $id);
+
+            // Get client details
+            $client = \App\Models\Client::find($appointment->client_id);
+
+            // Send confirmation notification
+            $this->sendAppointmentConfirmation($appointment, $client);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment successfully booked and confirmed!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Appointment confirmation error: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to confirm appointment'], 500);
         }
     }
 }
