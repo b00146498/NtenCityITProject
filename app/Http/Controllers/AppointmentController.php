@@ -241,34 +241,85 @@ class AppointmentController extends AppBaseController
         }
     }
 
-    public function payAppointment($id)
+    /**
+     * Process payment for an appointment using a mock payment system
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function processPayment($id)
     {
+        Log::info('📌 Processing mock payment for appointment #' . $id);
+        
         try {
             // Find the appointment
             $appointment = $this->appointmentRepository->find($id);
 
             if (empty($appointment)) {
-                return response()->json(['error' => 'Appointment not found'], 404);
+                Log::error('Payment failed: Appointment #' . $id . ' not found');
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Appointment not found'
+                ], 404);
             }
 
-            // Update appointment status 
-            $appointment->status = 'confirmed';
-            $this->appointmentRepository->update($appointment->toArray(), $id);
+            // MOCK PAYMENT PROCESSING
+            // Simulate a payment by generating a mock transaction ID and receipt
+            $mockTransactionId = 'TRANS-' . strtoupper(substr(md5(uniqid()), 0, 10));
+            $mockAmount = 105.00; // Fixed price for all appointments in this demo
+            
+            // Simulate a slight delay like a real payment would have
+            sleep(1);
+            
+            // Update appointment with payment information
+            $this->appointmentRepository->update([
+                'status' => 'confirmed',
+                'notes' => $appointment->notes . "\n\nPayment processed: Transaction ID: {$mockTransactionId}, Amount: €{$mockAmount}"
+            ], $id);
 
-            // Get client details
+            // Get the updated appointment
+            $updatedAppointment = $this->appointmentRepository->find($id);
+
+            // Get client details for notifications
             $client = \App\Models\Client::find($appointment->client_id);
+            
+            // Send confirmation
+            $this->sendAppointmentConfirmation($updatedAppointment, $client);
 
-            // Send confirmation notification
-            $this->sendAppointmentConfirmation($appointment, $client);
+            // Generate a mock receipt
+            $receipt = [
+                'transaction_id' => $mockTransactionId,
+                'appointment_id' => $id,
+                'amount' => $mockAmount,
+                'currency' => 'EUR',
+                'date' => now()->format('Y-m-d H:i:s'),
+                'payment_method' => 'Credit Card (Simulated)',
+                'status' => 'Completed'
+            ];
+
+            Log::info('✅ Mock payment processed successfully for appointment #' . $id);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Appointment successfully booked and confirmed!'
+                'message' => 'Payment processed successfully',
+                'appointment' => $updatedAppointment,
+                'receipt' => $receipt
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Appointment confirmation error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to confirm appointment'], 500);
+            Log::error('❌ Mock payment processing error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment processing failed: ' . $e->getMessage()
+            ], 500);
         }
+    }
+
+    /**
+     * Legacy method for payAppointment - Redirects to processPayment
+     */
+    public function payAppointment($id)
+    {
+        Log::info('Legacy payAppointment method called, redirecting to processPayment');
+        return $this->processPayment($id);
     }
 }
