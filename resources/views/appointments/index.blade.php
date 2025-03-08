@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Appointments Calendar</title>
 
     <!-- Tailwind CSS -->
@@ -27,6 +28,7 @@
         var listClientsUrl = @json(route('clients.index', ['format' => 'json']));
         var listEmployeesUrl = @json(route('employees.index', ['format' => 'json']));
         var listPracticesUrl = @json(route('practices.index', ['format' => 'json']));
+        var paymentUrl = @json(route('appointments.pay', ['id' => ':id']));
     </script>
 
     <style>
@@ -255,6 +257,69 @@
         </div>
     </div>
 
+    <!-- Appointment Confirmation View -->
+    <div id="confirmation-view" class="mobile-view mt-6 hidden" data-appointment-id="">
+        <div class="status-bar">
+            <span class="status-time">9:45</span>
+            <div class="status-icons">
+                <span class="status-icon">📶</span>
+                <span class="status-icon">🔋</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center p-4 border-b">
+            <button id="back-from-confirm" class="text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <h1 class="text-center text-lg font-medium flex-1">Appointment</h1>
+        </div>
+        
+        <div class="p-4">
+            <div id="confirmation-header">
+                <!-- Selected date and time will be displayed here -->
+            </div>
+            
+            <div class="bg-yellow-50 rounded-lg p-4 mb-4">
+                <div id="confirm-doctor" class="font-bold text-lg mb-2">Dr. Andrew</div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Location</div>
+                    <div>The Spire, O'Connell Street</div>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Date</div>
+                    <div id="confirm-date">8th January, 2025</div>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Time</div>
+                    <div id="confirm-time">13:30 / Tuesday</div>
+                </div>
+                
+                <div class="mb-2">
+                    <div class="font-medium">Appointment Type</div>
+                    <div>Weekly check-in <span class="float-right">€105</span></div>
+                </div>
+                
+                <div class="border-t border-gray-300 mt-3 pt-2">
+                    <div class="font-bold">Total: <span class="float-right">€105</span></div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between mb-4">
+                <button id="cancel-confirm" class="px-8 py-2 border border-red-500 text-red-500 rounded-full">Cancel</button>
+                <button id="edit-confirm" class="px-8 py-2 border border-green-500 text-green-500 rounded-full">Edit</button>
+            </div>
+            
+            <button id="pay-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg">
+                Pay for Appointment
+            </button>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Global variables for selected date and time
@@ -272,6 +337,27 @@
                 initialView: 'dayGridMonth',
                 selectable: true,
                 editable: true,
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth'
+                },
+                
+                dateClick: function(info) {
+                    // Highlight the selected date
+                    $(".fc-day").removeClass("fc-day-selected");
+                    $(info.dayEl).addClass("fc-day-selected");
+                    
+                    // Store the selected date
+                    selectedDate = info.dateStr;
+                    console.log("Date selected:", selectedDate);
+                    
+                    // Load time slots for this date
+                    loadTimeSlots(selectedDate);
+                    
+                    // Make sure the Book Now button is updated with this date
+                    $("#book-btn").data("selected-date", selectedDate);
+                },
 
                 // ✅ Fetch appointments from Laravel
                 events: function(fetchInfo, successCallback, failureCallback) {
@@ -287,36 +373,17 @@
                             failureCallback(xhr);
                         }
                     });
-            
-            // ✅ Notification system
-            function showNotification(message, type) {
-                // Remove any existing notifications
-                $('.toast-notification').remove();
-                
-                // Create new notification
-                const notification = $(`<div class="toast-notification toast-${type}">${message}</div>`);
-                $('body').append(notification);
-                
-                // Show notification
-                setTimeout(() => {
-                    notification.addClass('toast-show');
-                }, 100);
-                
-                // Auto hide after 4 seconds
-                setTimeout(() => {
-                    notification.removeClass('toast-show');
-                    
-                    // Remove from DOM after fade out
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, 4000);
-            }
                 },
 
                 // ✅ Select a date to show available time slots
                 select: function(info) {
                     selectedDate = info.startStr;
+                    console.log("Date selected via select:", selectedDate);
+                    
+                    // Highlight the selected date
+                    $(".fc-day").removeClass("fc-day-selected");
+                    $(".fc-day[data-date='" + selectedDate + "']").addClass("fc-day-selected");
+                    
                     loadTimeSlots(selectedDate);
                 }
             });
@@ -382,6 +449,49 @@
                     }, 200);
                 });
             }, 1000);
+
+            // ✅ Notification system
+            function showNotification(message, type) {
+                // Remove any existing notifications
+                $('.toast-notification').remove();
+                
+                // Create new notification
+                const notification = $(`<div class="toast-notification toast-${type}">${message}</div>`);
+                $('body').append(notification);
+                
+                // Show notification
+                setTimeout(() => {
+                    notification.addClass('toast-show');
+                }, 100);
+                
+                // Auto hide after 4 seconds
+                setTimeout(() => {
+                    notification.removeClass('toast-show');
+                    
+                    // Remove from DOM after fade out
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 4000);
+            }
+            
+            // Function to restore selected date and time
+            function restoreSelections() {
+                // If a date was selected, re-highlight it
+                if (selectedDate) {
+                    setTimeout(() => {
+                        $('.fc-day[data-date="' + selectedDate + '"]').addClass('fc-day-selected');
+                    }, 100);
+                }
+                
+                // If a time was selected, re-highlight it
+                if (selectedTime) {
+                    setTimeout(() => {
+                        $('.time-slot[data-time="' + selectedTime + '"]').removeClass("bg-gray-200 text-gray-800").addClass("time-slot-selected bg-blue-500 text-white");
+                    }, 100);
+                }
+            }
+            
             function loadTimeSlots(date) {
                 if (!date) {
                     console.error("❌ No date provided to loadTimeSlots");
@@ -415,11 +525,15 @@
                         if (typeof timeSlots[0] === 'string') {
                             // Old format
                             timeSlots.forEach(slot => {
-                                let btn = $(`<button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">${slot}</button>`);
+                                let btn = $(`<button class="time-slot bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg" data-time="${slot}">${slot}</button>`);
                                 btn.on("click", function() {
-                                    $(".bg-blue-500").removeClass("bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
-                                    $(this).removeClass("bg-gray-200 text-gray-800").addClass("bg-blue-500 text-white");
+                                    $(".time-slot").removeClass("time-slot-selected bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
+                                    $(this).removeClass("bg-gray-200 text-gray-800").addClass("time-slot-selected bg-blue-500 text-white");
                                     selectedTime = slot;
+                                    console.log("Time selected:", selectedTime, "Current date:", selectedDate);
+                                    
+                                    // Make sure the Book Now button has both date and time
+                                    $("#book-btn").data("selected-time", selectedTime);
                                 });
                                 timeSlotsContainer.append(btn);
                             });
@@ -427,11 +541,15 @@
                             // New format with availability status
                             timeSlots.forEach(slot => {
                                 if (slot.available) {
-                                    let btn = $(`<button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">${slot.time}</button>`);
+                                    let btn = $(`<button class="time-slot bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg" data-time="${slot.time}">${slot.time}</button>`);
                                     btn.on("click", function() {
-                                        $(".bg-blue-500").removeClass("bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
-                                        $(this).removeClass("bg-gray-200 text-gray-800").addClass("bg-blue-500 text-white");
+                                        $(".time-slot").removeClass("time-slot-selected bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
+                                        $(this).removeClass("bg-gray-200 text-gray-800").addClass("time-slot-selected bg-blue-500 text-white");
                                         selectedTime = slot.time;
+                                        console.log("Time selected:", selectedTime, "Current date:", selectedDate);
+                                        
+                                        // Make sure the Book Now button has both date and time
+                                        $("#book-btn").data("selected-time", selectedTime);
                                     });
                                     timeSlotsContainer.append(btn);
                                 } else {
@@ -441,6 +559,9 @@
                                 }
                             });
                         }
+                        
+                        // Restore any previously selected time slot
+                        restoreSelections();
                     },
                     error: function(xhr) {
                         console.error("❌ Error fetching time slots:", xhr.responseText);
@@ -552,7 +673,13 @@
                                     hour12: true
                                 });
                                 
-                                let timeSlotEl = $(`<div class="time-slot-mobile">${slot} - ${formattedEndTime}</div>`);
+                                let timeLabel = `${slot} - ${formattedEndTime}`;
+                                let timeSlotEl = $(`<div class="time-slot-mobile" data-time="${slot}">${timeLabel}</div>`);
+                                
+                                // Check if this matches our selected time from the main view
+                                if (selectedTime === slot) {
+                                    timeSlotEl.addClass('selected');
+                                }
                                 
                                 timeSlotEl.on('click', function() {
                                     $('.time-slot-mobile').removeClass('selected');
@@ -576,19 +703,26 @@
                                     hour12: true
                                 });
                                 
+                                let timeLabel = `${slot.time} - ${formattedEndTime}`;
+                                
                                 if (slot.available) {
-                                    let timeSlotEl = $(`<div class="time-slot-mobile">${slot.time} - ${formattedEndTime}</div>`);
+                                    let timeSlotEl = $(`<div class="time-slot-mobile" data-time="${slot.time}">${timeLabel}</div>`);
+                                    
+                                    // Check if this matches our selected time from the main view
+                                    if (selectedTime === slot.time) {
+                                        timeSlotEl.addClass('selected');
+                                    }
                                     
                                     timeSlotEl.on('click', function() {
                                         $('.time-slot-mobile').removeClass('selected');
                                         $(this).addClass('selected');
-                                        selectedTime = slot.time;
+                                        electedTime = slot.time;
                                     });
                                     
                                     container.append(timeSlotEl);
                                 } else {
                                     // Create a disabled slot for booked times
-                                    let disabledSlot = $(`<div class="time-slot-mobile opacity-50 bg-gray-100 cursor-not-allowed">${slot.time} - ${formattedEndTime} <span class="text-red-500 float-right">Unavailable</span></div>`);
+                                    let disabledSlot = $(`<div class="time-slot-mobile opacity-50 bg-gray-100 cursor-not-allowed">${timeLabel} <span class="text-red-500 float-right">Unavailable</span></div>`);
                                     container.append(disabledSlot);
                                 }
                             });
@@ -642,44 +776,24 @@
                     return;
                 }
                 
-                // Populate month and year selects based on selected date
+                console.log("Booking with date:", selectedDate, "and time:", selectedTime);
+                
+                // Parse the selected date to get day, month, year
                 let dateObj = new Date(selectedDate);
+                let selectedDay = dateObj.getDate();
+                let selectedMonth = dateObj.getMonth() + 1; // Month is 0-indexed
+                let selectedYear = dateObj.getFullYear();
+                
+                console.log("Selected day:", selectedDay, "month:", selectedMonth, "year:", selectedYear);
                 
                 // Set month and year in the select inputs
-                $('#month-select').val(dateObj.getMonth() + 1); // Month is 0-indexed
-                $('#year-select').val(dateObj.getFullYear());
+                $('#month-select').val(selectedMonth);
+                $('#year-select').val(selectedYear);
                 
-                // Generate days
-                generateDaySelector(dateObj.getFullYear(), dateObj.getMonth() + 1);
+                // Generate days centered around the selected date
+                generateDaySelector(selectedYear, selectedMonth, selectedDay);
                 
-                // Find and select the correct day automatically
-                setTimeout(() => {
-                    const selectedDay = dateObj.getDate();
-                    $('.day').each(function() {
-                        const dayNumber = parseInt($(this).find('.day-number').text());
-                        if (dayNumber === selectedDay) {
-                            $('.day').removeClass('selected');
-                            $(this).addClass('selected');
-                            
-                            // Load time slots for this day
-                            loadMobileTimeSlots($(this).data('date'));
-                        }
-                    });
-                    
-                    // If we have a selected time, automatically select it
-                    if (selectedTime) {
-                        setTimeout(() => {
-                            $('.time-slot-mobile').each(function() {
-                                if ($(this).text().startsWith(selectedTime)) {
-                                    $('.time-slot-mobile').removeClass('selected');
-                                    $(this).addClass('selected');
-                                }
-                            });
-                        }, 500);
-                    }
-                }, 500);
-                
-                // No need to load dropdowns anymore
+                // No need to load dropdowns
                 
                 // Show appointment edition view
                 $('#calendar-view').addClass('hidden');
@@ -758,11 +872,45 @@
                 $('#appointment-edition').removeClass('hidden');
             });
             
+            // ✅ Payment button - Process payment for appointment
             $('#pay-btn').on('click', function() {
-                alert('Payment processing would happen here!');
-                // After payment, return to calendar
-                $('#confirmation-view').addClass('hidden');
-                $('#calendar-view').removeClass('hidden');
+                // Get the appointment ID from the confirmation view
+                let appointmentId = $('#confirmation-view').data('appointment-id');
+                if (!appointmentId) {
+                    showNotification("No appointment selected", "error");
+                    return;
+                }
+                
+                // Replace :id in the route template with the actual ID
+                let payUrl = paymentUrl.replace(':id', appointmentId);
+                
+                fetch(payUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        showNotification("✅ Payment successful!", "success");
+                        
+                        // Hide confirmation view and return to calendar
+                        $('#confirmation-view').addClass('hidden');
+                        $('#calendar-view').removeClass('hidden');
+                        
+                        // Refresh calendar events
+                        calendar.refetchEvents();
+                    } else {
+                        showNotification("❌ Payment failed: " + data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification("❌ An error occurred during payment", "error");
+                });
             });
 
             // ✅ Save Appointment
@@ -776,17 +924,38 @@
                 }
                 
                 let selectedDayEl = $('.day.selected');
-                let selectedDateStr = selectedDayEl.data('date');
-                let selectedTimeEl = $('.time-slot-mobile.selected');
-                
-                if (!selectedDateStr || !selectedTimeEl.length) {
-                    alert("Please select a date and time slot.");
+                if (!selectedDayEl.length) {
+                    alert("Please select a day.");
                     return;
                 }
                 
+                let selectedTimeEl = $('.time-slot-mobile.selected');
+                if (!selectedTimeEl.length) {
+                    alert("Please select a time slot.");
+                    return;
+                }
+                
+                let selectedDateStr = selectedDayEl.data('date');
                 let timeRange = selectedTimeEl.text().split(' - ');
-                let startTime = timeRange[0];
-                let endTime = timeRange[1];
+                let startTime = timeRange[0].trim();
+                
+                // Calculate end time based on start time (add 45 minutes)
+                let startDateTime = new Date(`2025-01-01 ${startTime}`);
+                let endDateTime = new Date(startDateTime);
+                endDateTime.setMinutes(endDateTime.getMinutes() + 45);
+                
+                let endTime = endDateTime.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                
+                console.log("Submitting appointment:", {
+                    date: selectedDateStr,
+                    start: startTime,
+                    end: endTime,
+                    doctor: doctor_id
+                });
                 
                 $.ajax({
                     url: storeAppointmentUrl,
@@ -804,6 +973,9 @@
                     },
                     success: function(response) {
                         if (response.success) {
+                            // Store the appointment ID in the confirmation view
+                            $('#confirmation-view').data('appointment-id', response.appointment.id);
+                            
                             // Show confirmation view instead of alert
                             updateConfirmationView(selectedDateStr, startTime, doctor_id);
                             
@@ -833,69 +1005,5 @@
             });
         });
     </script>
-
-    <!-- Appointment Confirmation View -->
-    <div id="confirmation-view" class="mobile-view mt-6 hidden">
-        <div class="status-bar">
-            <span class="status-time">9:45</span>
-            <div class="status-icons">
-                <span class="status-icon">📶</span>
-                <span class="status-icon">🔋</span>
-            </div>
-        </div>
-        
-        <div class="flex items-center p-4 border-b">
-            <button id="back-from-confirm" class="text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-            </button>
-            <h1 class="text-center text-lg font-medium flex-1">Appointment</h1>
-        </div>
-        
-        <div class="p-4">
-            <div id="confirmation-header">
-                <!-- Selected date and time will be displayed here -->
-            </div>
-            
-            <div class="bg-yellow-50 rounded-lg p-4 mb-4">
-                <div id="confirm-doctor" class="font-bold text-lg mb-2">Dr. Andrew</div>
-                
-                <div class="mb-2">
-                    <div class="font-medium">Location</div>
-                    <div>The Spire, O'Connell Street</div>
-                </div>
-                
-                <div class="mb-2">
-                    <div class="font-medium">Date</div>
-                    <div id="confirm-date">8th January, 2025</div>
-                </div>
-                
-                <div class="mb-2">
-                    <div class="font-medium">Time</div>
-                    <div id="confirm-time">13:30 / Tuesday</div>
-                </div>
-                
-                <div class="mb-2">
-                    <div class="font-medium">Appointment Type</div>
-                    <div>Weekly check-in <span class="float-right">€105</span></div>
-                </div>
-                
-                <div class="border-t border-gray-300 mt-3 pt-2">
-                    <div class="font-bold">Total: <span class="float-right">€105</span></div>
-                </div>
-            </div>
-            
-            <div class="flex justify-between mb-4">
-                <button id="cancel-confirm" class="px-8 py-2 border border-red-500 text-red-500 rounded-full">Cancel</button>
-                <button id="edit-confirm" class="px-8 py-2 border border-green-500 text-green-500 rounded-full">Edit</button>
-            </div>
-            
-            <button id="pay-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg">
-                Pay for Appointment
-            </button>
-        </div>
-    </div>
-
 </body>
 </html>
