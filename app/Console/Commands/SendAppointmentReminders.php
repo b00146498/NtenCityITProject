@@ -3,40 +3,34 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Appointment;
+use App\Models\Client;
+use App\Notifications\AppointmentNotification;
+use Carbon\Carbon;
 
 class SendAppointmentReminders extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'command:name';
+    protected $signature = 'appointments:send-reminders';
+    protected $description = 'Send reminders for upcoming appointments';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Command description';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
     public function handle()
     {
-        return 0;
+        // Get tomorrow's date
+        $tomorrow = Carbon::tomorrow()->toDateString();
+        
+        // Find all confirmed appointments for tomorrow
+        $appointments = Appointment::where('booking_date', $tomorrow)
+            ->where('status', 'confirmed')
+            ->get();
+            
+        $this->info("Found {$appointments->count()} appointments for tomorrow.");
+        
+        foreach ($appointments as $appointment) {
+            $client = Client::find($appointment->client_id);
+            $client->notify(new AppointmentNotification($appointment, 'reminder'));
+            $this->info("Sent reminder for appointment #{$appointment->id} to client #{$client->id}");
+        }
+        
+        return Command::SUCCESS;
     }
 }
