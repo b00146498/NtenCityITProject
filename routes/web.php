@@ -84,3 +84,4 @@ Route::get('/employee/new/{userid}', [App\Http\Controllers\EmployeeController::c
 Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index')->middleware('auth');
 Route::get('/appointments/calendar', [CalendarController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create')->middleware('auth');
+Route::get('/api/appointments', [AppointmentController::class, 'index']);

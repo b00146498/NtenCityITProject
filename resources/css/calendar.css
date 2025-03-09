@@ -1,11 +1,18 @@
-body {
-    margin: 40px 10px;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
+.morning-slot {
+    background-color: #cceeff; /* Light blue */
+    color: #333333; /* Dark text for readability */
 }
 
-#calendar {
-    max-width: 1100px;
-    margin: 0 auto;
+.afternoon-slot {
+    background-color: #ccffcc; /* Light green */
+    color: #333333;
+}
+
+.evening-slot {
+    background-color: #ffdacc; /* Light orange */
+    color: #333333;
+}
+
+.fc-timegrid-slot-lane {
+    opacity: 0.8; /* Makes the background color less intense */
 }
