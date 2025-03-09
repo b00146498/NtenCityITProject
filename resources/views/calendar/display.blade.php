@@ -1,35 +1,81 @@
 @extends('layouts.app')
 
 @section('content')
-    <div id="calendar"></div>
+<div id="calendar"></div>
 
-    <link rel="stylesheet" href="{{ asset('css/calendar.css') }}">
-    <script src="{{ asset('js/calendar.js') }}"></script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
 
+    #calendar {
+        max-width: 100%;
+        margin: 0 auto;
+    }
 
-  
+    /* Time slots background colors */
+    .fc-timegrid-slot-lane {
+        background-color: #e9ecef; /* light gray for non-specific time slots */
+    }
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
+    .fc-timegrid-slot[data-time^='09:00'], .fc-timegrid-slot[data-time^='10:00'] {
+        background-color: #d1ecf1; /* light blue for morning slots */
+    }
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                plugins: [ dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin ],
-                initialView: 'timeGridWeek',  // Change this line to set the week view as default
-                slotMinTime: '09:00:00',
-                slotMaxTime: '21:00:00',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'timeGridWeek,dayGridMonth,timeGridDay,listWeek'
-                },
-                events: [
-                    { title: 'Event 1', start: '2025-02-18' },
-                    { title: 'Event 2', start: '2025-02-20', end: '2025-02-22' }
-                ]
-            });
+    .fc-timegrid-slot[data-time^='12:00'], .fc-timegrid-slot[data-time^='13:00'], .fc-timegrid-slot[data-time^='14:00'] {
+        background-color: #c8e6c9; /* light green for early afternoon slots */
+    }
 
-            calendar.render();
+    .fc-timegrid-slot[data-time^='15:00'], .fc-timegrid-slot[data-time^='16:00'], .fc-timegrid-slot[data-time^='17:00'] {
+        background-color: #fde0dc; /* light red for late afternoon slots */
+    }
+
+    .fc-timegrid-slot[data-time^='18:00'], .fc-timegrid-slot[data-time^='19:00'], .fc-timegrid-slot[data-time^='20:00'] {
+        background-color: #fff9c4; /* light yellow for evening slots */
+    }
+
+    /* Adjusting the header */
+    .fc-header-toolbar {
+        background: #fff;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Button styles */
+    .fc-button {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .fc-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<script src="{{ asset('js/calendar.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+            initialView: 'timeGridWeek',
+            slotMinTime: '09:00:00',
+            slotMaxTime: '21:00:00',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            }
         });
-    </script>
+
+        calendar.render();
+    });
+</script>
 @endsection
