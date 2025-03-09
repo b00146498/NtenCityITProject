@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Flash;
 use Response;
 use Carbon\Carbon;
+use App\Notifications\AppointmentNotification;
 
 class AppointmentController extends AppBaseController
 {
@@ -104,6 +105,9 @@ class AppointmentController extends AppBaseController
             
             // Send confirmation notification
             $this->sendAppointmentConfirmation($appointment, $client);
+            
+            // Send database notification
+            $this->sendDatabaseNotification($appointment, $client, 'confirmation');
 
             Log::info('✅ Appointment Successfully Created', $appointment->toArray());
 
@@ -153,6 +157,9 @@ class AppointmentController extends AppBaseController
             return response()->json(['error' => 'Appointment not found'], 404);
         }
 
+        // Store original status to compare after update
+        $originalStatus = $appointment->status;
+
         $validator = Validator::make($request->all(), [
             'client_id'    => 'required',
             'employee_id'  => 'required',
@@ -168,11 +175,32 @@ class AppointmentController extends AppBaseController
             return response()->json(['error' => 'Invalid input', 'messages' => $validator->errors()], 400);
         }
 
-        $appointment = $this->appointmentRepository->update($request->all(), $id);
+        $updatedAppointment = $this->appointmentRepository->update($request->all(), $id);
+        
+        // Get client for notifications
+        $client = \App\Models\Client::find($updatedAppointment->client_id);
+        
+        // Determine type of notification based on status change
+        if ($originalStatus !== $updatedAppointment->status) {
+            if ($updatedAppointment->status === 'confirmed') {
+                // Status changed to confirmed - send confirmation notification
+                $this->sendAppointmentConfirmation($updatedAppointment, $client);
+                $this->sendDatabaseNotification($updatedAppointment, $client, 'confirmation');
+            } elseif ($updatedAppointment->status === 'canceled') {
+                // Status changed to canceled - send cancellation notification
+                $this->sendDatabaseNotification($updatedAppointment, $client, 'cancellation');
+            } else {
+                // Status changed to something else - send update notification
+                $this->sendDatabaseNotification($updatedAppointment, $client, 'update');
+            }
+        } else {
+            // Status didn't change but other details might have - send update notification
+            $this->sendDatabaseNotification($updatedAppointment, $client, 'update');
+        }
 
         return response()->json([
             'success' => 'Appointment updated successfully!',
-            'appointment' => $appointment
+            'appointment' => $updatedAppointment
         ]);
     }
 
@@ -183,6 +211,12 @@ class AppointmentController extends AppBaseController
         if (empty($appointment)) {
             return response()->json(['error' => 'Appointment not found'], 404);
         }
+        
+        // Get client for cancellation notification
+        $client = \App\Models\Client::find($appointment->client_id);
+        
+        // Send cancellation notification before deleting
+        $this->sendDatabaseNotification($appointment, $client, 'cancellation');
 
         $this->appointmentRepository->delete($id);
 
@@ -190,7 +224,7 @@ class AppointmentController extends AppBaseController
     }
     
     /**
-     * Send appointment confirmation to client
+     * Send appointment confirmation to client via email/SMS
      */
     private function sendAppointmentConfirmation($appointment, $client)
     {
@@ -240,6 +274,25 @@ class AppointmentController extends AppBaseController
             }
         }
     }
+    
+    /**
+     * Send database notification for appointment
+     */
+    private function sendDatabaseNotification($appointment, $client, $type)
+    {
+        if (!$client) {
+            Log::error('Cannot send database notification: Client not found for ID ' . $appointment->client_id);
+            return;
+        }
+        
+        try {
+            // Send notification using Laravel's notification system
+            $client->notify(new AppointmentNotification($appointment, $type));
+            Log::info("Database notification ({$type}) sent for appointment #{$appointment->id}");
+        } catch (\Exception $e) {
+            Log::error('Failed to send database notification: ' . $e->getMessage());
+        }
+    }
 
     /**
      * Process payment for an appointment using a mock payment system
@@ -285,6 +338,9 @@ class AppointmentController extends AppBaseController
             
             // Send confirmation
             $this->sendAppointmentConfirmation($updatedAppointment, $client);
+            
+            // Send database notification
+            $this->sendDatabaseNotification($updatedAppointment, $client, 'confirmation');
 
             // Generate a mock receipt
             $receipt = [
