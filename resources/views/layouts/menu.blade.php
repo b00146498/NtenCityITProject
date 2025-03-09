@@ -38,3 +38,11 @@
 </li>
 
 
+<li class="nav-item">
+    <a href="{{ route('notifications.index') }}"
+       class="nav-link {{ Request::is('notifications*') ? 'active' : '' }}">
+        <p>Notifications</p>
+    </a>
+</li>
+
+
