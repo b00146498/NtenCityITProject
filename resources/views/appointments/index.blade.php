@@ -716,7 +716,7 @@
                                     timeSlotEl.on('click', function() {
                                         $('.time-slot-mobile').removeClass('selected');
                                         $(this).addClass('selected');
-                                        electedTime = slot.time;
+                                        selectedTime = slot.time;
                                     });
                                     
                                     container.append(timeSlotEl);
