@@ -9,6 +9,8 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Flash;
 use Response;
+use Auth;
+use Carbon\Carbon;
 
 class NotificationController extends AppBaseController
 {
@@ -29,7 +31,20 @@ class NotificationController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $notifications = $this->notificationRepository->all();
+        // Get the authenticated user
+        $user = Auth::user();
+        
+        if (!$user) {
+            Flash::error('You need to be logged in to view notifications');
+            return redirect(route('login'));
+        }
+        
+        // Filter notifications based on request
+        if ($request->has('filter') && $request->filter == 'unread') {
+            $notifications = $user->unreadNotifications()->paginate(10);
+        } else {
+            $notifications = $user->notifications()->paginate(10);
+        }
 
         return view('notifications.index')
             ->with('notifications', $notifications);
@@ -152,5 +167,70 @@ class NotificationController extends AppBaseController
         Flash::success('Notification deleted successfully.');
 
         return redirect(route('notifications.index'));
+    }
+    
+    /**
+     * Mark a notification as read
+     *
+     * @param string $id
+     * @return Response
+     */
+    public function markAsRead($id)
+    {
+        $user = Auth::user();
+        $notification = $user->notifications()->where('id', $id)->first();
+        
+        if (empty($notification)) {
+            Flash::error('Notification not found');
+            return redirect(route('notifications.index'));
+        }
+        
+        $notification->markAsRead();
+        
+        Flash::success('Notification marked as read.');
+        return redirect()->back();
+    }
+    
+    /**
+     * Mark all notifications as read
+     *
+     * @return Response
+     */
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+        $user->unreadNotifications->markAsRead();
+        
+        Flash::success('All notifications marked as read.');
+        return redirect()->back();
+    }
+    
+    /**
+     * Get color for notification type
+     */
+    public function getNotificationTypeColor($type)
+    {
+        return match (strtolower($type)) {
+            'confirmation' => 'success',
+            'update'       => 'info',
+            'reminder'     => 'warning',
+            'cancellation' => 'danger',
+            default        => 'primary',
+        };
+    }
+
+    /**
+     * Get badge color for appointment status
+     */
+    public function getStatusBadgeColor($status)
+    {
+        return match (strtolower($status)) {
+            'confirmed'  => 'success',
+            'pending'    => 'warning',
+            'checked-in' => 'info',
+            'completed'  => 'secondary',
+            'canceled'   => 'danger',
+            default      => 'primary',
+        };
     }
 }
