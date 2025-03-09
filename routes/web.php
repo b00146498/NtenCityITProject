@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\DiaryEntryController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\NotificationController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 
@@ -59,7 +60,13 @@ Route::middleware(['auth'])->group(function () {
     Route::put('diary-entries/{id}', [DiaryEntryController::class, 'update'])->name('diary-entries.update');
     Route::delete('diary-entries/{id}', [DiaryEntryController::class, 'destroy'])->name('diary-entries.destroy');
     Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
+    
+    // Notification Routes
+    Route::resource('notifications', App\Http\Controllers\NotificationController::class);
+    Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
+
 Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 
 // Calendar Display Route (Using CalendarController)
@@ -78,13 +85,8 @@ Route::resource('customers', App\Http\Controllers\customerController::class);
 
 Route::get('/employee/new/{userid}', [App\Http\Controllers\EmployeeController::class, 'new'])->name('employee.new');
 
-
-
 // Web Routes in Laravel
 Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index')->middleware('auth');
 Route::get('/appointments/calendar', [CalendarController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create')->middleware('auth');
 Route::get('/api/appointments', [AppointmentController::class, 'index']);
-
-
-Route::resource('notifications', App\Http\Controllers\NotificationController::class);
