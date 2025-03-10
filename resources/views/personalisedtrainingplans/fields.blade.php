@@ -1,13 +1,11 @@
+<!-- Client Selection via Live Search -->
 <div class="col-md-6 mb-3">
-    {!! Form::label('client_id', 'Client:', ['class' => 'form-label fw-bold']) !!}
-    <select name="client_id" class="form-select">
-        <option value="" selected disabled>Select a Client</option>
-        @foreach($clients as $client)
-            <option value="{{ $client->id }}">
-                {{ $client->first_name }} {{ $client->surname }}
-            </option>
-        @endforeach
-    </select>
+    {!! Form::label('client_id', 'Search Client:', ['class' => 'form-label fw-bold']) !!}
+    <div class="position-relative">
+        <input type="text" id="client-search" class="form-control search-input" placeholder="Type client name..." autocomplete="off">
+        <input type="hidden" name="client_id" id="selected-client-id">
+        <div id="client-list" class="list-group shadow-sm position-absolute w-100 bg-white"></div>
+    </div>
 </div>
 
 <!-- Start Date Field -->
@@ -27,3 +25,41 @@
     {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
     <a href="{!! route('personalisedtrainingplans.index') !!}" class="btn btn-default">Cancel</a>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let searchInput = document.getElementById("client-search");
+        let clientList = document.getElementById("client-list");
+
+        searchInput.addEventListener("keyup", function () {
+            let query = this.value;
+
+            if (query.length > 1) {
+                fetch(`/search-clients?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        clientList.innerHTML = "";
+                        if (data.length > 0) {
+                            data.forEach(client => {
+                                let item = document.createElement("a");
+                                item.href = "#";
+                                item.classList.add("list-group-item", "list-group-item-action");
+                                item.textContent = `${client.first_name} ${client.surname}`;
+                                item.onclick = function () {
+                                    searchInput.value = `${client.first_name} ${client.surname}`;
+                                    document.getElementById("selected-client-id").value = client.id;
+                                    clientList.innerHTML = "";
+                                };
+                                clientList.appendChild(item);
+                            });
+                        } else {
+                            clientList.innerHTML = `<div class="list-group-item">No results found</div>`;
+                        }
+                    });
+            } else {
+                clientList.innerHTML = "";
+            }
+        });
+    });
+</script>

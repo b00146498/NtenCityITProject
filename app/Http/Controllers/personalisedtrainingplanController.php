@@ -159,4 +159,16 @@ class personalisedtrainingplanController extends AppBaseController
 
         return redirect(route('personalisedtrainingplans.index'));
     }
+    public function searchClients(Request $request)
+    {
+        $query = $request->input('query');
+
+        $clients = Client::where('first_name', 'LIKE', "%{$query}%")
+                        ->orWhere('surname', 'LIKE', "%{$query}%")
+                        ->orderBy('first_name')
+                        ->limit(10)
+                        ->get(['id', 'first_name', 'surname']); // Select only necessary fields
+
+        return response()->json($clients);
+    }
 }

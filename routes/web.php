@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
+Route::get('/search-clients', [PersonalisedTrainingPlanController::class, 'searchClients'])->name('search.clients');
 
 // Calendar Display Route (Using CalendarController)
 Route::get('/calendar/display', [CalendarController::class, 'display'])
