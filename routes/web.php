@@ -90,3 +90,11 @@ Route::get('/appointments', [AppointmentController::class, 'index'])->name('appo
 Route::get('/appointments/calendar', [CalendarController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create')->middleware('auth');
 Route::get('/api/appointments', [AppointmentController::class, 'index']);
+
+Route::resource('standardexercises', App\Http\Controllers\standardexercisesController::class);
+
+
+Route::resource('tpelogs', App\Http\Controllers\tpelogController::class);
+
+
+Route::resource('personalisedtrainingplans', App\Http\Controllers\personalisedtrainingplanController::class);

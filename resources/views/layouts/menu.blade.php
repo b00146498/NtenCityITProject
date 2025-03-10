@@ -46,3 +46,27 @@
 </li>
 
 
+<li class="nav-item">
+    <a href="{{ route('standardexercises.index') }}"
+       class="nav-link {{ Request::is('standardexercises*') ? 'active' : '' }}">
+        <p>Standardexercises</p>
+    </a>
+</li>
+
+
+<li class="nav-item">
+    <a href="{{ route('tpelogs.index') }}"
+       class="nav-link {{ Request::is('tpelogs*') ? 'active' : '' }}">
+        <p>Tpelogs</p>
+    </a>
+</li>
+
+
+<li class="nav-item">
+    <a href="{{ route('personalisedtrainingplans.index') }}"
+       class="nav-link {{ Request::is('personalisedtrainingplans*') ? 'active' : '' }}">
+        <p>Personalisedtrainingplans</p>
+    </a>
+</li>
+
+
