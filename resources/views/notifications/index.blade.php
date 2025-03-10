@@ -40,7 +40,7 @@
                                         @if(!$notification->read_at)
                                             <span class="badge badge-pill badge-primary mr-2">New</span>
                                         @endif
-                                        <span class="text-{{ $this->getNotificationTypeColor($notification->data['type'] ?? 'appointment') }}">
+                                        <span class="text-{{ getNotificationTypeColor($notification->data['type'] ?? 'appointment') }}">
                                             {{ ucfirst($notification->data['type'] ?? 'Appointment') }} Notification
                                         </span>
                                     </h5>
@@ -91,7 +91,7 @@
                                                         <i class="fa fa-info-circle text-primary mr-2"></i>
                                                         <div>
                                                             <small class="text-muted d-block">Status</small>
-                                                            <span class="badge badge-{{ $this->getStatusBadgeColor($notification->data['status']) }}">
+                                                            <span class="badge badge-{{ getStatusBadgeColor($notification->data['status']) }}">
                                                                 {{ ucfirst($notification->data['status']) }}
                                                             </span>
                                                         </div>
@@ -151,7 +151,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
