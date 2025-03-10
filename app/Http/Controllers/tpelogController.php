@@ -62,13 +62,25 @@ class tpelogController extends AppBaseController
      */
     public function store(CreatetpelogRequest $request)
     {
-        $input = $request->all();
+        //$input = $request->all();
 
-        $tpelog = $this->tpelogRepository->create($input);
+        //$tpelog = $this->tpelogRepository->create($input);
 
-        Flash::success('Tpelog saved successfully.');
+        //Flash::success('Tpelog saved successfully.');
 
-        return redirect(route('tpelogs.index'));
+        //return redirect(route('tpelogs.index'));
+        $validated = $request->validate([
+            'plan_id' => 'required|exists:personalisedtrainingplan,id',
+            'exercise_id' => 'required|exists:standardexercises,id',
+            'num_sets' => 'required|integer|min:1',
+            'num_reps' => 'required|integer|min:1',
+            'minutes' => 'nullable|integer|min:0',
+            'incline' => 'required|numeric|min:-20|max:20', // Allow decline (negative values)
+        ]);
+    
+        Tpelog::create($validated);
+    
+        return redirect()->route('tpelogs.index')->with('success', 'Exercise added successfully!');
     }
 
     /**

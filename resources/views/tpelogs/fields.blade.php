@@ -57,11 +57,30 @@
     </select>
 </div>
 
-<!-- Incline Field -->
+<!-- Incline/Decline Selection -->
 <div class="form-group col-sm-6">
-    {!! Form::label('incline', 'Incline:') !!}
-    {!! Form::number('incline', null, ['class' => 'form-control']) !!}
+    {!! Form::label('incline_type', 'Incline or Decline:', ['class' => 'form-label fw-bold']) !!}
+    <div class="d-flex align-items-center">
+        <input type="radio" name="incline_type" id="incline_option" value="incline" class="form-check-input" checked>
+        <label for="incline_option" class="ms-2">Incline</label>
+
+        <input type="radio" name="incline_type" id="decline_option" value="decline" class="form-check-input ms-4">
+        <label for="decline_option" class="ms-2">Decline</label>
+    </div>
 </div>
+
+<!-- Incline/Decline Percentage Input -->
+<div class="form-group col-sm-6">
+    {!! Form::label('incline_value', 'Incline/Decline Percentage:', ['class' => 'form-label fw-bold']) !!}
+    <div class="input-group">
+        <button type="button" class="btn btn-outline-secondary" onclick="changeValue(-1)">-</button>
+        <input type="number" name="incline_value" id="incline_value" class="form-control text-center" value="0" min="0" max="20">
+        <button type="button" class="btn btn-outline-secondary" onclick="changeValue(1)">+</button>
+    </div>
+</div>
+
+<!-- Hidden Input to Store Final Incline/Decline Value -->
+<input type="hidden" name="incline" id="final_incline" value="0">
 
 <!-- Times Per Week Field -->
 <div class="form-group col-sm-6">

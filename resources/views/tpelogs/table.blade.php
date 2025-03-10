@@ -18,7 +18,15 @@
             <td>{!! $tpelog->num_sets !!}</td>
             <td>{!! $tpelog->num_reps !!}</td>
             <td>{!! $tpelog->minutes !!}</td>
-            <td>{!! $tpelog->intensity !!}</td>
+            <td>
+                @if ($tpelog->incline > 0)
+                    Incline {{ $tpelog->incline }}%
+                @elseif ($tpelog->incline < 0)
+                    Decline {{ abs($tpelog->incline) }}%
+                @else
+                    Flat (0%)
+                @endif
+            </td>
             <td>{!! $tpelog->incline !!}</td>
             <td>{!! $tpelog->times_per_week !!}</td>
             <td>
