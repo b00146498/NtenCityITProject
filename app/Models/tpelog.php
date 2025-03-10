@@ -83,5 +83,8 @@ class tpelog extends Model
         'deleted_at' => 'nullable'
     ];
 
-    
+    public function exercise()
+    {
+        return $this->belongsTo(standardexercises::class, 'exercise_id');
+    }
 }

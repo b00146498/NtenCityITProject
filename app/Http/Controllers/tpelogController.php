@@ -8,6 +8,7 @@ use App\Repositories\tpelogRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use App\Models\Tpelog;
+use App\Models\standardexercises;
 use Flash;
 use Response;
 
@@ -30,10 +31,13 @@ class tpelogController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $tpelogs = $this->tpelogRepository->all();
+        //$tpelogs = $this->tpelogRepository->all();
 
-        return view('tpelogs.index')
-            ->with('tpelogs', $tpelogs);
+        //return view('tpelogs.index')
+            //->with('tpelogs', $tpelogs);
+        $tpelogs = Tpelog::with('exercise')->get();
+
+        return view('tpelogs.index', compact('tpelogs'));
     }
 
     /**
@@ -43,7 +47,9 @@ class tpelogController extends AppBaseController
      */
     public function create()
     {
-        return view('tpelogs.create');
+        $exercises = standardexercises::all();
+        //return view('tpelogs.create');
+        return view('tpelogs.create', compact('exercises'));
     }
     
 
@@ -62,8 +68,7 @@ class tpelogController extends AppBaseController
 
         Flash::success('Tpelog saved successfully.');
 
-        //return redirect(route('tpelogs.index'));
-        return redirect()->route('dashboard')->with('success', 'Exercise Log added successfully!');
+        return redirect(route('tpelogs.index'));
     }
 
     /**

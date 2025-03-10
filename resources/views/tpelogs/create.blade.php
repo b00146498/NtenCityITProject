@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            tpelog
+            Add new Training Plan Exercises/Workout Logs/Exercise Assignments
         </h1>
     </section>
     <div class="content">
@@ -22,3 +22,9 @@
         </div>
     </div>
 @endsection
+<style>
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold !important;
+    font-size: 2rem !important; /* Adjust size */
+}
+</style>
