@@ -22,6 +22,8 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
+
+
 Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();

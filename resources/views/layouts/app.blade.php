@@ -155,6 +155,7 @@
             <ul class="dropdown-menu custom-dropdown" aria-labelledby="clientsDropdown">
                 <li><a class="dropdown-item custom-dropdown-item" href="{{ route('clients.index') }}">View Client Profiles</a></li>
                 <li><a class="dropdown-item custom-dropdown-item" href="{{ route('diary-entries.index') }}">Client Progress Notes</a></li>
+                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('standardexercises.index') }}">Standard Exercises</a></li>
             </ul>
         </li>
         <li class="nav-item">
