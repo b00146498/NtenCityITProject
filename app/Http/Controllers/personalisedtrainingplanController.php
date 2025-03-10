@@ -34,6 +34,7 @@ class personalisedtrainingplanController extends AppBaseController
 
         return view('personalisedtrainingplans.index')
             ->with('personalisedtrainingplans', $personalisedtrainingplans);
+            
     }
 
     /**

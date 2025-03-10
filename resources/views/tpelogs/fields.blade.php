@@ -51,3 +51,5 @@
     {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
     <a href="{!! route('tpelogs.index') !!}" class="btn btn-default">Cancel</a>
 </div>
+
+

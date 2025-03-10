@@ -7,6 +7,8 @@ use App\Http\Controllers\DiaryEntryController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\tpelogController;
+use App\Http\Controllers\personalisedtrainingplanController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 
@@ -100,3 +102,9 @@ Route::resource('tpelogs', App\Http\Controllers\tpelogController::class);
 
 
 Route::resource('personalisedtrainingplans', App\Http\Controllers\personalisedtrainingplanController::class);
+
+Route::get('/personalised-training-plans/create', [PersonalisedTrainingPlanController::class, 'create'])->name('personalisedTrainingPlans.create');
+Route::post('/personalised-training-plans/store', [PersonalisedTrainingPlanController::class, 'store'])->name('personalisedTrainingPlans.store');
+
+Route::get('/tpelog/create/{plan_id}', [tpelogController::class, 'create'])->name('tpelog.create');
+Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.store');

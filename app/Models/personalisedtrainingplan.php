@@ -62,6 +62,11 @@ class personalisedtrainingplan extends Model
         'updated_at' => 'nullable',
         'deleted_at' => 'nullable'
     ];
+    
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
 
     
 }

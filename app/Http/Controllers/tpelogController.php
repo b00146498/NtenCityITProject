@@ -45,6 +45,7 @@ class tpelogController extends AppBaseController
     {
         return view('tpelogs.create');
     }
+    
 
     /**
      * Store a newly created tpelog in storage.
@@ -61,7 +62,8 @@ class tpelogController extends AppBaseController
 
         Flash::success('Tpelog saved successfully.');
 
-        return redirect(route('tpelogs.index'));
+        //return redirect(route('tpelogs.index'));
+        return redirect()->route('dashboard')->with('success', 'Exercise Log added successfully!');
     }
 
     /**
