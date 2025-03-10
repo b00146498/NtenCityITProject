@@ -8,6 +8,7 @@ use App\Repositories\personalisedtrainingplanRepository;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use App\Models\Personalisedtrainingplan;
+use App\Models\Client;
 use Flash;
 use Response;
 
@@ -34,7 +35,7 @@ class personalisedtrainingplanController extends AppBaseController
 
         return view('personalisedtrainingplans.index')
             ->with('personalisedtrainingplans', $personalisedtrainingplans);
-            
+
     }
 
     /**
@@ -44,7 +45,10 @@ class personalisedtrainingplanController extends AppBaseController
      */
     public function create()
     {
-        return view('personalisedtrainingplans.create');
+        $clients = Client::all();
+
+        return view('personalisedtrainingplans.create', compact('clients'));
+        //return view('personalisedtrainingplans.create');
     }
 
     /**

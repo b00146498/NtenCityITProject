@@ -1,7 +1,13 @@
-<!-- Client Id Field -->
-<div class="form-group col-sm-6">
-    {!! Form::label('client_id', 'Client Id:') !!}
-    {!! Form::number('client_id', null, ['class' => 'form-control']) !!}
+<div class="col-md-6 mb-3">
+    {!! Form::label('client_id', 'Client:', ['class' => 'form-label fw-bold']) !!}
+    <select name="client_id" class="form-select">
+        <option value="" selected disabled>Select a Client</option>
+        @foreach($clients as $client)
+            <option value="{{ $client->id }}">
+                {{ $client->first_name }} {{ $client->surname }}
+            </option>
+        @endforeach
+    </select>
 </div>
 
 <!-- Start Date Field -->
