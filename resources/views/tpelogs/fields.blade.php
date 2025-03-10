@@ -17,16 +17,24 @@
     </select>
 </div>
 
-<!-- Num Sets Field -->
+<<!-- Number of Sets with Increment/Decrement -->
 <div class="form-group col-sm-6">
-    {!! Form::label('num_sets', 'Number of Sets:') !!}
-    {!! Form::number('num_sets', null, ['class' => 'form-control']) !!}
+    {!! Form::label('num_sets', 'Number of Sets:', ['class' => 'form-label fw-bold']) !!}
+    <div class="input-group">
+        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_sets', -1)">-</button>
+        <input type="text" name="num_sets" id="num_sets" class="form-control text-center" value="1" readonly>
+        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_sets', 1)">+</button>
+    </div>
 </div>
 
-<!-- Num Reps Field -->
+<!-- Number of Reps with Increment/Decrement -->
 <div class="form-group col-sm-6">
-    {!! Form::label('num_reps', 'Number of Reps:') !!}
-    {!! Form::number('num_reps', null, ['class' => 'form-control']) !!}
+    {!! Form::label('num_reps', 'Number of Reps:', ['class' => 'form-label fw-bold']) !!}
+    <div class="input-group">
+        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_reps', -1)">-</button>
+        <input type="text" name="num_reps" id="num_reps" class="form-control text-center" value="10" readonly>
+        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_reps', 1)">+</button>
+    </div>
 </div>
 
 <!-- Minutes Field -->
@@ -35,10 +43,18 @@
     {!! Form::number('minutes', null, ['class' => 'form-control']) !!}
 </div>
 
-<!-- Intensity Field -->
+<!-- Intensity Dropdown -->
 <div class="form-group col-sm-6">
-    {!! Form::label('intensity', 'Intensity Level:') !!}
-    {!! Form::text('intensity', null, ['class' => 'form-control']) !!}
+    {!! Form::label('intensity', 'Intensity Level:', ['class' => 'form-label fw-bold']) !!}
+    <select name="intensity" class="form-select">
+        <option value="" selected disabled>Select Intensity</option>
+        <option value="Very Light">Very Light</option>
+        <option value="Light">Light</option>
+        <option value="Moderate">Moderate</option>
+        <option value="Vigorous">Vigorous</option>
+        <option value="High-Intensity">High-Intensity</option>
+        <option value="Maximum Effort">Maximum Effort</option>
+    </select>
 </div>
 
 <!-- Incline Field -->
