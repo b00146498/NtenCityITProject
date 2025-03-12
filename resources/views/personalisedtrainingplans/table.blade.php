@@ -9,8 +9,8 @@
     @foreach($personalisedtrainingplans as $personalisedtrainingplan)
         <tr>
             <td>{{ $personalisedtrainingplan->client->first_name ?? 'N/A' }} {{ $personalisedtrainingplan->client->surname ?? '' }}</td>
-            <td>{!! $personalisedtrainingplan->start_date !!}</td>
-            <td>{!! $personalisedtrainingplan->end_date !!}</td>
+            <td>{{ \Carbon\Carbon::parse($personalisedtrainingplan->start_date)->format('d/m/Y') }}</td> <!-- Removes Time -->
+            <td>{{ \Carbon\Carbon::parse($personalisedtrainingplan->end_date)->format('d/m/Y') }}</td> <!-- Removes Time -->
             <td>
                 {!! Form::open(['route' => ['personalisedtrainingplans.destroy', $personalisedtrainingplan->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>
@@ -24,3 +24,4 @@
     @endforeach
     </tbody>
 </table>
+
