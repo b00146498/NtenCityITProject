@@ -43,18 +43,24 @@
         border-bottom: 1px solid #ddd;
     }
 
-    /* Button styles */
+    /* Match FullCalendar Button Styles to Sidebar Theme */
     .fc-button {
-        background-color: #007bff;
-        color: white;
+        background-color: #c9a86a !important;  /* Light Gold (Matches Sidebar) */
+        border: none !important;
+        color: white !important;
         padding: 8px 16px;
-        border: none;
         border-radius: 4px;
-        cursor: pointer;
+        font-weight: bold;
     }
 
     .fc-button:hover {
-        background-color: #0056b3;
+        background-color: #a8894f !important; /* Slightly Darker Gold */
+    }
+
+    /* Change Active View Button Background */
+    .fc-button-active {
+        background-color: #b78b50 !important; /* Slightly Darker Gold for Active Button */
+        border-color: #a67c47 !important;
     }
 </style>
 
@@ -65,30 +71,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: [window.dayGridPlugin, window.timeGridPlugin, window.listPlugin, window.interactionPlugin],
-        initialView: 'timeGridWeek',
-        initialDate: new Date().toISOString().split("T")[0], // ✅ Sets initial date to today
-        slotMinTime: '09:00:00',
-        slotMaxTime: '21:00:00',
+        initialView: 'timeGridWeek', // ✅ Default to Week View
+        initialDate: new Date().toISOString().split("T")[0], // ✅ Set today as the default date
+        slotMinTime: '08:00:00', 
+        slotMaxTime: '22:00:00',
+        height: "auto", 
+        eventMinHeight: 30, // ✅ Ensures short events are visible
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
-        events: @json(route('appointment.json')), // ✅ Fetch real appointments dynamically
+        events: "{{ route('appointment.json') }}",
         eventsSet: function(events) {
             console.log("✅ FullCalendar Loaded Events:", events);
-            if (events.length === 0) {
-                console.warn("⚠️ No events loaded. Check if data exists in the database.");
-            }
         },
-
-        // ✅ CATCH ERRORS WHEN EVENTS FAIL TO LOAD
         eventSourceFailure: function(error) {
             console.error("❌ FullCalendar Event Fetch Failed:", error);
-            alert("⚠️ Error loading events! Check the console for details.");
         },
-
-        // ✅ LOG WHEN EACH EVENT RENDERS
         eventDidMount: function(info) {
             console.log("📅 Rendering Event:", info.event);
         }
@@ -96,5 +96,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     calendar.render();
 });
+
 </script>
 @endsection
