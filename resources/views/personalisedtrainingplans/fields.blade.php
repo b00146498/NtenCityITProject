@@ -14,15 +14,16 @@
 
         <!-- Start Date Field -->
         <div class="form-group col-sm-12 mb-3">
-            {!! Form::label('start_date', 'Start Date:', ['class' => 'text-dark']) !!}
+            {!! Form::label('start_date', 'Start Date:', ['class' => 'text-dark fw-bold']) !!}
             {!! Form::date('start_date', null, ['class' => 'form-control datepicker']) !!}
         </div>
 
         <!-- End Date Field -->
         <div class="form-group col-sm-12 mb-3">
-            {!! Form::label('end_date', 'End Date:', ['class' => 'text-dark']) !!}
+            {!! Form::label('end_date', 'End Date:', ['class' => 'text-dark fw-bold']) !!}
             {!! Form::date('end_date', null, ['class' => 'form-control datepicker']) !!}
         </div>
+
 
         <!-- Submit Field -->
         <div class="form-group col-sm-12 text-center">
@@ -101,7 +102,7 @@
 
     /* Form Box Styling */
     .form-box {
-        background-color: #FDE8C9; /* Light Beige/Orange */
+        background-color: #EEE0B1; /* Light Beige/Orange */
         border-radius: 12px;
         padding: 30px;
         width: 600px; /* Increased width */
@@ -121,19 +122,22 @@
     }
 
     /* Buttons */
+    /* Common Button Styles (Back & Update) */
     .btn-primary {
-        background-color: #FFA500 !important; /* Light Orange */
+        background-color: #C96E04 !important; /* Orange */
         color: white !important;
         font-weight: bold;
         padding: 10px 20px;
         border: none;
-        border-radius: 10px;
-        font-size: 16px;
+        border-radius: 5px;
+        font-size: 15px;
         transition: 0.3s;
         text-decoration: none;
     }
+
+    /* Hover Effect */
     .btn-primary:hover {
-        background-color: #FF8C00 !important; /* Slightly darker orange */
+        background-color: #A85C03 !important; /* Darker Orange */
     }
 
     /* Cancel Button */
