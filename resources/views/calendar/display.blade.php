@@ -58,24 +58,43 @@
     }
 </style>
 
-<script src="{{ asset('js/calendar.js') }}"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-            initialView: 'timeGridWeek',
-            slotMinTime: '09:00:00',
-            slotMaxTime: '21:00:00',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-            }
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
 
-        calendar.render();
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [window.dayGridPlugin, window.timeGridPlugin, window.listPlugin, window.interactionPlugin],
+        initialView: 'timeGridWeek',
+        initialDate: new Date().toISOString().split("T")[0], // ✅ Sets initial date to today
+        slotMinTime: '09:00:00',
+        slotMaxTime: '21:00:00',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        events: @json(route('appointment.json')), // ✅ Fetch real appointments dynamically
+        eventsSet: function(events) {
+            console.log("✅ FullCalendar Loaded Events:", events);
+            if (events.length === 0) {
+                console.warn("⚠️ No events loaded. Check if data exists in the database.");
+            }
+        },
+
+        // ✅ CATCH ERRORS WHEN EVENTS FAIL TO LOAD
+        eventSourceFailure: function(error) {
+            console.error("❌ FullCalendar Event Fetch Failed:", error);
+            alert("⚠️ Error loading events! Check the console for details.");
+        },
+
+        // ✅ LOG WHEN EACH EVENT RENDERS
+        eventDidMount: function(info) {
+            console.log("📅 Rendering Event:", info.event);
+        }
     });
+
+    calendar.render();
+});
 </script>
 @endsection

@@ -111,3 +111,6 @@ Route::post('/personalised-training-plans/store', [PersonalisedTrainingPlanContr
 
 Route::get('/tpelog/create/{plan_id}', [tpelogController::class, 'create'])->name('tpelog.create');
 Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.store');
+
+Route::get('/calendar/display', [AppointmentController::class, 'display'])->name('calendar.display')->middleware('auth');
+Route::get('/appointment/json', 'App\Http\Controllers\AppointmentController@getAppointments')->name('appointment.json')->middleware('auth');

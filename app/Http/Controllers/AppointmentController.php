@@ -6,6 +6,7 @@ use App\Http\Requests\CreateAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Repositories\AppointmentRepository;
 use App\Http\Controllers\AppBaseController;
+use App\Http\Controllers\AppointmentController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +15,7 @@ use Flash;
 use Response;
 use Carbon\Carbon;
 use App\Notifications\AppointmentNotification;
+
 
 class AppointmentController extends AppBaseController
 {
@@ -377,5 +379,42 @@ class AppointmentController extends AppBaseController
     {
         Log::info('Legacy payAppointment method called, redirecting to processPayment');
         return $this->processPayment($id);
+    }
+
+    public function display()
+    {
+        return view('calendar.display'); // Loads the Blade file
+    }
+
+    /**
+     * Fetch appointments as JSON for FullCalendar.
+     */
+    /* public function getAppointments()
+    {
+        $appointments =  \App\Models\Appointment::all();
+
+        $events = [];
+
+        foreach ($appointments as $appointment) {
+            $events[] = [
+                'id'    => $appointment->id,
+                'title' => "Client #{$appointment->client_id} - {$appointment->status}",
+                'start' => "{$appointment->booking_date}T{$appointment->start_time}",
+                'end'   => "{$appointment->booking_date}T{$appointment->end_time}",
+                'color' => $this->getStatusColor($appointment->status),
+            ];
+        }
+
+        return response()->json($events);
+    } */
+    public function getAppointments()
+    {
+        //$this->view->disable();
+        $content = \App\Models\AppointmentEvent::all()->toJson();
+        //$content=$json_encode($events);
+        return response($content)->withHeaders([
+                'Content-Type' => 'application/json',
+                'charset' => 'UTF-8'
+            ]);
     }
 }
