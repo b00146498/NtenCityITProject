@@ -1,24 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="content-header">
-        <h1>
-            standardexercises
-        </h1>
-    </section>
-    <div class="content">
-        @include('basic-template::common.errors')
-        <div class="box box-primary">
+<div class="container mt-3">
+    <div class="card shadow-lg">
+        <div class="card-header bg-warning text-white d-flex justify-content-between">
+            <h4 class="fw-bold">Create Standard Exercise</h4>
+            <a href="{{ route('standardexercises.index') }}" class="text-white text-decoration-none fw-bold">✖ Close</a>
+        </div>
+        <div class="card-body">
+            @include('basic-template::common.errors')
 
-            <div class="box-body">
-                <div class="row">
-                    {!! Form::open(['route' => 'standardexercises.store']) !!}
+            {!! Form::open(['route' => 'standardexercises.store']) !!}
 
-                        @include('standardexercises.fields')
+            @include('standardexercises.fields')
 
-                    {!! Form::close() !!}
-                </div>
-            </div>
+            {!! Form::close() !!}
         </div>
     </div>
+</div>
 @endsection
+

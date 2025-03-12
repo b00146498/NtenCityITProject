@@ -1,18 +1,18 @@
-<!-- Client Id Field -->
-<div class="form-group">
-    {!! Form::label('client_id', 'Client Id:') !!}
-    <p>{!! $personalisedtrainingplan->client_id !!}</p>
-</div>
+<table class="table table-bordered table-sm">
+    <tbody>
+        <tr>
+            <th style="width: 30%;">Client</th>
+            <td>{{ $personalisedtrainingplan->client->first_name ?? 'N/A' }} {{ $personalisedtrainingplan->client->surname ?? '' }}</td>
+        </tr>
+        <tr>
+            <th style="width: 30%;">Start Date</th>
+            <td>{{ \Carbon\Carbon::parse($personalisedtrainingplan->start_date)->format('d/m/Y') }}</td>
+        </tr>
+        <tr>
+            <th style="width: 30%;">End Date</th>
+            <td>{{ \Carbon\Carbon::parse($personalisedtrainingplan->end_date)->format('d/m/Y') }}</td>
+        </tr>
+    </tbody>
+</table>
 
-<!-- Start Date Field -->
-<div class="form-group">
-    {!! Form::label('start_date', 'Start Date:') !!}
-    <p>{!! $personalisedtrainingplan->start_date !!}</p>
-</div>
-
-<!-- End Date Field -->
-<div class="form-group">
-    {!! Form::label('end_date', 'End Date:') !!}
-    <p>{!! $personalisedtrainingplan->end_date !!}</p>
-</div>
 
