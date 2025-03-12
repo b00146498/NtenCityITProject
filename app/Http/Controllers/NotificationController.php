@@ -206,6 +206,42 @@ class NotificationController extends AppBaseController
     }
     
     /**
+     * Create a test notification (for debugging)
+     *
+     * @return Response
+     */
+    public function createTestNotification()
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            Flash::error('You need to be logged in to create a test notification');
+            return redirect(route('login'));
+        }
+        
+        // Get a recent appointment if available
+        $appointment = \App\Models\Appointment::latest()->first();
+        
+        if (!$appointment) {
+            // Create dummy appointment data if no appointment exists
+            $appointment = new \stdClass();
+            $appointment->id = 1;
+            $appointment->booking_date = now()->format('Y-m-d');
+            $appointment->start_time = '14:00:00';
+            $appointment->end_time = '15:00:00';
+            $appointment->status = 'confirmed';
+            $appointment->notes = 'Test appointment';
+        }
+        
+        // Send the test notification
+        $user->notify(new \App\Notifications\AppointmentNotification($appointment, 'confirmation'));
+        
+        Flash::success('Test notification created successfully.');
+        
+        return redirect(route('notifications.index'));
+    }
+    
+    /**
      * Get color for notification type
      */
     public function getNotificationTypeColor($type)

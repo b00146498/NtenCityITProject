@@ -38,27 +38,32 @@ class AppointmentNotification extends Notification
     {
         $message = (new MailMessage)
             ->subject($this->getSubject())
-            ->greeting('Hello ' . $notifiable->first_name . '!')
+            ->greeting('Hello ' . ($notifiable->first_name ?? 'there') . '!')
             ->line($this->getMainLine());
 
         // Format date and time nicely
-        $date = date('l, F j, Y', strtotime($this->appointment->booking_date));
-        $startTime = date('g:i A', strtotime($this->appointment->start_time));
-        $endTime = date('g:i A', strtotime($this->appointment->end_time));
+        try {
+            $date = date('l, F j, Y', strtotime($this->appointment->booking_date));
+            $startTime = date('g:i A', strtotime($this->appointment->start_time));
+            $endTime = date('g:i A', strtotime($this->appointment->end_time));
 
-        // Add appointment details
-        $message->line('Appointment Details:')
-                ->line('Date: ' . $date)
-                ->line('Time: ' . $startTime . ' - ' . $endTime)
-                ->line('Status: ' . ucfirst($this->appointment->status));
+            // Add appointment details
+            $message->line('Appointment Details:')
+                    ->line('Date: ' . $date)
+                    ->line('Time: ' . $startTime . ' - ' . $endTime)
+                    ->line('Status: ' . ucfirst($this->appointment->status));
 
-        // Add notes if available
-        if (!empty($this->appointment->notes)) {
-            $message->line('Notes: ' . $this->appointment->notes);
+            // Add notes if available
+            if (!empty($this->appointment->notes)) {
+                $message->line('Notes: ' . $this->appointment->notes);
+            }
+
+            // Add action button
+            $message->action('View Appointment Details', url('/appointments/' . $this->appointment->id));
+        } catch (\Exception $e) {
+            \Log::error('Error formatting appointment notification: ' . $e->getMessage());
+            $message->line('Please check your appointment details in the system.');
         }
-
-        // Add action button
-        $message->action('View Appointment Details', url('/appointments/' . $this->appointment->id));
 
         return $message;
     }
@@ -68,23 +73,33 @@ class AppointmentNotification extends Notification
      */
     public function toDatabase($notifiable)
     {
-        // Format date and time nicely
-        $date = date('l, F j, Y', strtotime($this->appointment->booking_date));
-        $startTime = date('g:i A', strtotime($this->appointment->start_time));
-        $endTime = date('g:i A', strtotime($this->appointment->end_time));
+        try {
+            // Format date and time nicely
+            $date = date('l, F j, Y', strtotime($this->appointment->booking_date));
+            $startTime = date('g:i A', strtotime($this->appointment->start_time));
+            $endTime = date('g:i A', strtotime($this->appointment->end_time));
 
-        return [
-            'type' => $this->type,
-            'appointment_id' => $this->appointment->id,
-            'booking_date' => $this->appointment->booking_date,
-            'formatted_date' => $date,
-            'start_time' => $this->appointment->start_time,
-            'end_time' => $this->appointment->end_time,
-            'formatted_time' => $startTime . ' - ' . $endTime,
-            'status' => $this->appointment->status,
-            'notes' => $this->appointment->notes,
-            'message' => $this->getMainLine()
-        ];
+            return [
+                'type' => $this->type,
+                'appointment_id' => $this->appointment->id,
+                'booking_date' => $this->appointment->booking_date,
+                'formatted_date' => $date,
+                'start_time' => $this->appointment->start_time,
+                'end_time' => $this->appointment->end_time,
+                'formatted_time' => $startTime . ' - ' . $endTime,
+                'status' => $this->appointment->status,
+                'notes' => $this->appointment->notes ?? '',
+                'message' => $this->getMainLine()
+            ];
+        } catch (\Exception $e) {
+            \Log::error('Error creating database notification: ' . $e->getMessage());
+            
+            return [
+                'type' => $this->type,
+                'message' => 'You have a new ' . $this->type . ' notification.',
+                'error' => 'There was an error processing the full notification details.'
+            ];
+        }
     }
 
     /**
@@ -111,21 +126,26 @@ class AppointmentNotification extends Notification
      */
     private function getMainLine()
     {
-        // Format date for message
-        $date = date('l, F j', strtotime($this->appointment->booking_date));
-        $time = date('g:i A', strtotime($this->appointment->start_time));
+        try {
+            // Format date for message
+            $date = date('l, F j', strtotime($this->appointment->booking_date));
+            $time = date('g:i A', strtotime($this->appointment->start_time));
 
-        switch ($this->type) {
-            case 'confirmation':
-                return "Your appointment on {$date} at {$time} has been confirmed!";
-            case 'reminder':
-                return "This is a reminder about your upcoming appointment on {$date} at {$time}.";
-            case 'update':
-                return "Your appointment on {$date} at {$time} has been updated.";
-            case 'cancellation':
-                return "Your appointment on {$date} at {$time} has been cancelled.";
-            default:
-                return "You have an appointment on {$date} at {$time}.";
+            switch ($this->type) {
+                case 'confirmation':
+                    return "Your appointment on {$date} at {$time} has been confirmed!";
+                case 'reminder':
+                    return "This is a reminder about your upcoming appointment on {$date} at {$time}.";
+                case 'update':
+                    return "Your appointment on {$date} at {$time} has been updated.";
+                case 'cancellation':
+                    return "Your appointment on {$date} at {$time} has been cancelled.";
+                default:
+                    return "You have an appointment on {$date} at {$time}.";
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error generating notification message: ' . $e->getMessage());
+            return "You have a new " . $this->type . " notification.";
         }
     }
 }

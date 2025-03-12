@@ -95,6 +95,8 @@ Route::get('/appointments', [AppointmentController::class, 'index'])->name('appo
 Route::get('/appointments/calendar', [CalendarController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointments/create', [AppointmentController::class, 'create'])->name('appointments.create')->middleware('auth');
 Route::get('/api/appointments', [AppointmentController::class, 'index']);
+Route::get('notifications/create-test', [App\Http\Controllers\NotificationController::class, 'createTestNotification'])
+    ->name('notifications.test')->middleware('auth');
 
 Route::resource('standardexercises', App\Http\Controllers\standardexercisesController::class);
 
