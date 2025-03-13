@@ -85,7 +85,29 @@ Route::get('/simple-test', function() {
         return 'Error: ' . $e->getMessage();
     }
 })->middleware('auth');
-
+Route::get('/test-appointment-notification', function() {
+    $user = Auth::user();
+    
+    if (!$user) {
+        return 'Not logged in';
+    }
+    
+    try {
+        $appointment = (object)[
+            'id' => 123,
+            'booking_date' => date('Y-m-d'),
+            'status' => 'confirmed',
+            'notes' => 'Test appointment from route',
+            'doctor_name' => 'Dr. Smith'
+        ];
+        
+        $user->notify(new \App\Notifications\SimpleAppointmentNotification($appointment));
+        return 'Appointment notification sent! Go check your notifications page.';
+    } catch (\Exception $e) {
+        \Log::error('Error creating appointment notification: ' . $e->getMessage());
+        return 'Error: ' . $e->getMessage();
+    }
+})->middleware('auth');
 Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 Route::get('/search-clients', [PersonalisedTrainingPlanController::class, 'searchClients'])->name('search.clients');
 
