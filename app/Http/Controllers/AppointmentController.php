@@ -440,6 +440,23 @@ class AppointmentController extends AppBaseController
     }
 
     /**
+     * Get appointment details as JSON for API requests
+     * 
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAppointmentDetails($id)
+    {
+        $appointment = $this->appointmentRepository->find($id);
+        
+        if (empty($appointment)) {
+            return response()->json(['error' => 'Appointment not found'], 404);
+        }
+        
+        return response()->json($appointment);
+    }
+
+    /**
      * Fetch appointments as JSON for FullCalendar.
      */
     /* public function getAppointments()
