@@ -1,12 +1,14 @@
 @extends('layouts.app')
-
 @section('content')
     <section class="content-header">
-        <h1 class="pull-left">Workout Logs</h1><br> 
-        <h1 class="pull-right">
-           <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px" href="{!! route('tpelogs.create') !!}">Add New</a>
-        </h1>
-    </section>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="mb-0">Workout Logs</h1>
+            <a href="{!! route('tpelogs.create') !!}" class="btn btn-primary" 
+                style="background-color: #C96E04; border-color: #C96E04; color: white;">
+                <i class="glyphicon glyphicon-plus"></i> Add New Workout Log
+            </a>
+        </div>
+    </section><br>
     <div class="content">
         <div class="clearfix"></div>
 

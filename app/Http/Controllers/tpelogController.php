@@ -113,7 +113,7 @@ class tpelogController extends AppBaseController
      */
     public function edit($id)
     {
-        $tpelog = $this->tpelogRepository->find($id);
+        /*$tpelog = $this->tpelogRepository->find($id);
 
         if (empty($tpelog)) {
             Flash::error('Tpelog not found');
@@ -121,7 +121,18 @@ class tpelogController extends AppBaseController
             return redirect(route('tpelogs.index'));
         }
 
-        return view('tpelogs.edit')->with('tpelog', $tpelog);
+        return view('tpelogs.edit')->with('tpelog', $tpelog);*/
+
+        $tpelog = $this->tpelogRepository->find($id);
+
+        if (empty($tpelog)) {
+            Flash::error('Tpelog not found');
+            return redirect(route('tpelogs.index'));
+        }
+
+        $exercises = standardexercises::all(); // ✅ Fetch exercises
+
+        return view('tpelogs.edit', compact('tpelog', 'exercises'));
     }
 
     /**

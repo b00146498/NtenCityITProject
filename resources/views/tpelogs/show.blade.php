@@ -1,19 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="content-header">
-        <h1>
-            Workout Logs
-        </h1>
-    </section>
-    <div class="content">
-        <div class="box box-primary">
-            <div class="box-body">
-                <div class="row" style="padding-left: 20px">
-                    @include('tpelogs.show_fields')
-                    <a href="{!! route('tpelogs.index') !!}" class="btn btn-default">Back</a>
-                </div>
+<div class="container mt-1">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white d-flex justify-content-between">
+            <h4>View Workout Log</h4>
+            <a href="{{ route('tpelogs.index') }}" class="text-white text-decoration-none">✖ Close</a>
+        </div>
+        <div class="card-body">
+            @include('tpelogs.show_fields')
+
+            <div class="d-flex justify-content-end mt-3">
+                <a href="{!! route('tpelogs.index') !!}" class="btn btn-outline-dark px-4 py-2">Back</a>
             </div>
         </div>
     </div>
+</div>
 @endsection
+
