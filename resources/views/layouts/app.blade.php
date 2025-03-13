@@ -155,9 +155,9 @@
             <ul class="dropdown-menu custom-dropdown" aria-labelledby="clientsDropdown">
                 <li><a class="dropdown-item custom-dropdown-item" href="{{ route('clients.index') }}">View Client Profiles</a></li>
                 <li><a class="dropdown-item custom-dropdown-item" href="{{ route('diary-entries.index') }}">Client Progress Notes</a></li>
-                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('standardexercises.index') }}">Standard Exercises</a></li>
-                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('tpelogs.index') }}">logs</a></li>
                 <li><a class="dropdown-item custom-dropdown-item" href="{{ route('personalisedtrainingplans.index') }}">Personalised Training Plan</a></li>
+                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('tpelogs.index') }}">Workout Logs</a></li>
+                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('standardexercises.index') }}">Standard Exercises</a></li>     
             </ul>
         </li>
         <li class="nav-item">

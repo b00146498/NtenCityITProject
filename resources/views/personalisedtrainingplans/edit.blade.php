@@ -105,4 +105,22 @@
         }
     });
 </script>
+<style>
+    .btn-primary {
+        background-color: #C96E04 !important; /* Orange */
+        color: white !important;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        transition: 0.3s;
+        text-decoration: none;
+    }
+
+    /* Hover Effect */
+    .btn-primary:hover {
+        background-color: #A85C03 !important; /* Darker Orange */
+    }
+</style>
 
