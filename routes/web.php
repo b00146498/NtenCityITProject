@@ -9,7 +9,6 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\tpelogController;
 use App\Http\Controllers\personalisedtrainingplanController;
-use Illuminate\Support\Facades\DB;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 
@@ -71,30 +70,6 @@ Route::middleware(['auth'])->group(function () {
     Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
-
-// Notification debug route
-Route::get('/check-notifications', function() {
-    // Get direct access to the notifications table
-    $notifications = DB::table('notifications')->get();
-    
-    echo "<h1>All Notifications (" . $notifications->count() . ")</h1>";
-    echo "<hr>";
-    
-    // Display all notifications in the system
-    foreach($notifications as $notification) {
-        echo "<div style='border: 1px solid #ccc; margin-bottom: 10px; padding: 10px;'>";
-        echo "<p><strong>ID:</strong> " . $notification->id . "</p>";
-        echo "<p><strong>Type:</strong> " . $notification->type . "</p>";
-        echo "<p><strong>Notifiable Type:</strong> " . $notification->notifiable_type . "</p>";
-        echo "<p><strong>Notifiable ID:</strong> " . $notification->notifiable_id . "</p>";
-        echo "<p><strong>Data:</strong> <pre>" . json_encode(json_decode($notification->data), JSON_PRETTY_PRINT) . "</pre></p>";
-        echo "<p><strong>Created:</strong> " . $notification->created_at . "</p>";
-        echo "</div>";
-    }
-    
-    return '';
-})->middleware('auth');
-
 Route::get('/simple-test', function() {
     $user = Auth::user();
     
@@ -159,7 +134,6 @@ Route::get('/appointments/create', [AppointmentController::class, 'create'])->na
 Route::get('/api/appointments', [AppointmentController::class, 'index']);
 Route::get('notifications/create-test', [App\Http\Controllers\NotificationController::class, 'createTestNotification'])
     ->name('notifications.test')->middleware('auth');
-    Route::get('/api/appointments/{id}', [AppointmentController::class, 'getAppointmentDetails'])->name('api.appointments.show')->middleware('auth');
 
 Route::resource('standardexercises', App\Http\Controllers\standardexercisesController::class);
 
@@ -178,30 +152,3 @@ Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.s
 Route::get('/calendar/display', [AppointmentController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointment/json', 'App\Http\Controllers\AppointmentController@getAppointments')->name('appointment.json')->middleware('auth');
 
-Route::get('/raw-notifications', function() {
-    $user = Auth::user();
-    
-    if (!$user) {
-        return redirect('login');
-    }
-    
-    // Get all notifications directly from the database
-    $notifications = DB::table('notifications')->get();
-    
-    // Return a simple view with these notifications
-    return view('notifications.raw', [
-        'notifications' => $notifications
-    ]);
-})->middleware('auth');
-
-Route::get('/debug-index-template', function() {
-    // Get all notifications from DB
-    $notifications = DB::table('notifications')->orderBy('created_at', 'desc')->get();
-    
-    // Output the count
-    echo "<p>Found " . $notifications->count() . " notifications</p>";
-    
-    // Try to render the index template with these notifications
-    return view('notifications.index')
-        ->with('notifications', $notifications);
-});

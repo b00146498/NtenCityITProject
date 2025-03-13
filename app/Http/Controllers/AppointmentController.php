@@ -6,6 +6,7 @@ use App\Http\Requests\CreateAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Repositories\AppointmentRepository;
 use App\Http\Controllers\AppBaseController;
+use App\Http\Controllers\AppointmentController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -57,153 +58,43 @@ class AppointmentController extends AppBaseController
         };
     }
 
+      /**
+     * Store a newly created appointment.
+     */
     public function store(Request $request)
     {
-        Log::info('📌 Received Appointment Booking Request', $request->all());
-
-        // Modified validation to handle time format with AM/PM
-        $validator = Validator::make($request->all(), [
-            'client_id'    => 'required',
-            'employee_id'  => 'required',
-            'practice_id'  => 'required',
-            'booking_date' => 'required|date',
-            'start_time'   => 'required',
-            'end_time'     => 'required',
-            'status'       => 'nullable|string',
-            'notes'        => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            Log::error('❌ Validation Failed', $validator->errors()->toArray());
-            return response()->json(['error' => 'Invalid input', 'messages' => $validator->errors()], 400);
-        }
-
-        // Format the data for database insertion
-        $data = $request->all();
-        
-        // Convert AM/PM times to 24-hour format if needed
-        if (strpos($data['start_time'], 'AM') !== false || strpos($data['start_time'], 'PM') !== false) {
-            $startDateTime = Carbon::parse($data['start_time']);
-            $data['start_time'] = $startDateTime->format('H:i:s');
-        }
-        
-        if (strpos($data['end_time'], 'AM') !== false || strpos($data['end_time'], 'PM') !== false) {
-            $endDateTime = Carbon::parse($data['end_time']);
-            $data['end_time'] = $endDateTime->format('H:i:s');
-        }
-        
-        // Format has now been standardized to a format your database expects
+        Log::info('📌 Force-Saving Appointment:', $request->all());
+    
         try {
-            $appointment = $this->appointmentRepository->create($data);
-
-            if (!$appointment) {
-                Log::error('❌ Appointment Creation Failed');
-                return response()->json(['error' => 'Failed to create appointment'], 500);
-            }
-
-            // Get client details for notifications
-            $client = \App\Models\Client::find($appointment->client_id);
-            
-            // Send confirmation notification
-            $this->sendAppointmentConfirmation($appointment, $client);
-            
-            // Send database notification
-            $this->sendDatabaseNotification($appointment, $client, 'confirmation');
-
-            Log::info('✅ Appointment Successfully Created', $appointment->toArray());
-
+            // 🔥 Force-Save Appointment
+            $appointment = new \App\Models\Appointment();
+            $appointment->client_id = $request->client_id; 
+            $appointment->employee_id = $request->employee_id;
+            $appointment->practice_id = $request->practice_id;
+            $appointment->booking_date = $request->booking_date;
+            $appointment->start_time = $request->start_time;
+            $appointment->end_time = $request->end_time;
+            $appointment->status = $request->status ?? 'confirmed'; 
+            $appointment->save();
+    
+            Log::info('✅ Appointment Successfully Forced Into Database', $appointment->toArray());
+    
+            // 🚀 Return a simple success response (JS will handle pop-up)
             return response()->json([
                 'success' => true,
-                'message' => 'Appointment created successfully!',
-                'appointment' => $appointment
+                'message' => '✅ Appointment saved successfully!',
             ]);
+    
         } catch (\Exception $e) {
-            Log::error('❌ Exception Creating Appointment: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to create appointment: ' . $e->getMessage()], 500);
+            Log::error('❌ Exception Forcing Appointment Save: ' . $e->getMessage());
+            return response()->json([
+                'error' => '❌ Failed to force-save appointment: ' . $e->getMessage()
+            ], 500);
         }
     }
+    
 
-    public function getAvailableSlots(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'date' => 'required|date',
-            'employee_id' => 'nullable|integer', // Optional doctor/employee filter
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => 'Invalid input', 'messages' => $validator->errors()], 400);
-        }
-
-        $date = Carbon::parse($request->date);
-        
-        // For backward compatibility, return simple time slots
-        // This ensures existing frontend implementations continue to work
-        $timeSlots = [
-            "09:00 AM", "10:00 AM", "11:30 AM",
-            "12:00 PM", "02:00 PM", "03:30 PM",
-            "05:00 PM", "07:00 PM", "10:00 PM"
-        ];
-
-        return response()->json([
-            'date' => $date->toDateString(),
-            'timeSlots' => $timeSlots
-        ]);
-    }
-
-    public function update($id, Request $request)
-    {
-        $appointment = $this->appointmentRepository->find($id);
-
-        if (empty($appointment)) {
-            return response()->json(['error' => 'Appointment not found'], 404);
-        }
-
-        // Store original status to compare after update
-        $originalStatus = $appointment->status;
-
-        $validator = Validator::make($request->all(), [
-            'client_id'    => 'required',
-            'employee_id'  => 'required',
-            'practice_id'  => 'required',
-            'booking_date' => 'required|date',
-            'start_time'   => 'required',
-            'end_time'     => 'required',
-            'status'       => 'nullable|string',
-            'notes'        => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => 'Invalid input', 'messages' => $validator->errors()], 400);
-        }
-
-        $updatedAppointment = $this->appointmentRepository->update($request->all(), $id);
-        
-        // Get client for notifications
-        $client = \App\Models\Client::find($updatedAppointment->client_id);
-        
-        // Determine type of notification based on status change
-        if ($originalStatus !== $updatedAppointment->status) {
-            if ($updatedAppointment->status === 'confirmed') {
-                // Status changed to confirmed - send confirmation notification
-                $this->sendAppointmentConfirmation($updatedAppointment, $client);
-                $this->sendDatabaseNotification($updatedAppointment, $client, 'confirmation');
-            } elseif ($updatedAppointment->status === 'canceled') {
-                // Status changed to canceled - send cancellation notification
-                $this->sendDatabaseNotification($updatedAppointment, $client, 'cancellation');
-            } else {
-                // Status changed to something else - send update notification
-                $this->sendDatabaseNotification($updatedAppointment, $client, 'update');
-            }
-        } else {
-            // Status didn't change but other details might have - send update notification
-            $this->sendDatabaseNotification($updatedAppointment, $client, 'update');
-        }
-
-        return response()->json([
-            'success' => 'Appointment updated successfully!',
-            'appointment' => $updatedAppointment
-        ]);
-    }
 
     public function destroy($id)
     {
@@ -281,71 +172,17 @@ class AppointmentController extends AppBaseController
      */
     private function sendDatabaseNotification($appointment, $client, $type)
     {
-        Log::info('Attempting to send notification', [
-            'client_id' => $client ? $client->id : 'null',
-            'appointment_id' => $appointment->id,
-            'type' => $type
-        ]);
-
         if (!$client) {
             Log::error('Cannot send database notification: Client not found for ID ' . $appointment->client_id);
             return;
         }
         
         try {
-            // Get the doctor/employee name
-            $doctor = \App\Models\Employee::find($appointment->employee_id);
-            $doctorName = $doctor ? 'Dr. ' . $doctor->emp_first_name . ' ' . $doctor->emp_surname : 'Your Doctor';
-            
-            Log::info('Doctor information for notification', [
-                'doctor_id' => $appointment->employee_id,
-                'doctor_name' => $doctorName
-            ]);
-            
-            // Add doctor name to the appointment object
-            $appointmentWithDoctor = clone $appointment;
-            $appointmentWithDoctor->doctor_name = $doctorName;
-            
-            // Send notification to the client
-            $client->notify(new \App\Notifications\AppointmentNotification($appointmentWithDoctor, $type));
-            Log::info("Database notification ({$type}) sent to Client #{$client->id} for appointment #{$appointment->id}");
-            
-            // Also send to User if it exists and is different from client
-            if ($client->userid) {
-                $user = \App\Models\User::find($client->userid);
-                if ($user) {
-                    $user->notify(new \App\Notifications\AppointmentNotification($appointmentWithDoctor, $type));
-                    Log::info("Database notification ({$type}) also sent to User #{$user->id} for appointment #{$appointment->id}");
-                }
-            }
+            // Send notification using Laravel's notification system
+            $client->notify(new AppointmentNotification($appointment, $type));
+            Log::info("Database notification ({$type}) sent for appointment #{$appointment->id}");
         } catch (\Exception $e) {
-            Log::error('Failed to send database notification: ' . $e->getMessage(), [
-                'exception' => get_class($e),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            // Fall back to sending notification to user if client notification fails
-            try {
-                if ($client->userid) {
-                    $user = \App\Models\User::find($client->userid);
-                    if ($user) {
-                        // Get the doctor/employee name
-                        $doctor = \App\Models\Employee::find($appointment->employee_id);
-                        $doctorName = $doctor ? 'Dr. ' . $doctor->emp_first_name . ' ' . $doctor->emp_surname : 'Your Doctor';
-                        
-                        // Add doctor name to the appointment object
-                        $appointmentWithDoctor = clone $appointment;
-                        $appointmentWithDoctor->doctor_name = $doctorName;
-                        
-                        $user->notify(new \App\Notifications\AppointmentNotification($appointmentWithDoctor, $type));
-                        Log::info("Fallback: Database notification ({$type}) sent to User #{$user->id} for appointment #{$appointment->id}");
-                    }
-                }
-            } catch (\Exception $fallbackException) {
-                Log::error('Both client and user notification attempts failed: ' . $fallbackException->getMessage());
-            }
+            Log::error('Failed to send database notification: ' . $e->getMessage());
         }
     }
 
@@ -433,29 +270,15 @@ class AppointmentController extends AppBaseController
         Log::info('Legacy payAppointment method called, redirecting to processPayment');
         return $this->processPayment($id);
     }
-
     public function display()
     {
-        return view('calendar.display'); // Loads the Blade file
+        $clients = \App\Models\Client::all(['id', 'first_name', 'surname']); // ✅ Clients' Full Names
+        $practices = \App\Models\Practice::all(['id', 'company_name']); // ✅ Practice Names
+        $employees = \DB::table('employee')->get(); // ✅ Explicitly fetch from 'employee' table
+    
+        return view('calendar.display', compact('clients', 'practices', 'employees'));
     }
-
-    /**
-     * Get appointment details as JSON for API requests
-     * 
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getAppointmentDetails($id)
-    {
-        $appointment = $this->appointmentRepository->find($id);
-        
-        if (empty($appointment)) {
-            return response()->json(['error' => 'Appointment not found'], 404);
-        }
-        
-        return response()->json($appointment);
-    }
-
+    
     /**
      * Fetch appointments as JSON for FullCalendar.
      */
@@ -487,4 +310,9 @@ class AppointmentController extends AppBaseController
                 'charset' => 'UTF-8'
             ]);
     }
+
+    public function create()
+{
+    return view('appointments.create'); // ✅ Make sure this view exists
+}
 }
