@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
 /**
- * Class Client
+ * Class client
  * @package App\Models
  * @version February 26, 2025, 3:36 pm UTC
  *
@@ -25,10 +25,13 @@ use Illuminate\Notifications\Notifiable;
  * @property string $password
  * @property string $account_status
  * @property integer $practice_id
+ * @property integer $userid
  */
-class Client extends Model
+class client extends Model
 {
-    use SoftDeletes, HasFactory, Notifiable;
+    use SoftDeletes;
+    use HasFactory;
+    use Notifiable;
 
     public $table = 'client';
     
@@ -50,44 +53,63 @@ class Client extends Model
         'username',
         'password',
         'account_status',
-        'practice_id'
+        'practice_id',
+        'userid'
     ];
 
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
     protected $casts = [
-        'id'             => 'integer',
-        'first_name'     => 'string',
-        'surname'        => 'string',
-        'date_of_birth'  => 'date',
-        'gender'         => 'string',
-        'email'          => 'string',
+        'id' => 'integer',
+        'first_name' => 'string',
+        'surname' => 'string',
+        'date_of_birth' => 'date',
+        'gender' => 'string',
+        'email' => 'string',
         'contact_number' => 'string',
-        'street'         => 'string',
-        'city'           => 'string',
-        'county'         => 'string',
-        'username'       => 'string',
-        'password'       => 'string',
+        'street' => 'string',
+        'city' => 'string',
+        'county' => 'string',
+        'username' => 'string',
+        'password' => 'string',
         'account_status' => 'string',
-        'practice_id'    => 'integer'
+        'practice_id' => 'integer',
+        'userid' => 'integer'
     ];
 
+    /**
+     * Validation rules
+     *
+     * @var array
+     */
     public static $rules = [
-        'first_name'     => 'required|string|max:50',
-        'surname'        => 'required|string|max:50',
-        'date_of_birth'  => 'required',
-        'gender'         => 'required|string',
-        'email'          => 'required|string|max:255',
+        'first_name' => 'required|string|max:50',
+        'surname' => 'required|string|max:50',
+        'date_of_birth' => 'required',
+        'gender' => 'required|string',
+        'email' => 'required|string|max:255',
         'contact_number' => 'required|string|max:15',
-        'street'         => 'required|string|max:255',
-        'city'           => 'required|string|max:50',
-        'county'         => 'required|string|max:50',
-        'username'       => 'required|string|max:50',
-        'password'       => 'required|string|max:255',
+        'street' => 'required|string|max:255',
+        'city' => 'required|string|max:50',
+        'county' => 'required|string|max:50',
+        'username' => 'required|string|max:50',
+        'password' => 'required|string|max:255',
         'account_status' => 'required|string',
-        'practice_id'    => 'required|integer'
+        'practice_id' => 'required|integer',
+        'userid' => 'nullable'
     ];
-
-    // Removed the user() relationship since we are not linking directly
-
+    
+    /**
+     * Get the user associated with the client.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'userid');
+    }
+    
     /**
      * Route notifications for the mail channel.
      *

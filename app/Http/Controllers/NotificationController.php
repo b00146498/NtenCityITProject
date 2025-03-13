@@ -12,6 +12,7 @@ use Response;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class NotificationController extends AppBaseController
 {
@@ -40,72 +41,61 @@ class NotificationController extends AppBaseController
             return redirect(route('login'));
         }
         
-        // Get user notifications
-        if ($request->has('filter') && $request->filter == 'unread') {
-            $userNotifications = $user->unreadNotifications()->get();
-        } else {
-            $userNotifications = $user->notifications()->get();
-        }
-        
-        // Try to get client notifications if the user has a client record
         try {
-            // CHANGED HERE: from 'userid' to 'user_id'
-            $client = \App\Models\Client::where('user_id', $user->id)->first();
-            
-            if ($client && method_exists($client, 'notifications')) {
-                Log::info('Found client record for user', ['user_id' => $user->id, 'client_id' => $client->id]);
+            // Get user notifications from database
+            $userQuery = DB::table('notifications')
+                ->where('notifiable_type', 'App\\Models\\User')
+                ->where('notifiable_id', $user->id);
                 
-                // Get client notifications
-                $clientNotifications = $request->has('filter') && $request->filter == 'unread'
-                    ? $client->unreadNotifications()->get()
-                    : $client->notifications()->get();
+            // Get client notifications from database
+            $clientQuery = DB::table('notifications')
+                ->where('notifiable_type', 'App\\Models\\Client'); // Get all client notifications initially
                 
-                // Merge user and client notifications
-                $allNotifications = $userNotifications->merge($clientNotifications);
-                
-                // Sort by created_at (newest first)
-                $allNotifications = $allNotifications->sortByDesc('created_at');
-                
-                // Paginate manually
-                $page = $request->get('page', 1);
-                $perPage = 10;
-                $total = $allNotifications->count();
-                $items = $allNotifications->forPage($page, $perPage);
-                
-                // Create custom paginator
-                $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-                    $items,
-                    $total,
-                    $perPage,
-                    $page,
-                    ['path' => $request->url(), 'query' => $request->query()]
-                );
-                
-                Log::info('Combined notifications', [
-                    'user_notifications' => $userNotifications->count(),
-                    'client_notifications' => $clientNotifications->count(),
-                    'total' => $total
-                ]);
-                
-                return view('notifications.index')
-                    ->with('notifications', $paginator);
+            // If we're filtering to unread only
+            if ($request->has('filter') && $request->filter == 'unread') {
+                $userQuery->whereNull('read_at');
+                $clientQuery->whereNull('read_at');
             }
+            
+            // Get both sets of notifications
+            $userNotifications = $userQuery->get();
+            $clientNotifications = $clientQuery->get();
+            
+            // Convert to Laravel collection for easier manipulation
+            $allNotifications = collect($userNotifications->all())
+                ->merge($clientNotifications->all())
+                ->sortByDesc('created_at');
+                
+            // Paginate the results manually
+            $page = $request->get('page', 1);
+            $perPage = 10;
+            $items = $allNotifications->forPage($page, $perPage);
+            
+            // Create a length-aware paginator
+            $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                $items,
+                $allNotifications->count(),
+                $perPage,
+                $page,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+            
+            return view('notifications.index')
+                ->with('notifications', $paginator);
+                
         } catch (\Exception $e) {
-            Log::error('Error retrieving client notifications', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            Log::error('Error getting notifications: ' . $e->getMessage());
+            
+            // Fallback to just user notifications
+            if ($request->has('filter') && $request->filter == 'unread') {
+                $notifications = $user->unreadNotifications()->paginate(10);
+            } else {
+                $notifications = $user->notifications()->paginate(10);
+            }
+            
+            return view('notifications.index')
+                ->with('notifications', $notifications);
         }
-        
-        // If no client record, or error occurred, just use user notifications
-        if ($request->has('filter') && $request->filter == 'unread') {
-            $notifications = $user->unreadNotifications()->paginate(10);
-        } else {
-            $notifications = $user->notifications()->paginate(10);
-        }
-
-        return view('notifications.index')
-            ->with('notifications', $notifications);
     }
 
     /**
@@ -235,32 +225,28 @@ class NotificationController extends AppBaseController
      */
     public function markAsRead($id)
     {
-        $user = Auth::user();
-        $notification = $user->notifications()->where('id', $id)->first();
-        
-        if (empty($notification)) {
-            // Check if it's a client notification
-            try {
-                // CHANGED HERE: from 'userid' to 'user_id'
-                $client = \App\Models\Client::where('user_id', $user->id)->first();
-                if ($client && method_exists($client, 'notifications')) {
-                    $notification = $client->notifications()->where('id', $id)->first();
-                }
-            } catch (\Exception $e) {
-                Log::error('Error finding client notification to mark as read', [
-                    'error' => $e->getMessage()
-                ]);
-            }
-            
-            if (empty($notification)) {
+        try {
+            // Try to find and mark the notification regardless of type
+            $notification = DB::table('notifications')
+                ->where('id', $id)
+                ->first();
+                
+            if (!$notification) {
                 Flash::error('Notification not found');
                 return redirect(route('notifications.index'));
             }
+            
+            // Mark as read by updating the read_at timestamp
+            DB::table('notifications')
+                ->where('id', $id)
+                ->update(['read_at' => now()]);
+                
+            Flash::success('Notification marked as read.');
+        } catch (\Exception $e) {
+            Log::error('Error marking notification as read: ' . $e->getMessage());
+            Flash::error('Error marking notification as read.');
         }
         
-        $notification->markAsRead();
-        
-        Flash::success('Notification marked as read.');
         return redirect()->back();
     }
     
@@ -272,21 +258,23 @@ class NotificationController extends AppBaseController
     public function markAllAsRead()
     {
         $user = Auth::user();
-        $user->unreadNotifications->markAsRead();
         
-        // Also mark client notifications as read if applicable
         try {
-            $client = \App\Models\Client::where('email', $user->email)->first();
-            if ($client && method_exists($client, 'unreadNotifications')) {
-                $client->unreadNotifications->markAsRead();
-            }
+            // Mark all user notifications as read
+            $user->unreadNotifications->markAsRead();
+            
+            // Also mark any client notifications as read
+            DB::table('notifications')
+                ->where('notifiable_type', 'App\\Models\\Client')
+                ->whereNull('read_at')
+                ->update(['read_at' => now()]);
+                
+            Flash::success('All notifications marked as read.');
         } catch (\Exception $e) {
-            Log::error('Error marking client notifications as read', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error('Error marking all notifications as read: ' . $e->getMessage());
+            Flash::error('Error marking all notifications as read.');
         }
         
-        Flash::success('All notifications marked as read.');
         return redirect()->back();
     }
     
