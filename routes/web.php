@@ -70,7 +70,44 @@ Route::middleware(['auth'])->group(function () {
     Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
-
+Route::get('/simple-test', function() {
+    $user = Auth::user();
+    
+    if (!$user) {
+        return 'Not logged in';
+    }
+    
+    try {
+        $user->notify(new \App\Notifications\SimpleTestNotification());
+        return 'Test notification sent successfully! Go check your notifications page.';
+    } catch (\Exception $e) {
+        \Log::error('Error creating simple notification: ' . $e->getMessage());
+        return 'Error: ' . $e->getMessage();
+    }
+})->middleware('auth');
+Route::get('/test-appointment-notification', function() {
+    $user = Auth::user();
+    
+    if (!$user) {
+        return 'Not logged in';
+    }
+    
+    try {
+        $appointment = (object)[
+            'id' => 123,
+            'booking_date' => date('Y-m-d'),
+            'status' => 'confirmed',
+            'notes' => 'Test appointment from route',
+            'doctor_name' => 'Dr. Smith'
+        ];
+        
+        $user->notify(new \App\Notifications\SimpleAppointmentNotification($appointment));
+        return 'Appointment notification sent! Go check your notifications page.';
+    } catch (\Exception $e) {
+        \Log::error('Error creating appointment notification: ' . $e->getMessage());
+        return 'Error: ' . $e->getMessage();
+    }
+})->middleware('auth');
 Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 Route::get('/search-clients', [PersonalisedTrainingPlanController::class, 'searchClients'])->name('search.clients');
 

@@ -1,10 +1,12 @@
+
+
 @extends('layouts.app')
 
 @section('content')
 <div class="container">
-    <section class="content-header mb-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <h1 class="mb-0"><i class="fa fa-bell mr-2"></i>Notifications</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fa fa-bell mr-2"></i>Notifications</h1>
+        <div>
             <div class="btn-group shadow-sm">
                 <a href="{{ route('notifications.index') }}" class="btn {{ !request()->has('filter') ? 'btn-primary' : 'btn-outline-primary' }}">
                     <i class="fa fa-list mr-1"></i> All
@@ -12,149 +14,176 @@
                 <a href="{{ route('notifications.index', ['filter' => 'unread']) }}" class="btn {{ request()->get('filter') == 'unread' ? 'btn-primary' : 'btn-outline-primary' }}">
                     <i class="fa fa-envelope mr-1"></i> Unread
                 </a>
-                
-                @if(auth()->user()->unreadNotifications->count() > 0)
-                    <form action="{{ route('notifications.markAllAsRead') }}" method="POST" class="d-inline ml-2">
-                        @csrf
-                        @method('PUT')
-                        <button type="submit" class="btn btn-secondary">
-                            <i class="fa fa-check-double mr-1"></i> Mark All as Read
-                        </button>
-                    </form>
-                @endif
             </div>
+            
+            @if(auth()->user()->unreadNotifications->count() > 0)
+                <form action="{{ route('notifications.markAllAsRead') }}" method="POST" class="d-inline ml-2">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fa fa-check-double mr-1"></i> Mark All as Read
+                    </button>
+                </form>
+            @endif
         </div>
-    </section>
+    </div>
 
-    <div class="content">
-        @include('flash::message')
+    @include('flash::message')
 
-        <div class="card shadow">
-            <div class="card-body p-0">
-                @if(count($notifications) > 0)
-                    <div class="list-group list-group-flush">
-                        @foreach($notifications as $notification)
-                            <div class="list-group-item {{ $notification->read_at ? 'bg-white' : 'bg-light border-left border-primary border-4' }}">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="mb-0">
-                                        @if(!$notification->read_at)
-                                            <span class="badge badge-pill badge-primary mr-2">New</span>
-                                        @endif
-                                        <span class="text-{{ getNotificationTypeColor($notification->data['type'] ?? 'appointment') }}">
-                                            {{ ucfirst($notification->data['type'] ?? 'Appointment') }} Notification
-                                        </span>
-                                    </h5>
-                                    <small class="text-muted">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
+    {{-- Debug information --}}
+    <div class="card mb-4 d-none">
+        <div class="card-body">
+            <h5>Debug Info:</h5>
+            <ul>
+                <li>User ID: {{ auth()->id() }}</li>
+                <li>User notifications: {{ auth()->user()->notifications()->count() }}</li>
+                <li>Unread notifications: {{ auth()->user()->unreadNotifications()->count() }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body p-0">
+            @php
+                // Combine notifications from both user model and client model if user has a client record
+                $allNotifications = auth()->user()->notifications;
+                
+                // Try to find client associated with user
+                $client = null;
+                try {
+                    $client = \App\Models\Client::where('userid', auth()->id())->first();
+                } catch (\Exception $e) {
+                    // Client table might not exist or other error
+                }
+                
+                if ($client && method_exists($client, 'notifications')) {
+                    $clientNotifications = $client->notifications;
+                    $allNotifications = $allNotifications->merge($clientNotifications);
+                }
+                
+                // Sort by created_at
+                $allNotifications = $allNotifications->sortByDesc('created_at');
+                
+                // Filter for unread if requested
+                if (request()->has('filter') && request()->get('filter') == 'unread') {
+                    $allNotifications = $allNotifications->whereNull('read_at');
+                }
+            @endphp
+            
+            @if(count($allNotifications) > 0)
+                <div class="list-group list-group-flush">
+                    @foreach($allNotifications as $notification)
+                        <div class="list-group-item notification-item">
+                            <div class="d-flex">
+                                <div class="mr-3">
+                                    <i class="fa fa-bell mt-1"></i>
                                 </div>
                                 
-                                <p class="mb-3 lead">{{ $notification->data['message'] ?? 'Appointment notification' }}</p>
-                                
-                                <div class="card bg-light mb-3">
-                                    <div class="card-body py-3">
-                                        <div class="row">
-                                            @if(isset($notification->data['booking_date']))
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fa fa-calendar-alt text-primary mr-2"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Date</small>
-                                                            <strong>
-                                                                {{ isset($notification->data['formatted_date']) ? 
-                                                                    $notification->data['formatted_date'] : 
-                                                                    \Carbon\Carbon::parse($notification->data['booking_date'])->format('l, F j, Y') }}
-                                                            </strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="text-muted small">
+                                        {{ \Carbon\Carbon::parse($notification->created_at)->format('jS F, Y') }}
+                                    </div>
+                                    
+                                    <div class="notification-text">
+                                        @if(isset($notification->data['type']) && $notification->data['type'] == 'appointment')
+                                            @if(isset($notification->data['doctor_name']))
+                                                {{ $notification->data['doctor_name'] }}
+                                            @else
+                                                Appointment Notification
                                             @endif
-                                            
-                                            @if(isset($notification->data['start_time']) && isset($notification->data['end_time']))
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fa fa-clock text-primary mr-2"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Time</small>
-                                                            <strong>
-                                                                {{ isset($notification->data['formatted_time']) ? 
-                                                                    $notification->data['formatted_time'] : 
-                                                                    \Carbon\Carbon::parse($notification->data['start_time'])->format('g:i A') . ' - ' . 
-                                                                    \Carbon\Carbon::parse($notification->data['end_time'])->format('g:i A') }}
-                                                            </strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'payment')
+                                            Appointment Paid Successfully
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'account_updated')
+                                            Account Details Updated
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'account_created')
+                                            Account Created
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'confirmation')
+                                            @if(isset($notification->data['doctor_name']))
+                                                {{ $notification->data['doctor_name'] }}
+                                            @else
+                                                Appointment Confirmed
                                             @endif
-                                            
-                                            @if(isset($notification->data['status']))
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fa fa-info-circle text-primary mr-2"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Status</small>
-                                                            <span class="badge badge-{{ getStatusBadgeColor($notification->data['status']) }}">
-                                                                {{ ucfirst($notification->data['status']) }}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        
-                                        @if(isset($notification->data['notes']) && !empty($notification->data['notes']))
-                                            <div class="mt-3">
-                                                <div class="d-flex align-items-start">
-                                                    <i class="fa fa-comment-alt text-primary mt-1 mr-2"></i>
-                                                    <div>
-                                                        <small class="text-muted d-block">Notes</small>
-                                                        <p class="mb-0">{{ $notification->data['notes'] }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        @elseif(isset($notification->data['message']))
+                                            {{ $notification->data['message'] }}
+                                        @else
+                                            Notification
                                         @endif
                                     </div>
+                                    
+                                    @if(isset($notification->data['notes']))
+                                        <p class="text-muted mt-1 mb-0 small">{{ $notification->data['notes'] }}</p>
+                                    @endif
                                 </div>
                                 
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    @if(isset($notification->data['appointment_id']))
-                                        <a href="{{ route('appointments.show', $notification->data['appointment_id']) }}" 
-                                           class="btn btn-primary">
-                                            <i class="fa fa-eye mr-1"></i> View Appointment
-                                        </a>
-                                    @else
-                                        <div></div>
-                                    @endif
+                                @if(!$notification->read_at)
+                                    <div class="ml-2">
+                                        <span class="unread-indicator"></span>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            @if(isset($notification->data['appointment_id']))
+                                <div class="mt-2">
+                                    <a href="{{ route('appointments.show', $notification->data['appointment_id']) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-eye mr-1"></i> View Appointment
+                                    </a>
                                     
                                     @if(!$notification->read_at)
-                                        <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST">
+                                        <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('PUT')
-                                            <button type="submit" class="btn btn-outline-secondary">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
                                                 <i class="fa fa-check mr-1"></i> Mark as Read
                                             </button>
                                         </form>
                                     @endif
                                 </div>
-                            </div>
-                        @endforeach
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-5">
+                    <div class="position-relative d-inline-block mb-3">
+                        <i class="fa fa-bell fa-3x text-muted"></i>
+                        <div class="position-absolute" style="top: 0; right: 0; width: 100%; height: 100%;">
+                            <div style="width: 40px; height: 2px; background-color: #6c757d; transform: rotate(45deg); margin-top: 20px;"></div>
+                        </div>
                     </div>
-                    
-                    <div class="d-flex justify-content-center p-4">
-                        {{ $notifications->links() }}
-                    </div>
-                @else
-                    <div class="text-center py-5">
-                        <i class="fa fa-bell-slash fa-3x text-muted mb-3"></i>
-                        <p class="lead">No notifications found.</p>
-                    </div>
-                @endif
-            </div>
+                    <p class="lead">No notifications found.</p>
+                </div>
+            @endif
         </div>
     </div>
 </div>
 @endsection
 
-@push('scripts')
-<script>
-    // Optional JavaScript enhancements can go here
-</script>
+@push('styles')
+<style>
+    .notification-item {
+        background-color: #FFF8E1;
+        border-radius: 8px;
+        margin: 10px;
+        transition: all 0.2s;
+        border: none;
+    }
+    
+    .notification-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .notification-text {
+        font-size: 1rem;
+        font-weight: normal;
+    }
+    
+    .unread-indicator {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #000;
+        margin-top: 5px;
+    }
+</style>
 @endpush

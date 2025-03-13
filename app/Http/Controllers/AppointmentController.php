@@ -6,7 +6,6 @@ use App\Http\Requests\CreateAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Repositories\AppointmentRepository;
 use App\Http\Controllers\AppBaseController;
-use App\Http\Controllers\AppointmentController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -282,17 +281,71 @@ class AppointmentController extends AppBaseController
      */
     private function sendDatabaseNotification($appointment, $client, $type)
     {
+        Log::info('Attempting to send notification', [
+            'client_id' => $client ? $client->id : 'null',
+            'appointment_id' => $appointment->id,
+            'type' => $type
+        ]);
+
         if (!$client) {
             Log::error('Cannot send database notification: Client not found for ID ' . $appointment->client_id);
             return;
         }
         
         try {
-            // Send notification using Laravel's notification system
-            $client->notify(new AppointmentNotification($appointment, $type));
-            Log::info("Database notification ({$type}) sent for appointment #{$appointment->id}");
+            // Get the doctor/employee name
+            $doctor = \App\Models\Employee::find($appointment->employee_id);
+            $doctorName = $doctor ? 'Dr. ' . $doctor->emp_first_name . ' ' . $doctor->emp_surname : 'Your Doctor';
+            
+            Log::info('Doctor information for notification', [
+                'doctor_id' => $appointment->employee_id,
+                'doctor_name' => $doctorName
+            ]);
+            
+            // Add doctor name to the appointment object
+            $appointmentWithDoctor = clone $appointment;
+            $appointmentWithDoctor->doctor_name = $doctorName;
+            
+            // Send notification to the client
+            $client->notify(new \App\Notifications\AppointmentNotification($appointmentWithDoctor, $type));
+            Log::info("Database notification ({$type}) sent to Client #{$client->id} for appointment #{$appointment->id}");
+            
+            // Also send to User if it exists and is different from client
+            if ($client->userid) {
+                $user = \App\Models\User::find($client->userid);
+                if ($user) {
+                    $user->notify(new \App\Notifications\AppointmentNotification($appointmentWithDoctor, $type));
+                    Log::info("Database notification ({$type}) also sent to User #{$user->id} for appointment #{$appointment->id}");
+                }
+            }
         } catch (\Exception $e) {
-            Log::error('Failed to send database notification: ' . $e->getMessage());
+            Log::error('Failed to send database notification: ' . $e->getMessage(), [
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Fall back to sending notification to user if client notification fails
+            try {
+                if ($client->userid) {
+                    $user = \App\Models\User::find($client->userid);
+                    if ($user) {
+                        // Get the doctor/employee name
+                        $doctor = \App\Models\Employee::find($appointment->employee_id);
+                        $doctorName = $doctor ? 'Dr. ' . $doctor->emp_first_name . ' ' . $doctor->emp_surname : 'Your Doctor';
+                        
+                        // Add doctor name to the appointment object
+                        $appointmentWithDoctor = clone $appointment;
+                        $appointmentWithDoctor->doctor_name = $doctorName;
+                        
+                        $user->notify(new \App\Notifications\AppointmentNotification($appointmentWithDoctor, $type));
+                        Log::info("Fallback: Database notification ({$type}) sent to User #{$user->id} for appointment #{$appointment->id}");
+                    }
+                }
+            } catch (\Exception $fallbackException) {
+                Log::error('Both client and user notification attempts failed: ' . $fallbackException->getMessage());
+            }
         }
     }
 
