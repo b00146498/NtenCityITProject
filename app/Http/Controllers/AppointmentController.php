@@ -303,6 +303,8 @@ class AppointmentController extends AppBaseController
     }
 }
 
+
+
     /**
      * Process payment for an appointment using a mock payment system
      * 

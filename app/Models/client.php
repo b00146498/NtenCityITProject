@@ -5,6 +5,7 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class client
@@ -29,18 +30,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class client extends Model
 {
     use SoftDeletes;
-
     use HasFactory;
+    use Notifiable;
 
     public $table = 'client';
     
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
-
-
+ 
     protected $dates = ['deleted_at'];
-
-
 
     public $fillable = [
         'first_name',
@@ -103,6 +101,23 @@ class client extends Model
         'practice_id' => 'required|integer',
         'userid' => 'nullable'
     ];
-
     
+    /**
+     * Get the user associated with the client.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'userid');
+    }
+    
+    /**
+     * Route notifications for the mail channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForMail($notification)
+    {
+        return $this->email;
+    }
 }
