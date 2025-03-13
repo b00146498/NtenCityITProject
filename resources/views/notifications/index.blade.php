@@ -37,7 +37,8 @@
             <p>User Notifications Count: {{ auth()->user()->notifications->count() }}</p>
             
             @php
-                $client = \App\Models\Client::where('userid', auth()->id())->first();
+                // Changed from 'userid' to 'user_id'
+                $client = \App\Models\Client::where('user_id', auth()->id())->first();
             @endphp
             
             @if($client)
@@ -89,7 +90,8 @@
                 // Try to find client associated with user
                 $client = null;
                 try {
-                    $client = \App\Models\Client::where('userid', auth()->id())->first();
+                    // Changed from 'userid' to 'user_id'
+                    $client = \App\Models\Client::where('user_id', auth()->id())->first();
                 } catch (\Exception $e) {
                     // Client table might not exist or other error
                 }
