@@ -47,9 +47,10 @@ class NotificationController extends AppBaseController
                 ->where('notifiable_type', 'App\\Models\\User')
                 ->where('notifiable_id', $user->id);
                 
-            // Get client notifications from database
+            // Get client notifications from database - using case-insensitive query
+            // App\Models\client (lowercase) in DB, but code uses App\Models\Client
             $clientQuery = DB::table('notifications')
-                ->where('notifiable_type', 'App\\Models\\Client'); // Get all client notifications initially
+                ->whereRaw('LOWER(notifiable_type) = ?', [strtolower('App\\Models\\client')]);
                 
             // If we're filtering to unread only
             if ($request->has('filter') && $request->filter == 'unread') {
@@ -84,7 +85,12 @@ class NotificationController extends AppBaseController
                 ->with('notifications', $paginator);
                 
         } catch (\Exception $e) {
-            Log::error('Error getting notifications: ' . $e->getMessage());
+            Log::error('Error getting notifications: ' . $e->getMessage(), [
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             // Fallback to just user notifications
             if ($request->has('filter') && $request->filter == 'unread') {
@@ -265,7 +271,7 @@ class NotificationController extends AppBaseController
             
             // Also mark any client notifications as read
             DB::table('notifications')
-                ->where('notifiable_type', 'App\\Models\\Client')
+                ->whereRaw('LOWER(notifiable_type) = ?', [strtolower('App\\Models\\client')])
                 ->whereNull('read_at')
                 ->update(['read_at' => now()]);
                 
