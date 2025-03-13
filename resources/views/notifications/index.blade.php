@@ -30,11 +30,49 @@
 
     @include('flash::message')
 
+    {{-- Debug information --}}
+    <div class="card mb-4 d-none">
+        <div class="card-body">
+            <h5>Debug Info:</h5>
+            <ul>
+                <li>User ID: {{ auth()->id() }}</li>
+                <li>User notifications: {{ auth()->user()->notifications()->count() }}</li>
+                <li>Unread notifications: {{ auth()->user()->unreadNotifications()->count() }}</li>
+            </ul>
+        </div>
+    </div>
+
     <div class="card shadow">
         <div class="card-body p-0">
-            @if(count($notifications) > 0)
+            @php
+                // Combine notifications from both user model and client model if user has a client record
+                $allNotifications = auth()->user()->notifications;
+                
+                // Try to find client associated with user
+                $client = null;
+                try {
+                    $client = \App\Models\Client::where('userid', auth()->id())->first();
+                } catch (\Exception $e) {
+                    // Client table might not exist or other error
+                }
+                
+                if ($client && method_exists($client, 'notifications')) {
+                    $clientNotifications = $client->notifications;
+                    $allNotifications = $allNotifications->merge($clientNotifications);
+                }
+                
+                // Sort by created_at
+                $allNotifications = $allNotifications->sortByDesc('created_at');
+                
+                // Filter for unread if requested
+                if (request()->has('filter') && request()->get('filter') == 'unread') {
+                    $allNotifications = $allNotifications->whereNull('read_at');
+                }
+            @endphp
+            
+            @if(count($allNotifications) > 0)
                 <div class="list-group list-group-flush">
-                    @foreach($notifications as $notification)
+                    @foreach($allNotifications as $notification)
                         <div class="list-group-item notification-item">
                             <div class="d-flex">
                                 <div class="mr-3">
@@ -59,12 +97,22 @@
                                             Account Details Updated
                                         @elseif(isset($notification->data['type']) && $notification->data['type'] == 'account_created')
                                             Account Created
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'confirmation')
+                                            @if(isset($notification->data['doctor_name']))
+                                                {{ $notification->data['doctor_name'] }}
+                                            @else
+                                                Appointment Confirmed
+                                            @endif
                                         @elseif(isset($notification->data['message']))
                                             {{ $notification->data['message'] }}
                                         @else
                                             Notification
                                         @endif
                                     </div>
+                                    
+                                    @if(isset($notification->data['notes']))
+                                        <p class="text-muted mt-1 mb-0 small">{{ $notification->data['notes'] }}</p>
+                                    @endif
                                 </div>
                                 
                                 @if(!$notification->read_at)
@@ -73,12 +121,26 @@
                                     </div>
                                 @endif
                             </div>
+                            
+                            @if(isset($notification->data['appointment_id']))
+                                <div class="mt-2">
+                                    <a href="{{ route('appointments.show', $notification->data['appointment_id']) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa fa-eye mr-1"></i> View Appointment
+                                    </a>
+                                    
+                                    @if(!$notification->read_at)
+                                        <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-check mr-1"></i> Mark as Read
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                     @endforeach
-                </div>
-                
-                <div class="d-flex justify-content-center p-4">
-                    {{ $notifications->links() }}
                 </div>
             @else
                 <div class="text-center py-5">
