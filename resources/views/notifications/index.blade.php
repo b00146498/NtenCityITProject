@@ -34,104 +34,48 @@
                 @if(count($notifications) > 0)
                     <div class="list-group list-group-flush">
                         @foreach($notifications as $notification)
-                            <div class="list-group-item {{ $notification->read_at ? 'bg-white' : 'bg-light border-left border-primary border-4' }}">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="mb-0">
-                                        @if(!$notification->read_at)
-                                            <span class="badge badge-pill badge-primary mr-2">New</span>
-                                        @endif
-                                        <span class="text-{{ getNotificationTypeColor($notification->data['type'] ?? 'appointment') }}">
-                                            {{ ucfirst($notification->data['type'] ?? 'Appointment') }} Notification
-                                        </span>
-                                    </h5>
-                                    <small class="text-muted">{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</small>
-                                </div>
-                                
-                                <p class="mb-3 lead">{{ $notification->data['message'] ?? 'Appointment notification' }}</p>
-                                
-                                <div class="card bg-light mb-3">
-                                    <div class="card-body py-3">
-                                        <div class="row">
-                                            @if(isset($notification->data['booking_date']))
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fa fa-calendar-alt text-primary mr-2"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Date</small>
-                                                            <strong>
-                                                                {{ isset($notification->data['formatted_date']) ? 
-                                                                    $notification->data['formatted_date'] : 
-                                                                    \Carbon\Carbon::parse($notification->data['booking_date'])->format('l, F j, Y') }}
-                                                            </strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                            
-                                            @if(isset($notification->data['start_time']) && isset($notification->data['end_time']))
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fa fa-clock text-primary mr-2"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Time</small>
-                                                            <strong>
-                                                                {{ isset($notification->data['formatted_time']) ? 
-                                                                    $notification->data['formatted_time'] : 
-                                                                    \Carbon\Carbon::parse($notification->data['start_time'])->format('g:i A') . ' - ' . 
-                                                                    \Carbon\Carbon::parse($notification->data['end_time'])->format('g:i A') }}
-                                                            </strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                            
-                                            @if(isset($notification->data['status']))
-                                                <div class="col-md-4 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fa fa-info-circle text-primary mr-2"></i>
-                                                        <div>
-                                                            <small class="text-muted d-block">Status</small>
-                                                            <span class="badge badge-{{ getStatusBadgeColor($notification->data['status']) }}">
-                                                                {{ ucfirst($notification->data['status']) }}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div>
-                                        
-                                        @if(isset($notification->data['notes']) && !empty($notification->data['notes']))
-                                            <div class="mt-3">
-                                                <div class="d-flex align-items-start">
-                                                    <i class="fa fa-comment-alt text-primary mt-1 mr-2"></i>
-                                                    <div>
-                                                        <small class="text-muted d-block">Notes</small>
-                                                        <p class="mb-0">{{ $notification->data['notes'] }}</p>
-                                                    </div>
-                                                </div>
+                            <!-- Simplified card design to match wireframe -->
+                            <div class="list-group-item bg-light border-0 mb-2" style="background-color: #FFF8E1 !important; border-radius: 8px; margin: 10px;">
+                                <div class="d-flex">
+                                    <!-- Bell icon on left -->
+                                    <div class="mr-3">
+                                        <i class="fa fa-bell mt-1"></i>
+                                    </div>
+                                    
+                                    <!-- Notification content -->
+                                    <div class="flex-grow-1">
+                                        <!-- Date and Doctor name -->
+                                        @if(isset($notification->data['booking_date']))
+                                            <div class="text-muted small">
+                                                {{ \Carbon\Carbon::parse($notification->data['booking_date'])->format('jS F, Y') }}
+                                            </div>
+                                        @else
+                                            <div class="text-muted small">
+                                                {{ \Carbon\Carbon::parse($notification->created_at)->format('jS F, Y') }}
                                             </div>
                                         @endif
+
+                                        <!-- Doctor name or notification type -->
+                                        <h5 class="mb-0 font-weight-normal">
+                                            @if(isset($notification->data['doctor_name']))
+                                                Dr. {{ $notification->data['doctor_name'] }}
+                                            @elseif(isset($notification->data['type']) && $notification->data['type'] == 'payment')
+                                                Appointment Paid Successfully
+                                            @elseif(isset($notification->data['type']) && $notification->data['type'] == 'account_updated')
+                                                Account Details Updated
+                                            @elseif(isset($notification->data['type']) && $notification->data['type'] == 'account_created')
+                                                Account Created
+                                            @else
+                                                {{ ucfirst($notification->data['type'] ?? 'Notification') }}
+                                            @endif
+                                        </h5>
                                     </div>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    @if(isset($notification->data['appointment_id']))
-                                        <a href="{{ route('appointments.show', $notification->data['appointment_id']) }}" 
-                                           class="btn btn-primary">
-                                            <i class="fa fa-eye mr-1"></i> View Appointment
-                                        </a>
-                                    @else
-                                        <div></div>
-                                    @endif
                                     
+                                    <!-- Unread indicator dot -->
                                     @if(!$notification->read_at)
-                                        <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-outline-secondary">
-                                                <i class="fa fa-check mr-1"></i> Mark as Read
-                                            </button>
-                                        </form>
+                                        <div class="ml-2">
+                                            <span class="badge badge-dark rounded-circle">&nbsp;</span>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -143,7 +87,12 @@
                     </div>
                 @else
                     <div class="text-center py-5">
-                        <i class="fa fa-bell-slash fa-3x text-muted mb-3"></i>
+                        <div class="position-relative d-inline-block mb-3">
+                            <i class="fa fa-bell fa-3x text-muted"></i>
+                            <div class="position-absolute" style="top: 0; right: 0; width: 100%; height: 100%;">
+                                <div style="width: 40px; height: 2px; background-color: #6c757d; transform: rotate(45deg); margin-top: 20px;"></div>
+                            </div>
+                        </div>
                         <p class="lead">No notifications found.</p>
                     </div>
                 @endif
@@ -158,3 +107,25 @@
     // Optional JavaScript enhancements can go here
 </script>
 @endpush
+
+@push('styles')
+<style>
+    /* Add custom styles to match wireframe */
+    .list-group-item {
+        transition: all 0.2s;
+    }
+    
+    .list-group-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .badge.rounded-circle {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        padding: 0;
+    }
+</style>
+@endpush
+
+
