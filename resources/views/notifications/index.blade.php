@@ -143,70 +143,70 @@
 </style>
 @endpush
 
-@push('scripts')
+@push('js_scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Create a simple modal manually
-    const modalHTML = `
-        <div id="simpleModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
-            <div style="margin:10% auto; padding:20px; width:80%; max-width:700px; background-color:white; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3 style="margin:0;">Appointment Details</h3>
-                    <button id="closeModalBtn" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
-                </div>
-                <div id="simpleModalContent">
-                    <div style="text-align:center;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                        <p>Loading appointment details...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Add the modal to the document
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Get modal elements
-    const modal = document.getElementById('simpleModal');
-    const closeBtn = document.getElementById('closeModalBtn');
-    const modalContent = document.getElementById('simpleModalContent');
-    
-    // Close modal when clicking close button
-    closeBtn.addEventListener('click', function() {
-        modal.style.display = 'none';
-    });
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-    
-    // Select all "View Appointment" buttons
+    // Get all the view appointment buttons
     const viewButtons = document.querySelectorAll('.view-appointment');
     
-    // Add click event to each button
-    viewButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const appointmentId = this.getAttribute('data-appointment-id');
-            console.log("Viewing appointment:", appointmentId);
+    // Log to confirm our script is running
+    console.log('Found ' + viewButtons.length + ' appointment buttons');
+    
+    // Add click event listener to each button
+    viewButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
             
-            // Show modal
-            modal.style.display = 'block';
+            // Get the appointment ID from the data attribute
+            const appointmentId = this.getAttribute('data-appointment-id');
+            console.log('Viewing appointment ID: ' + appointmentId);
+            
+            // Create modal if it doesn't exist
+            let modalElement = document.getElementById('appointmentModal');
+            if (!modalElement) {
+                const modalHTML = `
+                    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="appointmentModalLabel">Appointment Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" id="appointmentModalBody">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading appointment details...</p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                modalElement = document.getElementById('appointmentModal');
+            }
+            
+            // Get the modal body where we'll put the content
+            const modalBody = document.getElementById('appointmentModalBody');
             
             // Show loading state
-            modalContent.innerHTML = `
-                <div style="text-align:center;">
+            modalBody.innerHTML = `
+                <div class="text-center">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only">Loading...</span>
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p>Loading appointment details...</p>
+                    <p class="mt-2">Loading appointment details...</p>
                 </div>
             `;
+            
+            // Initialize Bootstrap 5 modal
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
             
             // Fetch appointment details
             fetch('/api/appointments/' + appointmentId)
@@ -217,49 +217,42 @@ document.addEventListener('DOMContentLoaded', function() {
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Appointment data:", data);
-                    
                     // Format the date and time
                     const date = new Date(data.booking_date).toLocaleDateString('en-US', {
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric'
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                     });
                     
                     // Format times
                     const startTime = formatTime(data.start_time);
                     const endTime = formatTime(data.end_time);
                     
-                    // Create HTML content
-                    const html = `
-                        <div style="border:1px solid #eee; border-radius:8px; padding:15px;">
-                            <h4>Appointment #${data.id}</h4>
-                            <div style="display:flex; flex-wrap:wrap;">
-                                <div style="flex:1; min-width:250px; margin-bottom:15px;">
-                                    <p><strong>Date:</strong> ${date}</p>
-                                    <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
-                                    <p><strong>Status:</strong> <span style="padding:3px 8px; border-radius:3px; background-color:${getStatusColor(data.status)}; color:white;">${capitalizeFirstLetter(data.status || 'Unknown')}</span></p>
+                    // Update modal content
+                    modalBody.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Appointment #${data.id}</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Date:</strong> ${date}</p>
+                                        <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+                                        <p><strong>Status:</strong> <span class="badge bg-${getStatusBadgeColor(data.status)}">${capitalizeFirstLetter(data.status)}</span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Client ID:</strong> ${data.client_id}</p>
+                                        <p><strong>Employee ID:</strong> ${data.employee_id}</p>
+                                        <p><strong>Practice ID:</strong> ${data.practice_id}</p>
+                                    </div>
                                 </div>
-                                <div style="flex:1; min-width:250px; margin-bottom:15px;">
-                                    <p><strong>Client ID:</strong> ${data.client_id}</p>
-                                    <p><strong>Employee ID:</strong> ${data.employee_id}</p>
-                                    <p><strong>Practice ID:</strong> ${data.practice_id}</p>
-                                </div>
+                                ${data.notes ? `<hr><h6>Notes:</h6><p>${data.notes}</p>` : ''}
                             </div>
-                            ${data.notes ? `<hr><h5>Notes:</h5><p>${data.notes}</p>` : ''}
                         </div>
                     `;
-                    
-                    // Update modal content
-                    modalContent.innerHTML = html;
                 })
                 .catch(error => {
                     console.error('Error fetching appointment details:', error);
-                    modalContent.innerHTML = `
-                        <div style="color:#721c24; background-color:#f8d7da; padding:15px; border-radius:4px; border:1px solid #f5c6cb;">
+                    modalBody.innerHTML = `
+                        <div class="alert alert-danger">
                             <p>Error loading appointment details: ${error.message}</p>
-                            <p>Please try again later.</p>
                         </div>
                     `;
                 });
@@ -284,19 +277,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
     
-    function getStatusColor(status) {
-        if (!status) return '#6c757d'; // Default gray
+    function getStatusBadgeColor(status) {
+        if (!status) return 'secondary'; // Default gray
         
         switch(status.toLowerCase()) {
-            case 'confirmed': return '#28a745'; // Green
-            case 'pending': return '#ffc107';   // Yellow
-            case 'checked-in': return '#17a2b8'; // Blue
-            case 'completed': return '#6c757d';  // Gray
-            case 'canceled': return '#dc3545';   // Red
-            default: return '#6c757d';           // Gray
+            case 'confirmed': return 'success'; // Green
+            case 'pending': return 'warning';   // Yellow
+            case 'checked-in': return 'info';   // Blue
+            case 'completed': return 'secondary'; // Gray
+            case 'canceled': return 'danger';   // Red
+            default: return 'secondary';        // Gray
         }
     }
 });
-
 </script>
 @endpush
