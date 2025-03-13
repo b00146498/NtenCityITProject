@@ -49,7 +49,8 @@ class NotificationController extends AppBaseController
         
         // Try to get client notifications if the user has a client record
         try {
-            $client = \App\Models\Client::where('userid', $user->id)->first();
+            // CHANGED HERE: from 'userid' to 'user_id'
+            $client = \App\Models\Client::where('user_id', $user->id)->first();
             
             if ($client && method_exists($client, 'notifications')) {
                 Log::info('Found client record for user', ['user_id' => $user->id, 'client_id' => $client->id]);
@@ -240,7 +241,8 @@ class NotificationController extends AppBaseController
         if (empty($notification)) {
             // Check if it's a client notification
             try {
-                $client = \App\Models\Client::where('userid', $user->id)->first();
+                // CHANGED HERE: from 'userid' to 'user_id'
+                $client = \App\Models\Client::where('user_id', $user->id)->first();
                 if ($client && method_exists($client, 'notifications')) {
                     $notification = $client->notifications()->where('id', $id)->first();
                 }
@@ -274,7 +276,7 @@ class NotificationController extends AppBaseController
         
         // Also mark client notifications as read if applicable
         try {
-            $client = \App\Models\Client::where('userid', $user->id)->first();
+            $client = \App\Models\Client::where('email', $user->email)->first();
             if ($client && method_exists($client, 'unreadNotifications')) {
                 $client->unreadNotifications->markAsRead();
             }

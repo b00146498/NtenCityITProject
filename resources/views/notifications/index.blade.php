@@ -30,6 +30,44 @@
 
     @include('flash::message')
 
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Debug Information:</h5>
+            <p>Current User ID: {{ auth()->id() }}</p>
+            <p>User Notifications Count: {{ auth()->user()->notifications->count() }}</p>
+            
+            @php
+                $client = \App\Models\Client::where('userid', auth()->id())->first();
+            @endphp
+            
+            @if($client)
+                <p>Associated Client ID: {{ $client->id }}</p>
+                <p>Client Model Class: {{ get_class($client) }}</p>
+                <p>Client has Notifiable trait: {{ method_exists($client, 'notify') ? 'Yes' : 'No' }}</p>
+                @if(method_exists($client, 'notifications'))
+                    <p>Client Notifications Count: {{ $client->notifications->count() }}</p>
+                @else
+                    <p>Client doesn't have notifications method</p>
+                @endif
+            @else
+                <p>No Client record found for this user</p>
+            @endif
+            
+            <h5>Raw Database Check:</h5>
+            @php
+                $rawNotifications = DB::table('notifications')
+                    ->where('notifiable_type', 'App\\Models\\Client')
+                    ->where('notifiable_id', $client ? $client->id : 0)
+                    ->get();
+            @endphp
+            <p>Raw Client Notifications: {{ $rawNotifications->count() }}</p>
+            
+            @if($rawNotifications->count() > 0)
+                <pre>{{ json_encode($rawNotifications->first(), JSON_PRETTY_PRINT) }}</pre>
+            @endif
+        </div>
+    </div>
+
     {{-- Debug information --}}
     <div class="card mb-4 d-none">
         <div class="card-body">
