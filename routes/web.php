@@ -192,3 +192,15 @@ Route::get('/raw-notifications', function() {
         'notifications' => $notifications
     ]);
 })->middleware('auth');
+
+Route::get('/debug-index-template', function() {
+    // Get all notifications from DB
+    $notifications = DB::table('notifications')->orderBy('created_at', 'desc')->get();
+    
+    // Output the count
+    echo "<p>Found " . $notifications->count() . " notifications</p>";
+    
+    // Try to render the index template with these notifications
+    return view('notifications.index')
+        ->with('notifications', $notifications);
+});

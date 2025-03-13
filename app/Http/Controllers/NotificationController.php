@@ -33,75 +33,11 @@ class NotificationController extends AppBaseController
      */
     public function index(Request $request)
     {
-        // Get the authenticated user
-        $user = Auth::user();
+        // Get all notifications directly from the database
+        $notifications = DB::table('notifications')->orderBy('created_at', 'desc')->get();
         
-        if (!$user) {
-            Flash::error('You need to be logged in to view notifications');
-            return redirect(route('login'));
-        }
-        
-        try {
-            // Get user notifications from database
-            $userQuery = DB::table('notifications')
-                ->where('notifiable_type', 'App\\Models\\User')
-                ->where('notifiable_id', $user->id);
-                
-            // Get client notifications from database - using case-insensitive query
-            // App\Models\client (lowercase) in DB, but code uses App\Models\Client
-            $clientQuery = DB::table('notifications')
-                ->whereRaw('LOWER(notifiable_type) = ?', [strtolower('App\\Models\\client')]);
-                
-            // If we're filtering to unread only
-            if ($request->has('filter') && $request->filter == 'unread') {
-                $userQuery->whereNull('read_at');
-                $clientQuery->whereNull('read_at');
-            }
-            
-            // Get both sets of notifications
-            $userNotifications = $userQuery->get();
-            $clientNotifications = $clientQuery->get();
-            
-            // Convert to Laravel collection for easier manipulation
-            $allNotifications = collect($userNotifications->all())
-                ->merge($clientNotifications->all())
-                ->sortByDesc('created_at');
-                
-            // Paginate the results manually
-            $page = $request->get('page', 1);
-            $perPage = 10;
-            $items = $allNotifications->forPage($page, $perPage);
-            
-            // Create a length-aware paginator
-            $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-                $items,
-                $allNotifications->count(),
-                $perPage,
-                $page,
-                ['path' => $request->url(), 'query' => $request->query()]
-            );
-            
-            return view('notifications.index')
-                ->with('notifications', $paginator);
-                
-        } catch (\Exception $e) {
-            Log::error('Error getting notifications: ' . $e->getMessage(), [
-                'exception' => get_class($e),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            // Fallback to just user notifications
-            if ($request->has('filter') && $request->filter == 'unread') {
-                $notifications = $user->unreadNotifications()->paginate(10);
-            } else {
-                $notifications = $user->notifications()->paginate(10);
-            }
-            
-            return view('notifications.index')
-                ->with('notifications', $notifications);
-        }
+        return view('notifications.index')
+            ->with('notifications', $notifications);
     }
 
     /**
@@ -263,15 +199,9 @@ class NotificationController extends AppBaseController
      */
     public function markAllAsRead()
     {
-        $user = Auth::user();
-        
         try {
-            // Mark all user notifications as read
-            $user->unreadNotifications->markAsRead();
-            
-            // Also mark any client notifications as read
+            // Mark all notifications as read
             DB::table('notifications')
-                ->whereRaw('LOWER(notifiable_type) = ?', [strtolower('App\\Models\\client')])
                 ->whereNull('read_at')
                 ->update(['read_at' => now()]);
                 
