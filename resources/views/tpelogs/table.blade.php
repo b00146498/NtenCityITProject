@@ -1,6 +1,6 @@
 <table class="table table-responsive" id="tpelogs-table">
     <thead>
-        <th>Training Plan</th>
+        <th>Client Training Plan</th>
         <th>Exercise</th>
         <th>Number of Sets</th>
         <th>Number of Reps</th>
@@ -13,7 +13,7 @@
     <tbody>
     @foreach($tpelogs as $tpelog)
         <tr>
-            <td>{!! $tpelog->plan_id !!}</td>
+            <td>{!! $tpelog->trainingPlan->client->first_name ?? 'N/A' !!} {!! $tpelog->trainingPlan->client->surname ?? '' !!}</td>
             <td>{{ $tpelog->exercise->exercise_name ?? 'N/A' }}</td>
             <td>{!! $tpelog->num_sets !!}</td>
             <td>{!! $tpelog->num_reps !!}</td>

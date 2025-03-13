@@ -9,6 +9,7 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use App\Models\Tpelog;
 use App\Models\standardexercises;
+use App\Models\personalisedtrainingplan;
 use Flash;
 use Response;
 
@@ -35,7 +36,7 @@ class tpelogController extends AppBaseController
 
         //return view('tpelogs.index')
             //->with('tpelogs', $tpelogs);
-        $tpelogs = Tpelog::with('exercise')->get();
+        $tpelogs = Tpelog::with('trainingPlan.client', 'exercise')->get();
 
         return view('tpelogs.index', compact('tpelogs'));
     }
@@ -48,8 +49,9 @@ class tpelogController extends AppBaseController
     public function create()
     {
         $exercises = standardexercises::all();
+        $trainingPlans = PersonalisedTrainingPlan::with('client')->get();
         //return view('tpelogs.create');
-        return view('tpelogs.create', compact('exercises'));
+        return view('tpelogs.create', compact('exercises', 'trainingPlans'));
     }
     
 
@@ -93,7 +95,7 @@ class tpelogController extends AppBaseController
      */
     public function show($id)
     {
-        $tpelog = $this->tpelogRepository->find($id);
+        /*$tpelog = $this->tpelogRepository->find($id);
 
         if (empty($tpelog)) {
             Flash::error('Tpelog not found');
@@ -101,7 +103,16 @@ class tpelogController extends AppBaseController
             return redirect(route('tpelogs.index'));
         }
 
-        return view('tpelogs.show')->with('tpelog', $tpelog);
+        return view('tpelogs.show')->with('tpelog', $tpelog);*/
+
+        $tpelog = Tpelog::with(['trainingPlan.client', 'exercise'])->find($id);
+
+        if (empty($tpelog)) {
+            Flash::error('Tpelog not found');
+            return redirect(route('tpelogs.index'));
+        }
+
+        return view('tpelogs.show', compact('tpelog'));
     }
 
     /**
@@ -131,8 +142,9 @@ class tpelogController extends AppBaseController
         }
 
         $exercises = standardexercises::all(); // ✅ Fetch exercises
+        $trainingPlans = PersonalisedTrainingPlan::with('client')->get();
 
-        return view('tpelogs.edit', compact('tpelog', 'exercises'));
+        return view('tpelogs.edit', compact('tpelog', 'exercises', 'trainingPlans'));
     }
 
     /**

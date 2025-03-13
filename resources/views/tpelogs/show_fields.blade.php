@@ -1,8 +1,8 @@
 <table class="table table-bordered table-sm">
     <tbody>
         <tr>
-            <th style="width: 30%;">Training Plan</th>
-            <td>{!! $tpelog->plan_id !!}</td>
+            <th style="width: 30%;">Client Name</th>
+            <td>{!! $tpelog->trainingPlan->client->first_name ?? 'N/A' !!} {!! $tpelog->trainingPlan->client->surname ?? '' !!}</td>
         </tr>
         <tr>
             <th style="width: 30%;">Exercise</th>

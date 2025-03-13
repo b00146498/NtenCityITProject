@@ -87,4 +87,9 @@ class tpelog extends Model
     {
         return $this->belongsTo(standardexercises::class, 'exercise_id');
     }
+
+    public function trainingPlan()
+    {
+        return $this->belongsTo(PersonalisedTrainingPlan::class, 'plan_id');
+    }
 }

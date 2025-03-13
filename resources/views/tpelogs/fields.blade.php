@@ -1,8 +1,15 @@
 <div class="row">
     <!-- Training Plan -->
     <div class="col-md-6 mb-3">
-        {!! Form::label('plan_id', 'Training Plan:', ['class' => 'form-label fw-bold']) !!}
-        {!! Form::number('plan_id', null, ['class' => 'form-control bg-light']) !!}
+        {!! Form::label('plan_id', 'Training Plan (Client):', ['class' => 'form-label fw-bold']) !!}
+        <select name="plan_id" class="form-select bg-light">
+            <option value="" disabled selected>Select a Training Plan</option>
+            @foreach($trainingPlans as $plan)
+                <option value="{{ $plan->id }}">
+                    {{ $plan->client->first_name ?? 'N/A' }} {{ $plan->client->surname ?? '' }}
+                </option>
+            @endforeach
+        </select>
     </div>
 
     <!-- Exercise Dropdown -->
