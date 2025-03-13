@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            Add new Training Plan Exercises/Workout Logs/Exercise Assignments
+            Add new Workout Log
         </h1>
     </section>
     <div class="content">

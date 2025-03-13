@@ -17,13 +17,13 @@
     </select>
 </div>
 
-<<!-- Number of Sets with Increment/Decrement -->
+<!-- Number of Sets with Increment/Decrement -->
 <div class="form-group col-sm-6">
     {!! Form::label('num_sets', 'Number of Sets:', ['class' => 'form-label fw-bold']) !!}
     <div class="input-group">
-        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_sets', -1)">-</button>
-        <input type="text" name="num_sets" id="num_sets" class="form-control text-center" value="1" readonly>
-        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_sets', 1)">+</button>
+        <button type="button" class="btn btn-outline-secondary decrease-btn" data-field="num_sets">-</button>
+        <input type="number" name="num_sets" id="num_sets" class="form-control text-center" value="{{ old('num_sets', 1) }}" min="1">
+        <button type="button" class="btn btn-outline-secondary increase-btn" data-field="num_sets">+</button>
     </div>
 </div>
 
@@ -31,9 +31,9 @@
 <div class="form-group col-sm-6">
     {!! Form::label('num_reps', 'Number of Reps:', ['class' => 'form-label fw-bold']) !!}
     <div class="input-group">
-        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_reps', -1)">-</button>
-        <input type="text" name="num_reps" id="num_reps" class="form-control text-center" value="10" readonly>
-        <button type="button" class="btn btn-outline-secondary" onclick="changeValue('num_reps', 1)">+</button>
+        <button type="button" class="btn btn-outline-secondary decrease-btn" data-field="num_reps">-</button>
+        <input type="number" name="num_reps" id="num_reps" class="form-control text-center" value="{{ old('num_reps', 10) }}" min="1">
+        <button type="button" class="btn btn-outline-secondary increase-btn" data-field="num_reps">+</button>
     </div>
 </div>
 
@@ -94,4 +94,28 @@
     <a href="{!! route('tpelogs.index') !!}" class="btn btn-default">Cancel</a>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".increase-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let field = this.getAttribute("data-field");
+                let input = document.getElementById(field);
+                if (input) {
+                    input.value = parseInt(input.value) + 1;
+                }
+            });
+        });
 
+        document.querySelectorAll(".decrease-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let field = this.getAttribute("data-field");
+                let input = document.getElementById(field);
+                if (input) {
+                    let newValue = parseInt(input.value) - 1;
+                    if (newValue < 1) newValue = 1; // Prevent going below 1
+                    input.value = newValue;
+                }
+            });
+        });
+    });
+</script>
