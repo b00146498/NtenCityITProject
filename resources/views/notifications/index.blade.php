@@ -35,7 +35,7 @@
             @if(count($notifications) > 0)
                 <div class="list-group list-group-flush">
                     @foreach($notifications as $notification)
-                        <div class="list-group-item" style="background-color: #FFF8E1; border-radius: 8px; margin: 10px;">
+                        <div class="list-group-item notification-item">
                             <div class="d-flex">
                                 <div class="mr-3">
                                     <i class="fa fa-bell mt-1"></i>
@@ -46,49 +46,33 @@
                                         {{ \Carbon\Carbon::parse($notification->created_at)->format('jS F, Y') }}
                                     </div>
                                     
-                                    <h5 class="mb-0">
+                                    <div class="notification-text">
                                         @if(isset($notification->data['type']) && $notification->data['type'] == 'appointment')
                                             @if(isset($notification->data['doctor_name']))
                                                 {{ $notification->data['doctor_name'] }}
                                             @else
                                                 Appointment Notification
                                             @endif
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'payment')
+                                            Appointment Paid Successfully
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'account_updated')
+                                            Account Details Updated
+                                        @elseif(isset($notification->data['type']) && $notification->data['type'] == 'account_created')
+                                            Account Created
                                         @elseif(isset($notification->data['message']))
                                             {{ $notification->data['message'] }}
                                         @else
                                             Notification
                                         @endif
-                                    </h5>
-                                    
-                                    @if(isset($notification->data['notes']))
-                                        <p class="mb-0 mt-1 text-muted">{{ $notification->data['notes'] }}</p>
-                                    @endif
+                                    </div>
                                 </div>
                                 
                                 @if(!$notification->read_at)
                                     <div class="ml-2">
-                                        <span class="badge badge-dark rounded-circle">&nbsp;</span>
+                                        <span class="unread-indicator"></span>
                                     </div>
                                 @endif
                             </div>
-                            
-                            @if(isset($notification->data['appointment_id']))
-                                <div class="mt-2">
-                                    <a href="{{ route('appointments.show', $notification->data['appointment_id']) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fa fa-eye mr-1"></i> View Appointment
-                                    </a>
-                                    
-                                    @if(!$notification->read_at)
-                                        <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-check mr-1"></i> Mark as Read
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -114,19 +98,30 @@
 
 @push('styles')
 <style>
-    .list-group-item {
+    .notification-item {
+        background-color: #FFF8E1;
+        border-radius: 8px;
+        margin: 10px;
         transition: all 0.2s;
+        border: none;
     }
     
-    .list-group-item:hover {
+    .notification-item:hover {
         transform: translateY(-2px);
     }
     
-    .badge.rounded-circle {
+    .notification-text {
+        font-size: 1rem;
+        font-weight: normal;
+    }
+    
+    .unread-indicator {
         display: inline-block;
         width: 8px;
         height: 8px;
-        padding: 0;
+        border-radius: 50%;
+        background-color: #000;
+        margin-top: 5px;
     }
 </style>
 @endpush
