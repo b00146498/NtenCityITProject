@@ -232,15 +232,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="card-body">
                                 <h5 class="card-title">Appointment #${data.id}</h5>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <p><strong>Date:</strong> ${date}</p>
                                         <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
                                         <p><strong>Status:</strong> <span class="badge bg-${getStatusBadgeColor(data.status)}">${capitalizeFirstLetter(data.status)}</span></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p><strong>Client ID:</strong> ${data.client_id}</p>
-                                        <p><strong>Employee ID:</strong> ${data.employee_id}</p>
-                                        <p><strong>Practice ID:</strong> ${data.practice_id}</p>
                                     </div>
                                 </div>
                                 ${data.notes ? `<hr><h6>Notes:</h6><p>${data.notes}</p>` : ''}
