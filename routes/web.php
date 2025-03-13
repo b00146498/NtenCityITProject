@@ -159,6 +159,7 @@ Route::get('/appointments/create', [AppointmentController::class, 'create'])->na
 Route::get('/api/appointments', [AppointmentController::class, 'index']);
 Route::get('notifications/create-test', [App\Http\Controllers\NotificationController::class, 'createTestNotification'])
     ->name('notifications.test')->middleware('auth');
+    Route::get('/api/appointments/{id}', [AppointmentController::class, 'getAppointmentDetails'])->name('api.appointments.show')->middleware('auth');
 
 Route::resource('standardexercises', App\Http\Controllers\standardexercisesController::class);
 
