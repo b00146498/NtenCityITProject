@@ -11,6 +11,7 @@ use Flash;
 use Response;
 use Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class NotificationController extends AppBaseController
 {
@@ -39,7 +40,63 @@ class NotificationController extends AppBaseController
             return redirect(route('login'));
         }
         
-        // Filter notifications based on request
+        // Get user notifications
+        if ($request->has('filter') && $request->filter == 'unread') {
+            $userNotifications = $user->unreadNotifications()->get();
+        } else {
+            $userNotifications = $user->notifications()->get();
+        }
+        
+        // Try to get client notifications if the user has a client record
+        try {
+            $client = \App\Models\Client::where('userid', $user->id)->first();
+            
+            if ($client && method_exists($client, 'notifications')) {
+                Log::info('Found client record for user', ['user_id' => $user->id, 'client_id' => $client->id]);
+                
+                // Get client notifications
+                $clientNotifications = $request->has('filter') && $request->filter == 'unread'
+                    ? $client->unreadNotifications()->get()
+                    : $client->notifications()->get();
+                
+                // Merge user and client notifications
+                $allNotifications = $userNotifications->merge($clientNotifications);
+                
+                // Sort by created_at (newest first)
+                $allNotifications = $allNotifications->sortByDesc('created_at');
+                
+                // Paginate manually
+                $page = $request->get('page', 1);
+                $perPage = 10;
+                $total = $allNotifications->count();
+                $items = $allNotifications->forPage($page, $perPage);
+                
+                // Create custom paginator
+                $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+                    $items,
+                    $total,
+                    $perPage,
+                    $page,
+                    ['path' => $request->url(), 'query' => $request->query()]
+                );
+                
+                Log::info('Combined notifications', [
+                    'user_notifications' => $userNotifications->count(),
+                    'client_notifications' => $clientNotifications->count(),
+                    'total' => $total
+                ]);
+                
+                return view('notifications.index')
+                    ->with('notifications', $paginator);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error retrieving client notifications', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+        
+        // If no client record, or error occurred, just use user notifications
         if ($request->has('filter') && $request->filter == 'unread') {
             $notifications = $user->unreadNotifications()->paginate(10);
         } else {
@@ -181,8 +238,22 @@ class NotificationController extends AppBaseController
         $notification = $user->notifications()->where('id', $id)->first();
         
         if (empty($notification)) {
-            Flash::error('Notification not found');
-            return redirect(route('notifications.index'));
+            // Check if it's a client notification
+            try {
+                $client = \App\Models\Client::where('userid', $user->id)->first();
+                if ($client && method_exists($client, 'notifications')) {
+                    $notification = $client->notifications()->where('id', $id)->first();
+                }
+            } catch (\Exception $e) {
+                Log::error('Error finding client notification to mark as read', [
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
+            if (empty($notification)) {
+                Flash::error('Notification not found');
+                return redirect(route('notifications.index'));
+            }
         }
         
         $notification->markAsRead();
@@ -200,6 +271,18 @@ class NotificationController extends AppBaseController
     {
         $user = Auth::user();
         $user->unreadNotifications->markAsRead();
+        
+        // Also mark client notifications as read if applicable
+        try {
+            $client = \App\Models\Client::where('userid', $user->id)->first();
+            if ($client && method_exists($client, 'unreadNotifications')) {
+                $client->unreadNotifications->markAsRead();
+            }
+        } catch (\Exception $e) {
+            Log::error('Error marking client notifications as read', [
+                'error' => $e->getMessage()
+            ]);
+        }
         
         Flash::success('All notifications marked as read.');
         return redirect()->back();
