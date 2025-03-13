@@ -279,22 +279,29 @@ class AppointmentController extends AppBaseController
     
     /**
      * Send database notification for appointment
-     */
-    private function sendDatabaseNotification($appointment, $client, $type)
-    {
-        if (!$client) {
-            Log::error('Cannot send database notification: Client not found for ID ' . $appointment->client_id);
-            return;
-        }
-        
-        try {
-            // Send notification using Laravel's notification system
-            $client->notify(new AppointmentNotification($appointment, $type));
-            Log::info("Database notification ({$type}) sent for appointment #{$appointment->id}");
-        } catch (\Exception $e) {
-            Log::error('Failed to send database notification: ' . $e->getMessage());
-        }
+     */private function sendDatabaseNotification($appointment, $client, $type)
+{
+    if (!$client) {
+        Log::error('Cannot send database notification: Client not found for ID ' . $appointment->client_id);
+        return;
     }
+    
+    try {
+        // Get the doctor/employee name
+        $doctor = \App\Models\Employee::find($appointment->employee_id);
+        $doctorName = $doctor ? 'Dr. ' . $doctor->emp_first_name . ' ' . $doctor->emp_surname : 'Your Doctor';
+        
+        // Add doctor name to the appointment object
+        $appointmentWithDoctor = clone $appointment;
+        $appointmentWithDoctor->doctor_name = $doctorName;
+        
+        // Send notification with the enhanced appointment object
+        $client->notify(new AppointmentNotification($appointmentWithDoctor, $type));
+        Log::info("Database notification ({$type}) sent for appointment #{$appointment->id}");
+    } catch (\Exception $e) {
+        Log::error('Failed to send database notification: ' . $e->getMessage());
+    }
+}
 
     /**
      * Process payment for an appointment using a mock payment system
