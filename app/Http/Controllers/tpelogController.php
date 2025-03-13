@@ -72,10 +72,11 @@ class tpelogController extends AppBaseController
         $validated = $request->validate([
             'plan_id' => 'required|exists:personalisedtrainingplan,id',
             'exercise_id' => 'required|exists:standardexercises,id',
-            'num_sets' => 'required|integer|min:1',
-            'num_reps' => 'required|integer|min:1',
+            'num_sets' => 'required|integer|min:0',
+            'num_reps' => 'required|integer|min:0',
             'minutes' => 'nullable|integer|min:0',
             'incline' => 'required|numeric|min:-20|max:20', // Allow decline (negative values)
+            'times_per_week' => 'required|integer|min:1|max:7'
         ]);
     
         Tpelog::create($validated);
