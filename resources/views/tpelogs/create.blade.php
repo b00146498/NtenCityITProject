@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-    <section class="content-header">
-        <h1>
-            Add new Training Plan Exercises/Workout Logs/Exercise Assignments
-        </h1>
-    </section>
-    <div class="content">
-        @include('basic-template::common.errors')
+<div class="container mt-3">
+    <div class="card shadow-lg">
+        <div class="card-header bg-warning text-white d-flex justify-content-between">
+            <h4 class="fw-bold">Create Workout Log</h4>
+            <a href="{{ route('tpelogs.index') }}" class="text-white text-decoration-none fw-bold">✖ Close</a>
+        </div>
+        <div class="card-body">
+            @include('basic-template::common.errors')
         <div class="box box-primary">
 
             <div class="box-body">
@@ -21,6 +22,7 @@
             </div>
         </div>
     </div>
+</div>
 @endsection
 <style>
 h1, h2, h3, h4, h5, h6 {

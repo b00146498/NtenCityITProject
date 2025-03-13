@@ -3,7 +3,7 @@
 @section('content')
     <section class="content-header">
         <h1>
-            tpelog
+            Edit Workout Log
         </h1>
     </section>
     <div class="content">
