@@ -145,93 +145,158 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    // Handle appointment view button click
-    $('.view-appointment').click(function() {
-        var appointmentId = $(this).data('appointment-id');
-        
-        // Clear previous content
-        $('#appointmentDetails').html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p>Loading appointment details...</p></div>');
-        
-        // Show modal
-        $('#appointmentDetailsModal').modal('show');
-        
-        // Fetch appointment details
-        $.ajax({
-            url: '/api/appointments/' + appointmentId,
-            type: 'GET',
-            success: function(response) {
-                // Format appointment details
-                var html = '<div class="card">';
-                html += '<div class="card-body">';
-                
-                // Basic details
-                html += '<h5 class="card-title">Appointment #' + response.id + '</h5>';
-                html += '<div class="row">';
-                
-                // Date and time
-                html += '<div class="col-md-6">';
-                html += '<p><strong>Date:</strong> ' + formatDate(response.booking_date) + '</p>';
-                html += '<p><strong>Time:</strong> ' + formatTime(response.start_time) + ' - ' + formatTime(response.end_time) + '</p>';
-                html += '<p><strong>Status:</strong> <span class="badge badge-' + getStatusBadgeColor(response.status) + '">' + capitalizeFirstLetter(response.status) + '</span></p>';
-                html += '</div>';
-                
-                // Client and employee info
-                html += '<div class="col-md-6">';
-                html += '<p><strong>Client ID:</strong> ' + response.client_id + '</p>';
-                html += '<p><strong>Employee ID:</strong> ' + response.employee_id + '</p>';
-                html += '<p><strong>Practice ID:</strong> ' + response.practice_id + '</p>';
-                html += '</div>';
-                html += '</div>';
-                
-                // Notes
-                if (response.notes) {
-                    html += '<hr><h6>Notes:</h6>';
-                    html += '<p>' + response.notes + '</p>';
-                }
-                
-                html += '</div>'; // card-body
-                html += '</div>'; // card
-                
-                // Update modal content
-                $('#appointmentDetails').html(html);
-            },
-            error: function(xhr) {
-                $('#appointmentDetails').html('<div class="alert alert-danger">Error loading appointment details. Please try again.</div>');
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    // Create a simple modal manually
+    const modalHTML = `
+        <div id="simpleModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+            <div style="margin:10% auto; padding:20px; width:80%; max-width:700px; background-color:white; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="margin:0;">Appointment Details</h3>
+                    <button id="closeModalBtn" style="background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+                </div>
+                <div id="simpleModalContent">
+                    <div style="text-align:center;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p>Loading appointment details...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add the modal to the document
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Get modal elements
+    const modal = document.getElementById('simpleModal');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const modalContent = document.getElementById('simpleModalContent');
+    
+    // Close modal when clicking close button
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+    
+    // Select all "View Appointment" buttons
+    const viewButtons = document.querySelectorAll('.view-appointment');
+    
+    // Add click event to each button
+    viewButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const appointmentId = this.getAttribute('data-appointment-id');
+            console.log("Viewing appointment:", appointmentId);
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Show loading state
+            modalContent.innerHTML = `
+                <div style="text-align:center;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p>Loading appointment details...</p>
+                </div>
+            `;
+            
+            // Fetch appointment details
+            fetch('/api/appointments/' + appointmentId)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Appointment data:", data);
+                    
+                    // Format the date and time
+                    const date = new Date(data.booking_date).toLocaleDateString('en-US', {
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric'
+                    });
+                    
+                    // Format times
+                    const startTime = formatTime(data.start_time);
+                    const endTime = formatTime(data.end_time);
+                    
+                    // Create HTML content
+                    const html = `
+                        <div style="border:1px solid #eee; border-radius:8px; padding:15px;">
+                            <h4>Appointment #${data.id}</h4>
+                            <div style="display:flex; flex-wrap:wrap;">
+                                <div style="flex:1; min-width:250px; margin-bottom:15px;">
+                                    <p><strong>Date:</strong> ${date}</p>
+                                    <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+                                    <p><strong>Status:</strong> <span style="padding:3px 8px; border-radius:3px; background-color:${getStatusColor(data.status)}; color:white;">${capitalizeFirstLetter(data.status || 'Unknown')}</span></p>
+                                </div>
+                                <div style="flex:1; min-width:250px; margin-bottom:15px;">
+                                    <p><strong>Client ID:</strong> ${data.client_id}</p>
+                                    <p><strong>Employee ID:</strong> ${data.employee_id}</p>
+                                    <p><strong>Practice ID:</strong> ${data.practice_id}</p>
+                                </div>
+                            </div>
+                            ${data.notes ? `<hr><h5>Notes:</h5><p>${data.notes}</p>` : ''}
+                        </div>
+                    `;
+                    
+                    // Update modal content
+                    modalContent.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching appointment details:', error);
+                    modalContent.innerHTML = `
+                        <div style="color:#721c24; background-color:#f8d7da; padding:15px; border-radius:4px; border:1px solid #f5c6cb;">
+                            <p>Error loading appointment details: ${error.message}</p>
+                            <p>Please try again later.</p>
+                        </div>
+                    `;
+                });
         });
     });
     
     // Helper functions
-    function formatDate(dateString) {
-        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-    
     function formatTime(timeString) {
-        var timeParts = timeString.split(':');
-        var hours = parseInt(timeParts[0]);
-        var minutes = timeParts[1];
-        var ampm = hours >= 12 ? 'PM' : 'AM';
+        if (!timeString) return 'Unknown';
+        
+        const timeParts = timeString.split(':');
+        let hours = parseInt(timeParts[0]);
+        const minutes = timeParts[1];
+        const ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12;
         hours = hours ? hours : 12; // Convert 0 to 12
-        return hours + ':' + minutes + ' ' + ampm;
+        return `${hours}:${minutes} ${ampm}`;
     }
     
     function capitalizeFirstLetter(string) {
+        if (!string) return '';
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
     
-    function getStatusBadgeColor(status) {
+    function getStatusColor(status) {
+        if (!status) return '#6c757d'; // Default gray
+        
         switch(status.toLowerCase()) {
-            case 'confirmed': return 'success';
-            case 'pending': return 'warning';
-            case 'checked-in': return 'info';
-            case 'completed': return 'secondary';
-            case 'canceled': return 'danger';
-            default: return 'primary';
+            case 'confirmed': return '#28a745'; // Green
+            case 'pending': return '#ffc107';   // Yellow
+            case 'checked-in': return '#17a2b8'; // Blue
+            case 'completed': return '#6c757d';  // Gray
+            case 'canceled': return '#dc3545';   // Red
+            default: return '#6c757d';           // Gray
         }
     }
 });
+
 </script>
 @endpush
