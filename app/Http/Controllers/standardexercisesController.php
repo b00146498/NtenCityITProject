@@ -59,7 +59,7 @@ class standardexercisesController extends AppBaseController
 
         $standardexercises = $this->standardexercisesRepository->create($input);
 
-        Flash::success('Standardexercises saved successfully.');
+        Flash::success('Exercise saved successfully.');
 
         return redirect(route('standardexercises.index'));
     }
@@ -76,7 +76,7 @@ class standardexercisesController extends AppBaseController
         $standardexercises = $this->standardexercisesRepository->find($id);
 
         if (empty($standardexercises)) {
-            Flash::error('Standardexercises not found');
+            Flash::error('Exercises not found');
 
             return redirect(route('standardexercises.index'));
         }
@@ -96,7 +96,7 @@ class standardexercisesController extends AppBaseController
         $standardexercises = $this->standardexercisesRepository->find($id);
 
         if (empty($standardexercises)) {
-            Flash::error('Standardexercises not found');
+            Flash::error('Exercises not found');
 
             return redirect(route('standardexercises.index'));
         }
@@ -124,7 +124,7 @@ class standardexercisesController extends AppBaseController
 
         $standardexercises = $this->standardexercisesRepository->update($request->all(), $id);
 
-        Flash::success('Standardexercises updated successfully.');
+        Flash::success('Exercises updated successfully.');
 
         return redirect(route('standardexercises.index'));
     }
@@ -143,14 +143,14 @@ class standardexercisesController extends AppBaseController
         $standardexercises = $this->standardexercisesRepository->find($id);
 
         if (empty($standardexercises)) {
-            Flash::error('Standardexercises not found');
+            Flash::error('Exercises not found');
 
             return redirect(route('standardexercises.index'));
         }
 
         $this->standardexercisesRepository->delete($id);
 
-        Flash::success('Standardexercises deleted successfully.');
+        Flash::success('Exercises deleted successfully.');
 
         return redirect(route('standardexercises.index'));
     }

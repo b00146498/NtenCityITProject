@@ -46,14 +46,28 @@ class tpelogController extends AppBaseController
      *
      * @return Response
      */
-    public function create()
+    /*public function create()
     {
         $exercises = standardexercises::all();
         $trainingPlans = PersonalisedTrainingPlan::with('client')->get();
         //return view('tpelogs.create');
         return view('tpelogs.create', compact('exercises', 'trainingPlans'));
+    }*/
+
+    public function create(Request $request)
+    {
+        $exercises = StandardExercises::all();
+        $trainingPlans = PersonalisedTrainingPlan::with('client')->get();
+
+        // Get client_id from request (if redirected from a training plan)
+        $selectedClient = null;
+        if ($request->has('client_id')) {
+            $selectedClient = PersonalisedTrainingPlan::where('client_id', $request->client_id)->with('client')->first();
+        }
+
+        return view('tpelogs.create', compact('exercises', 'trainingPlans', 'selectedClient'));
     }
-    
+
 
     /**
      * Store a newly created tpelog in storage.
@@ -77,6 +91,7 @@ class tpelogController extends AppBaseController
             'num_sets' => 'required|integer|min:0',
             'num_reps' => 'required|integer|min:0',
             'minutes' => 'nullable|integer|min:0',
+            'intensity' => 'required|string',
             'incline' => 'required|numeric|min:-20|max:20', // Allow decline (negative values)
             'times_per_week' => 'required|integer|min:1|max:7'
         ]);
@@ -108,7 +123,7 @@ class tpelogController extends AppBaseController
         $tpelog = Tpelog::with(['trainingPlan.client', 'exercise'])->find($id);
 
         if (empty($tpelog)) {
-            Flash::error('Tpelog not found');
+            Flash::error('Log not found');
             return redirect(route('tpelogs.index'));
         }
 
@@ -137,7 +152,7 @@ class tpelogController extends AppBaseController
         $tpelog = $this->tpelogRepository->find($id);
 
         if (empty($tpelog)) {
-            Flash::error('Tpelog not found');
+            Flash::error('Log not found');
             return redirect(route('tpelogs.index'));
         }
 
@@ -160,14 +175,14 @@ class tpelogController extends AppBaseController
         $tpelog = $this->tpelogRepository->find($id);
 
         if (empty($tpelog)) {
-            Flash::error('Tpelog not found');
+            Flash::error('Log not found');
 
             return redirect(route('tpelogs.index'));
         }
 
         $tpelog = $this->tpelogRepository->update($request->all(), $id);
 
-        Flash::success('Tpelog updated successfully.');
+        Flash::success('Log updated successfully.');
 
         return redirect(route('tpelogs.index'));
     }
@@ -186,14 +201,14 @@ class tpelogController extends AppBaseController
         $tpelog = $this->tpelogRepository->find($id);
 
         if (empty($tpelog)) {
-            Flash::error('Tpelog not found');
+            Flash::error('Log not found');
 
             return redirect(route('tpelogs.index'));
         }
 
         $this->tpelogRepository->delete($id);
 
-        Flash::success('Tpelog deleted successfully.');
+        Flash::success('Log deleted successfully.');
 
         return redirect(route('tpelogs.index'));
     }

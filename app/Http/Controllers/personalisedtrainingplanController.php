@@ -64,9 +64,10 @@ class personalisedtrainingplanController extends AppBaseController
 
         $personalisedtrainingplan = $this->personalisedtrainingplanRepository->create($input);
 
-        Flash::success('Personalisedtrainingplan saved successfully.');
+        Flash::success('Personalised Training Plan saved successfully.');
 
-        return redirect(route('personalisedtrainingplans.index'));
+        //return redirect(route('personalisedtrainingplans.index'));
+        return redirect()->route('tpelogs.create', ['client_id' => $personalisedtrainingplan->client_id]);
     }
 
     /**
@@ -81,7 +82,7 @@ class personalisedtrainingplanController extends AppBaseController
         $personalisedtrainingplan = $this->personalisedtrainingplanRepository->find($id);
 
         if (empty($personalisedtrainingplan)) {
-            Flash::error('Personalisedtrainingplan not found');
+            Flash::error('Personalised Training Plan not found');
 
             return redirect(route('personalisedtrainingplans.index'));
         }
@@ -101,7 +102,7 @@ class personalisedtrainingplanController extends AppBaseController
         $personalisedtrainingplan = $this->personalisedtrainingplanRepository->find($id);
 
         if (empty($personalisedtrainingplan)) {
-            Flash::error('Personalisedtrainingplan not found');
+            Flash::error('Personalised Training Plan not found');
 
             return redirect(route('personalisedtrainingplans.index'));
         }
@@ -122,14 +123,14 @@ class personalisedtrainingplanController extends AppBaseController
         $personalisedtrainingplan = $this->personalisedtrainingplanRepository->find($id);
 
         if (empty($personalisedtrainingplan)) {
-            Flash::error('Personalisedtrainingplan not found');
+            Flash::error('Personalised Training Plan not found');
 
             return redirect(route('personalisedtrainingplans.index'));
         }
 
         $personalisedtrainingplan = $this->personalisedtrainingplanRepository->update($request->all(), $id);
 
-        Flash::success('Personalisedtrainingplan updated successfully.');
+        Flash::success('Personalised Training Plan updated successfully.');
 
         return redirect(route('personalisedtrainingplans.index'));
     }
@@ -148,14 +149,14 @@ class personalisedtrainingplanController extends AppBaseController
         $personalisedtrainingplan = $this->personalisedtrainingplanRepository->find($id);
 
         if (empty($personalisedtrainingplan)) {
-            Flash::error('Personalisedtrainingplan not found');
+            Flash::error('Personalised Training Plan not found');
 
             return redirect(route('personalisedtrainingplans.index'));
         }
 
         $this->personalisedtrainingplanRepository->delete($id);
 
-        Flash::success('Personalisedtrainingplan deleted successfully.');
+        Flash::success('Personalised Training Plan deleted successfully.');
 
         return redirect(route('personalisedtrainingplans.index'));
     }

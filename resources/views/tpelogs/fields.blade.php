@@ -68,6 +68,7 @@
         </select>
     </div>
 
+
     <!-- Incline/Decline Selection -->
     <div class="form-group col-sm-6">
         {!! Form::label('incline_type', 'Incline or Decline:', ['class' => 'form-label fw-bold']) !!}
@@ -85,6 +86,7 @@
             <label for="decline_option" class="ms-2">Decline</label>
         </div>
     </div>
+
 
     <!-- Times Per Week -->
     <div class="col-md-6 mb-3">

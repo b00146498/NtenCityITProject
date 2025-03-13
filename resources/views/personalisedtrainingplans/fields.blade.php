@@ -27,8 +27,8 @@
 
         <!-- Submit Field -->
         <div class="form-group col-sm-12 text-center">
-            {!! Form::submit('Save', ['class' => 'btn btn-primary px-4']) !!}
             <a href="{!! route('personalisedtrainingplans.index') !!}" class="btn btn-outline-secondary px-4">Cancel</a>
+            {!! Form::submit('Save & Next', ['class' => 'btn btn-primary px-4']) !!}
         </div>
     </div>
 </div>
