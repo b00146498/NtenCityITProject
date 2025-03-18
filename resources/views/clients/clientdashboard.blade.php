@@ -4,11 +4,15 @@
 
     <!-- Dashboard Header -->
     <div class="dashboard-header">
-        <img src="{{ asset('images/ntencity_logo.png') }}" alt="NtenCity Logo" class="logo">
-        <div class="user-info">
-            <span>User Name</span>
-            <i class="fas fa-user-circle"></i>
-        </div>
+        <!-- Logo on the Left -->
+        <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
+
+        <!-- User Name on the Right -->
+        @auth
+            <div class="user-info">
+                {{ Auth::user()->name }}<i class="fas fa-user"></i>
+            </div>
+        @endauth
     </div>
 
     <!-- Search Bar -->
@@ -65,17 +69,17 @@
     }
 
     .logo {
-        width: 120px;
+        width: 135px;
+        height: auto;
     }
 
     .user-info {
         display: flex;
         align-items: center;
-        font-weight: bold;
     }
 
     .user-info i {
-        font-size: 25px;
+        font-size: 18px;
         margin-left: 10px;
     }
 
