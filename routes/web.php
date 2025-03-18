@@ -9,6 +9,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\tpelogController;
 use App\Http\Controllers\personalisedtrainingplanController;
+use App\Http\Controllers\ProfileController;
 use App\Models\Client;
 use App\Models\PersonalisedTrainingPlan;
 use App\Models\TpeLog;
@@ -27,8 +28,6 @@ Route::get('/dashboard', function () {
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
-
-
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();
@@ -73,7 +72,15 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('notifications', App\Http\Controllers\NotificationController::class);
     Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
     Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    
+    // Profile Routes
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::get('/profile/history', [ProfileController::class, 'history'])->name('profile.history');
+    Route::get('/profile/personal-details', [ProfileController::class, 'personalDetails'])->name('profile.personal-details');
+    Route::get('/profile/about', [ProfileController::class, 'about'])->name('profile.about');
+    Route::get('/profile/help', [ProfileController::class, 'help'])->name('profile.help');
 });
+
 Route::get('/simple-test', function() {
     $user = Auth::user();
     
@@ -89,6 +96,7 @@ Route::get('/simple-test', function() {
         return 'Error: ' . $e->getMessage();
     }
 })->middleware('auth');
+
 Route::get('/test-appointment-notification', function() {
     $user = Auth::user();
     
@@ -112,6 +120,7 @@ Route::get('/test-appointment-notification', function() {
         return 'Error: ' . $e->getMessage();
     }
 })->middleware('auth');
+
 Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 Route::get('/search-clients', [PersonalisedTrainingPlanController::class, 'searchClients'])->name('search.clients');
 
@@ -145,9 +154,7 @@ Route::get('notifications/create-test', [App\Http\Controllers\NotificationContro
 
 Route::resource('standardexercises', App\Http\Controllers\standardexercisesController::class);
 
-
 Route::resource('tpelogs', App\Http\Controllers\tpelogController::class);
-
 
 Route::resource('personalisedtrainingplans', App\Http\Controllers\personalisedtrainingplanController::class);
 
@@ -159,8 +166,6 @@ Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.s
 
 Route::get('/calendar/display', [AppointmentController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointment/json', 'App\Http\Controllers\AppointmentController@getAppointments')->name('appointment.json')->middleware('auth');
-
-
 
 Route::get('/progress', function () {
     $user = Auth::user();
