@@ -121,6 +121,8 @@ Route::resource('appointments', AppointmentController::class);
 
 Route::get('/loggedInClient','App\Http\Controllers\clientController@getLoggedInClientDetails');
 
+Route::get('/client/clientdashboard', [App\Http\Controllers\ClientController::class, 'clientdashboard'])->name('client.clientdashboard');
+
 Route::get('/client/new/{userid}', 'App\Http\Controllers\clientController@new')->name('client.new');
 Route::get('/employee/new/{userid}', 'App\Http\Controllers\employeeController@new')->name('employee.new');
 Route::resource('customers', App\Http\Controllers\customerController::class);

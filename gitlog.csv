@@ -1,65 +1,183 @@
-'a819634,b00146498@mytudublin.ie,2025-02-27 17:36:43,added user logged in details to top nav bar'
-'af341c7,b00146498@mytudublin.ie,2025-02-27 16:50:53,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject'
-'763b067,b00146498@mytudublin.ie,2025-02-27 16:50:25,added hardcoded values in employee dropdown'
-'c3ed632,B00144945,2025-02-27 14:53:01,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject'
-'d769123,B00144945,2025-02-27 14:50:36,added dropdown for employee view of appointments'
-'c20039f,B00144945,2025-02-27 14:48:43,added a dropdown for view appointments'
-'3c05aab,b00146498@mytudublin.ie,2025-02-27 13:41:31,added button back to employee and clients tables'
-'f8eb3ad,b00146498@mytudublin.ie,2025-02-27 12:39:39,added styling back to client table after rescaffolding'
-'ba62483,B00143361 Amos Fakrogha,2025-02-27 11:21:21,appointment booking now connects to database'
-'52f2342,b00146498@mytudublin.ie,2025-02-26 16:53:08,got user when registered to go through to client form and liks with client and user'
-'3f5121d,b00146498@mytudublin.ie,2025-02-26 13:50:55,Using the Logged in User's ID within your Application'
-'d59501d,b00146498@mytudublin.ie,2025-02-25 13:34:15,added styling to employee edit table and worked with database'
-'6047372,b00146498@mytudublin.ie,2025-02-25 13:19:22,added styling to client edit table and worked with database'
-'804fd44,B00143361 Amos Fakrogha,2025-02-25 01:17:50,fixed only dates in february being able to be highlited'
-'bb9fcfb,B00143361 Amos Fakrogha,2025-02-25 01:06:02,fixed calendar and time selection not being able to be higlhited sismeltaneoulsy'
-'058c300,B00143361 Amos Fakrogha,2025-02-25 01:00:32,updated code to automatically select what time you chose to appear on confirmation page'
-'a9ed813,B00143361 Amos Fakrogha,2025-02-25 00:25:56, added confirmation page for appointments'
-'2117b5f,B00143361 Amos Fakrogha,2025-02-25 00:22:04,updated appointment to only show doctor and removed practice and client id'
-'994171b,B00143361 Amos Fakrogha,2025-02-25 00:06:27,added appointment edition'
-'c081308,B00143361 Amos Fakrogha,2025-02-24 23:01:01,reverted back to original appointments code'
-'f734d3e,B00143361 Amos Fakrogha,2025-02-24 21:17:23,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject'
-'e96f193,B00143361 Amos Fakrogha,2025-02-24 21:17:09,added view my appointments page for clients side'
-'f569f2b,b00146498@mytudublin.ie,2025-02-24 20:48:03,added styling and forms to view client and employee details'
-'1f726da,B00143361 Amos Fakrogha,2025-02-24 20:41:17,updated appointment controller@'
-'ad9f824,B00143361 Amos Fakrogha,2025-02-22 09:52:36,updated calendar and addedd css adn tailwind to match wireframe'
-'25a2c09,B00143361 Amos Fakrogha,2025-02-22 09:27:00,fixed appoint saved not coming up'
-'6f0e812,B00143361 Amos Fakrogha,2025-02-22 08:52:55,fixed saved succesfully coming up for every appointment no matter status'
-'f940fb3,B00143361 Amos Fakrogha,2025-02-22 08:21:49,Integrated FullCalendar with Appointments'
-'cd8919c,B00143361 Amos Fakrogha,2025-02-22 07:47:56,updated appointment controller with with the index method added'
-'b5b04cb,B00143361 Amos Fakrogha,2025-02-22 07:25:07,Added appointment page and table'
-'75f2ce0,b00146498@mytudublin.ie,2025-02-20 23:16:18,Client Process Notes complete'
-'d9c5ab3,b00146498@mytudublin.ie,2025-02-20 21:52:59,added a button to add new note, and added button on entry to bring back to main entry page'
-'18ae1e0,b00146498@mytudublin.ie,2025-02-20 19:36:01,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject'
-'8273028,b00146498@mytudublin.ie,2025-02-20 19:35:33,added search bar to client progress notes'
-'d11b83c,B00144945,2025-02-19 20:54:12,Updated Appointments button to link to calendar display'
-'288fa65,B00144945,2025-02-19 20:49:01,Added auth middleware to restrict calendar access to logged-in users'
-'c75038e,b00146498@mytudublin.ie,2025-02-19 16:09:40,diary entries connecting perfectly to database'
-'2b457ac,b00146498@mytudublin.ie,2025-02-19 16:08:48,diary entries connecting perfectly to database'
-'fedfa48,b00146498@mytudublin.ie,2025-02-19 14:38:32,make clients drop down in Create diary entries'
-'eca296d,b00146498@mytudublin.ie,2025-02-19 13:37:26,took out Practiceid in the employee table'
-'d5517e2,b00146498@mytudublin.ie,2025-02-19 12:56:54,added UI to Diary-entries create page'
-'2a76fc5,b00146498@mytudublin.ie,2025-02-18 22:45:30,got create field, update and delete working'
-'46e8ba8,b00146498@mytudublin.ie,2025-02-18 21:15:24,added in diary entries, connects user to client and saves diary entry notes'
-'d7ebc2e,B00144945,2025-02-17 21:48:33,Integrated FullCalendar with Laravel Mix'
-'27db037,B00144945,2025-02-17 20:43:54,Fixed FullCalendar folder structure and asset paths.'
-'92a389b,B00144945,2025-02-17 20:04:36,Created calendar display page with FullCalendar integration'
-'7d3614a,B00144945,2025-02-17 19:50:21,Installed FullCalendar v4.4.3 and added necessary assets'
-'fbe3711,b00146498@mytudublin.ie,2025-02-13 19:07:31,added styling to tables'
-'5bb8e78,b00146498@mytudublin.ie,2025-02-13 18:21:12,updated fixed code login and register working'
-'26fb859,b00146498@mytudublin.ie,2025-02-13 17:24:00,error in auth.php, fixed code'
-'3d21db9,b00146498@mytudublin.ie,2025-02-13 17:18:19,Resolved merge conflicts'
-'11624c4,b00146498@mytudublin.ie,2025-02-13 17:15:57,Cleaned up employee and client tables'
-'055b33d,B00143361 Amos Fakrogha,2025-02-12 23:33:46,Fixed New Client button and updated client creation form'
-'4599df8,B00144945,2025-02-12 16:32:24,integrated dropdown for client practices'
-'0add06d,B00144945,2025-02-12 16:07:52,fixed client id fields showing'
-'c94e9b6,b00146498@mytudublin.ie,2025-02-11 11:13:43,added styling to the employee register page'
-'bbe6d7c,b00146498@mytudublin.ie,2025-02-11 11:03:52,added styling to the login feature'
-'5f55195,b00146498@mytudublin.ie,2025-02-10 20:55:46,Register function works and saves to database'
-'ed25f30,b00146498@mytudublin.ie,2025-02-10 18:02:33,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject'
-'583711b,b00146498@mytudublin.ie,2025-02-06 21:24:51,Completed Employee Profiles page with test data'
-'9b4efd6,b00146498@mytudublin.ie,2025-02-06 21:24:51,added side nav bar, styled and addes client and employee page links'
-'0b4b073,b00146498@mytudublin.ie,2025-02-06 11:36:55,Added a logo in the nav bar, addes glyphicons to add client and add employee and coloured in button'
-'97ff90c,b00146498@mytudublin.ie,2025-02-06 10:25:25,Adding new client working and connected to database'
-'342b335,b00146498@mytudublin.ie,2025-02-05 23:14:20,got employee scaffolded and added Deleted_at'
-'bc8610e,b00146498@mytudublin.ie,2025-02-05 22:52:35,Scaffolded Client, Employee and Practice Tables'
+'f98a2b1,b00146498@mytudublin.ie,13/03/2025 22:14,added new format to standard exercises table',
+'90adffd,b00146498@mytudublin.ie,13/03/2025 20:06,rearranged sidebar',
+'43ce184,b00146498@mytudublin.ie,13/03/2025 20:00,updates intencity button and Save & Next button',
+'53a8178,b00146498@mytudublin.ie,13/03/2025 19:16,connected client names to the logs',
+'6e31946,b00146498@mytudublin.ie,13/03/2025 18:50,tpelogs edit layout complete',
+'4952508,b00146498@mytudublin.ie,13/03/2025 18:48,tpelogs views complete',
+'a36b44c,amosyeager,13/03/2025 17:49,updated appointment controller again',
+'8f0bd69,amosyeager,13/03/2025 17:47,updated notiifcation index blade',
+'04791f4,amosyeager,13/03/2025 17:46,updated appointment controller again',
+'97a768a,amosyeager,13/03/2025 17:39,added view notifications',
+'5f88811,amosyeager,13/03/2025 17:36,notifications now wokring',
+'6cc8998,amosyeager,13/03/2025 17:35,added notifications index debugging',
+'6d2ad86,amosyeager,13/03/2025 17:31,created raw notifications',
+'11bcbf2,amosyeager,13/03/2025 17:20,updated notification controller with debuginng',
+'1fcfebb,amosyeager,13/03/2025 17:02,renmoved user id from client',
+'5fa1049,amosyeager,13/03/2025 16:36,added debug to notification index blade',
+'4625b32,b00146498@mytudublin.ie,13/03/2025 14:08,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'77894fc,b00146498@mytudublin.ie,13/03/2025 14:07,timer per week button working and connecting to db',
+'f110d05,amosyeager,13/03/2025 13:58,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'f1a8f51,amosyeager,13/03/2025 13:50,updated notification controller to recieve notifcations for clients aswelll as users',
+'a71753f,amosyeager,13/03/2025 13:46,updated blade template to ensure it's displaying notifications',
+'bf21524,amosyeager,13/03/2025 13:42,updated appointment controller for debugging and to send database request for clients',
+'38e0f63,amosyeager,13/03/2025 13:36,updated Client model to include the Notifiable trait',
+'cda3c0e,b00146498@mytudublin.ie,13/03/2025 13:29,added slider to minutes',
+'de4ddf0,amosyeager,13/03/2025 13:24,updated appointment controller to get doctors name for  notifications',
+'24c9177,amosyeager,13/03/2025 13:21,updated notification page again to match index',
+'33b6b99,amosyeager,13/03/2025 13:18,updated notifications route',
+'aa91407,amosyeager,13/03/2025 13:16,updated notification index blade',
+'55e8fad,amosyeager,13/03/2025 13:13,added test notifications tpo route',
+'2255308,amosyeager,13/03/2025 13:10, added simple test notfifcation php',
+'8538898,amosyeager,13/03/2025 12:58,added deleted at to notifications table',
+'d07dbcc,amosyeager,13/03/2025 12:56,added deleted at to notigfications',
+'4ce7f4d,b00146498@mytudublin.ie,13/03/2025 12:52,added + and - buttons to increase and descrease num reps and sets',
+'1935409,amosyeager,13/03/2025 12:44,updated notifications index to match wire frame',
+'6429a58,amosyeager,12/03/2025 23:51,Stabilized repo after reset',
+'9470b93,amosyeager,12/03/2025 23:50,Stabilized repo after reset',
+'4208526,Lesliy Egahghe,12/03/2025 21:22,Improved calendar aesthetics with new button styling',
+'df14ae7,Lesliy Egahghe,12/03/2025 21:21,optimized event rendering for better UI in weekly calendar mode',
+'529da67,Lesliy Egahghe,12/03/2025 21:20,Fixed missing appointments in week view & ensured proper display',
+'16c58a3,Lesliy Egahghe,12/03/2025 21:20,Updated FullCalendar buttons to match sidebar theme colors',
+'43dbf1b,Lesliy Egahghe,12/03/2025 21:19, Improved FullCalendar weekly view for better appointment visibility',
+'96675ec,Lesliy Egahghe,12/03/2025 15:25,appointment displays accurate times',
+'6c882d3,Lesliy Egahghe,12/03/2025 15:24,created an inner join for appointments table',
+'814b937,Lesliy Egahghe,12/03/2025 15:24,database connects fine with appointments now',
+'a690ad9,Lesliy Egahghe,12/03/2025 15:24,finalised laravel full calendar integration',
+'9e7a65d,Lesliy Egahghe,12/03/2025 15:23,debugged calendar fetch issues',
+'d0c4a97,Lesliy Egahghe,12/03/2025 15:23,full calendar event is stable',
+'80d1927,Lesliy Egahghe,12/03/2025 15:22,changed model to laravel model',
+'9366143,Lesliy Egahghe,12/03/2025 15:20,Resolved merge conflicts and completed merge',
+'8c30ceb,Lesliy Egahghe,12/03/2025 15:16,client first name and surname display on calendar',
+'9dc92e4,Lesliy Egahghe,12/03/2025 15:16,Resolved unexpected issues in event fetching',
+'db4b16b,Lesliy Egahghe,12/03/2025 15:15,event times are accurate#',
+'ac9baee,Lesliy Egahghe,12/03/2025 15:15,Database now connects',
+'c1a0481,Lesliy Egahghe,12/03/2025 15:14,Finalizing FullCalendar integration with Laravel',
+'07a3002,Lesliy Egahghe,12/03/2025 15:14,Debugged FullCalendar event fetching issue',
+'ac915e2,Lesliy Egahghe,12/03/2025 15:14,FullCalendar event display is stable',
+'85d1f81,Lesliy Egahghe,12/03/2025 15:11,fixed app model to get json events',
+'3899c6a,b00146498@mytudublin.ie,12/03/2025 15:05,did layout for edit personalised training plan',
+'e4a5c4a,b00146498@mytudublin.ie,12/03/2025 14:37,updated create ui layout to match rest - standard exercises',
+'bd6e1df,b00146498@mytudublin.ie,12/03/2025 14:31,updated edit standard exercises',
+'9958636,b00146498@mytudublin.ie,12/03/2025 14:08,updated view personalised training plan',
+'65bc1c2,b00146498@mytudublin.ie,12/03/2025 14:02,added in iframe to show and updates view standard exercises',
+'7cda90c,b00146498@mytudublin.ie,12/03/2025 12:11,only has date showing on table now took away 00:00:00',
+'21cfd4d,b00146498@mytudublin.ie,12/03/2025 12:03,added styling to personaltrainingplan/create',
+'79e5a1a,b00146498@mytudublin.ie,12/03/2025 11:18,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'cb12f15,b00146498@mytudublin.ie,12/03/2025 11:17,added calendar when selecting dates on personal training plan',
+'f6fa8f6,B00143361 Amos Fakrogha,10/03/2025 23:40,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'0ba5212,B00143361 Amos Fakrogha,10/03/2025 23:20,added helpers to composer file',
+'3c51db0,B00143361 Amos Fakrogha,10/03/2025 23:17,added functions into helper file',
+'70c87a4,B00143361 Amos Fakrogha,10/03/2025 23:11,Created helpers app',
+'defa119,B00143361 Amos Fakrogha,10/03/2025 22:55,updated notification index',
+'c6de93f,B00143361 Amos Fakrogha,10/03/2025 22:49,updated appointment notification controller',
+'54d411e,B00143361 Amos Fakrogha,10/03/2025 22:34,added test notifications',
+'f305e36,b00146498@mytudublin.ie,10/03/2025 22:30,added incline and decline radio buttons with option to increase by value or decrease, saves to db'
+'17ce9a0,b00146498@mytudublin.ie,10/03/2025 22:10,added hard coded values for dropdown for intencity & added button to increase & decrease the number of sets & reps',
+'c3cb0dd,b00146498@mytudublin.ie,10/03/2025 21:54,added dropdow in logs to show exercise name in index and create',
+'cd1058f,b00146498@mytudublin.ie,10/03/2025 21:15,put a live search in personalised training plane/create saves to db',
+'7476404,b00146498@mytudublin.ie,10/03/2025 21:06,made client id in create/personalisedtrainingplan show client full name',
+'9cc17c4,b00146498@mytudublin.ie,10/03/2025 20:27,on personalised trainng plan made it show full name instead of client id',
+'6b3bc5c,b00146498@mytudublin.ie,10/03/2025 19:31,added standard exercises to navbar',
+'27152f7,b00146498@mytudublin.ie,10/03/2025 14:38,added standard exercises, tpelog and Personalised training plan scaffolded tables'
+'369fec3,B00143361 Amos Fakrogha,09/03/2025 19:47,updated routes',
+'40b5290,B00143361 Amos Fakrogha,09/03/2025 19:34,added colour scheme to notiffications controller',
+'215e950,B00143361 Amos Fakrogha,09/03/2025 19:32,edited index blade for notifications page',
+'77e325d,B00143361 Amos Fakrogha,09/03/2025 19:28,updated kernel php',
+'7881033,B00143361 Amos Fakrogha,09/03/2025 19:25,edited console',
+'e5bda09,B00143361 Amos Fakrogha,09/03/2025 19:24,created console command',
+'0cd4092,B00143361 Amos Fakrogha,09/03/2025 19:23,made changes to appointment controller',
+'4bde501,B00143361 Amos Fakrogha,09/03/2025 19:19,added function into appointment notification controller',
+'ecdb20c,B00143361 Amos Fakrogha,09/03/2025 19:16,made appointmentnotification',
+'60095a2,B00143361 Amos Fakrogha,09/03/2025 19:07,added notfications table',
+'f6e0896,B00144945,09/03/2025 16:54,Embedded CSS',
+'5bf2062,B00144945,09/03/2025 15:58,Optimized calendar interaction and usability features in FullCalendar for a smoother user experience',
+'991e331,B00144945,09/03/2025 15:57,Implemented advanced error handling strategies in FullCalendar setup to improve reliability',
+'efa3d6c,B00144945,09/03/2025 15:57,Enhanced API integration for efficient event data fetching and processing in FullCalendar',
+'c8a5094,B00144945,09/03/2025 15:49,Fixed time slot display in FullCalendar by adjusting slotMinTime and slotMaxTime for better user experience',
+'f775092,B00143361 Amos Fakrogha,09/03/2025 03:00,added payment succesful and appointment booked alerts',
+'d888670,B00143361 Amos Fakrogha,08/03/2025 23:38,updated appointment controller',
+'5f3f943,B00143361 Amos Fakrogha,08/03/2025 23:32,updated appointment index',
+'0b9ab88,B00143361 Amos Fakrogha,07/03/2025 22:34,added new route',
+'bc6c238,B00143361 Amos Fakrogha,07/03/2025 22:34,updated appointment controller',
+'1bcfded,B00143361 Amos Fakrogha,07/03/2025 22:07,added code intoappointconfirmation',
+'202ce87,B00143361 Amos Fakrogha,07/03/2025 22:06,added emaisl to resources',
+'98766f0,B00143361 Amos Fakrogha,07/03/2025 21:21,edited appointment confirmation',
+'dc198d1,B00143361 Amos Fakrogha,07/03/2025 21:19,create an AppointmentConfirmation mailable class',
+'345a5e8,B00143361 Amos Fakrogha,07/03/2025 21:18,added twilio to appointment controller',
+5s7871a,b00146498@mytudublin.ie,07/03/2025 18:30,,
+5m68f2,b00146498@mytudublin.ie,06/03/2025 14:51,,
+'7e280bd,b00146498@mytudublin.ie,05/03/2025 14:58,employee id links to userid table',
+'e277b04,b00146498@mytudublin.ie,04/03/2025 10:41,user in database saves as employee role in db',
+'25007bb,b00146498@mytudublin.ie,04/03/2025 10:14,when register as employee brings to employee registration form and saves to db',
+'7ea1917,b00146498@mytudublin.ie,04/03/2025 09:24,added dropdown to register page put client and employee roles as hard values',
+'34a239a,b00146498@mytudublin.ie,03/03/2025 21:11,can now view client progress notes even if employee isnt assigned',
+'02a38a8,b00146498@mytudublin.ie,03/03/2025 20:59,added styling to create new client form after registration',
+'e81d28c,b00146498@mytudublin.ie,03/03/2025 20:57,added live dropdown search bar on progress notes section',
+'71ba552,B00144945,03/03/2025 14:45,changed default calendar view to weeks',
+'eecad03,b00146498@mytudublin.ie,01/03/2025 13:23,added live search to client process notes',
+'c497654,b00146498@mytudublin.ie,01/03/2025 12:34,added stying to new clients form affter registration',
+'a819634,b00146498@mytudublin.ie,27/02/2025 17:36,added user logged in details to top nav bar',
+'af341c7,b00146498@mytudublin.ie,27/02/2025 16:50,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'763b067,b00146498@mytudublin.ie,27/02/2025 16:50,added hardcoded values in employee dropdown',
+'c3ed632,B00144945,27/02/2025 14:53,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'d769123,B00144945,27/02/2025 14:50,added dropdown for employee view of appointments',
+'c20039f,B00144945,27/02/2025 14:48,added a dropdown for view appointments',
+'3c05aab,b00146498@mytudublin.ie,27/02/2025 13:41,added button back to employee and clients tables',
+'f8eb3ad,b00146498@mytudublin.ie,27/02/2025 12:39,added styling back to client table after rescaffolding',
+'ba62483,B00143361 Amos Fakrogha,27/02/2025 11:21,appointment booking now connects to database',
+'52f2342,b00146498@mytudublin.ie,26/02/2025 16:53,got user when registered to go through to client form and liks with client and user',
+'3f5121d,b00146498@mytudublin.ie,26/02/2025 13:50,Using the Logged in User's ID within your Application',
+'d59501d,b00146498@mytudublin.ie,25/02/2025 13:34,added styling to employee edit table and worked with database',
+'6047372,b00146498@mytudublin.ie,25/02/2025 13:19,added styling to client edit table and worked with database',
+'804fd44,B00143361 Amos Fakrogha,25/02/2025 01:17,fixed only dates in february being able to be highlited',
+'bb9fcfb,B00143361 Amos Fakrogha,25/02/2025 01:06,fixed calendar and time selection not being able to be higlhited sismeltaneoulsy',
+'058c300,B00143361 Amos Fakrogha,25/02/2025 01:00,updated code to automatically select what time you chose to appear on confirmation page',
+'a9ed813,B00143361 Amos Fakrogha,25/02/2025 00:25, added confirmation page for appointments',
+'2117b5f,B00143361 Amos Fakrogha,25/02/2025 00:22,updated appointment to only show doctor and removed practice and client id',
+'994171b,B00143361 Amos Fakrogha,25/02/2025 00:06,added appointment edition',
+'c081308,B00143361 Amos Fakrogha,24/02/2025 23:01,reverted back to original appointments code',
+'f734d3e,B00143361 Amos Fakrogha,24/02/2025 21:17,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'e96f193,B00143361 Amos Fakrogha,24/02/2025 21:17,added view my appointments page for clients side',
+'f569f2b,b00146498@mytudublin.ie,24/02/2025 20:48,added styling and forms to view client and employee details',
+'1f726da,B00143361 Amos Fakrogha,24/02/2025 20:41,updated appointment controller@',
+'ad9f824,B00143361 Amos Fakrogha,22/02/2025 09:52,updated calendar and addedd css adn tailwind to match wireframe',
+'25a2c09,B00143361 Amos Fakrogha,22/02/2025 09:27,fixed appoint saved not coming up',
+'6f0e812,B00143361 Amos Fakrogha,22/02/2025 08:52,fixed saved succesfully coming up for every appointment no matter status',
+'f940fb3,B00143361 Amos Fakrogha,22/02/2025 08:21,Integrated FullCalendar with Appointments',
+'cd8919c,B00143361 Amos Fakrogha,22/02/2025 07:47,updated appointment controller with with the index method added',
+'b5b04cb,B00143361 Amos Fakrogha,22/02/2025 07:25,Added appointment page and table',
+'75f2ce0,b00146498@mytudublin.ie,20/02/2025 23:16,Client Process Notes complete',
+'d9c5ab3,b00146498@mytudublin.ie,20/02/2025 21:52,added a button to add new note, and added button on entry to bring back to main entry page'
+'18ae1e0,b00146498@mytudublin.ie,20/02/2025 19:36,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'8273028,b00146498@mytudublin.ie,20/02/2025 19:35,added search bar to client progress notes',
+'d11b83c,B00144945,19/02/2025 20:54,Updated Appointments button to link to calendar display',
+'288fa65,B00144945,19/02/2025 20:49,Added auth middleware to restrict calendar access to logged-in users',
+'c75038e,b00146498@mytudublin.ie,19/02/2025 16:09,diary entries connecting perfectly to database',
+'2b457ac,b00146498@mytudublin.ie,19/02/2025 16:08,diary entries connecting perfectly to database',
+'fedfa48,b00146498@mytudublin.ie,19/02/2025 14:38,make clients drop down in Create diary entries',
+'eca296d,b00146498@mytudublin.ie,19/02/2025 13:37,took out Practiceid in the employee table',
+'d5517e2,b00146498@mytudublin.ie,19/02/2025 12:56,added UI to Diary-entries create page',
+'2a76fc5,b00146498@mytudublin.ie,18/02/2025 22:45,got create field, update and delete working'
+'46e8ba8,b00146498@mytudublin.ie,18/02/2025 21:15,added in diary entries, connects user to client and saves diary entry notes'
+'d7ebc2e,B00144945,17/02/2025 21:48,Integrated FullCalendar with Laravel Mix',
+'27db037,B00144945,17/02/2025 20:43,Fixed FullCalendar folder structure and asset paths.',
+'92a389b,B00144945,17/02/2025 20:04,Created calendar display page with FullCalendar integration',
+'7d3614a,B00144945,17/02/2025 19:50,Installed FullCalendar v4.4.3 and added necessary assets',
+'fbe3711,b00146498@mytudublin.ie,13/02/2025 19:07,added styling to tables',
+'5bb8e78,b00146498@mytudublin.ie,13/02/2025 18:21,updated fixed code login and register working',
+'26fb859,b00146498@mytudublin.ie,13/02/2025 17:24,error in auth.php, fixed code'
+'3d21db9,b00146498@mytudublin.ie,13/02/2025 17:18,Resolved merge conflicts',
+'11624c4,b00146498@mytudublin.ie,13/02/2025 17:15,Cleaned up employee and client tables',
+'055b33d,B00143361 Amos Fakrogha,12/02/2025 23:33,Fixed New Client button and updated client creation form',
+'4599df8,B00144945,12/02/2025 16:32,integrated dropdown for client practices',
+'0add06d,B00144945,12/02/2025 16:07,fixed client id fields showing',
+'c94e9b6,b00146498@mytudublin.ie,11/02/2025 11:13,added styling to the employee register page',
+'bbe6d7c,b00146498@mytudublin.ie,11/02/2025 11:03,added styling to the login feature',
+'5f55195,b00146498@mytudublin.ie,10/02/2025 20:55,Register function works and saves to database',
+'ed25f30,b00146498@mytudublin.ie,10/02/2025 18:02,Merge branch 'main' of https://github.com/b00146498/NtenCityITProject',
+'583711b,b00146498@mytudublin.ie,06/02/2025 21:24,Completed Employee Profiles page with test data',
+'9b4efd6,b00146498@mytudublin.ie,06/02/2025 21:24,added side nav bar, styled and addes client and employee page links'
+'0b4b073,b00146498@mytudublin.ie,06/02/2025 11:36,Added a logo in the nav bar, addes glyphicons to add client and add employee and coloured in button'
+'97ff90c,b00146498@mytudublin.ie,06/02/2025 10:25,Adding new client working and connected to database',
+'342b335,b00146498@mytudublin.ie,05/02/2025 23:14,got employee scaffolded and added Deleted_at',
+'bc8610e,b00146498@mytudublin.ie,05/02/2025 22:52,Scaffolded Client, Employee and Practice Tables'

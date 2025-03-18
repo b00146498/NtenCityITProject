@@ -86,7 +86,7 @@ class clientController extends AppBaseController
 
         Flash::success('Client saved successfully.');
 
-        return redirect(route('clients.index'));
+        return redirect()->route('client.clientdashboard');
     }
 
     /**
@@ -194,5 +194,10 @@ class clientController extends AppBaseController
 
         return response()->json($clients);
     }
+    public function clientdashboard()
+    {
+        return view('clients.clientdashboard');
+    }
+
 
 }
