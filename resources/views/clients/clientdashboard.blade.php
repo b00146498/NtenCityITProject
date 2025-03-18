@@ -16,21 +16,25 @@
     </div>
 
     <!-- Search Bar -->
-    <div class="search-container">
-        <input type="text" class="search-bar" placeholder="Search">
-        <i class="fas fa-search search-icon"></i>
+    <div class="col-md-12 mb-3">
+        {!! Form::label('employee_id', 'Search Employee:', ['class' => 'form-label fw-bold text-dark']) !!}
+        <div class="position-relative">
+            <input type="text" id="employee-search" class="form-control search-input" placeholder="Type employee name..." autocomplete="off">
+            <input type="hidden" name="employee_id" id="selected-employee-id">
+            <div id="employee-list" class="list-group shadow-sm position-absolute w-100 bg-white rounded border border-secondary" style="max-height: 200px; overflow-y: auto; display: none;"></div>
+        </div>
     </div>
 
     <h3 class="section-title">List of Professionals</h3>
 
     @forelse($employees as $employee)
-        <div class="professional-card">
+        <div class="professional-card" id="employee-{{ $employee->id }}">
             <div class="info">
                 <h4>{{ $employee->emp_first_name }} {{ $employee->emp_surname }}</h4>
                 <p>{{ $employee->role }}</p>
                 <p>Contact: {{ $employee->contact_number }}</p>
             </div>
-            <a href="{{ url('/appointments?employee_id=' . $employee->id) }}" class="book-btn">Book</a>
+            <a href="{{ url('/appointments') }}" class="book-btn">Book</a>
         </div>
     @empty
         <p>No professionals available in your selected practice.</p>
@@ -43,6 +47,74 @@
         <a href="#" class="nav-item"><i class="fas fa-user"></i> Profile</a>
         <a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
     </nav>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let searchInput = document.getElementById("employee-search");
+    let employeeList = document.getElementById("employee-list");
+    let professionalCards = document.querySelectorAll(".professional-card");
+
+    document.addEventListener("click", function(event) {
+        if (!searchInput.contains(event.target) && !employeeList.contains(event.target)) {
+            employeeList.style.display = "none";
+        }
+    });
+
+    searchInput.addEventListener("keyup", function () {
+        let query = this.value.trim().toLowerCase();
+
+        if (query.length > 1) {
+            employeeList.style.display = "block";
+            employeeList.innerHTML = `<div class="list-group-item text-muted">Searching...</div>`; 
+
+            console.log(`Fetching: /search-employees?query=${query}`); // Debugging request
+
+            fetch(`/search-employees?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Response received:", data); // Debugging response
+                    employeeList.innerHTML = "";
+
+                    if (data.length > 0) {
+                        data.forEach(employee => {
+                            let item = document.createElement("a");
+                            item.href = "#";
+                            item.classList.add("list-group-item", "list-group-item-action", "px-3");
+                            item.innerHTML = `<strong>${employee.emp_first_name} ${employee.emp_surname}</strong> (${employee.role})`;
+
+                            item.onclick = function (e) {
+                                e.preventDefault();
+                                searchInput.value = `${employee.emp_first_name} ${employee.emp_surname}`;
+                                document.getElementById("selected-employee-id").value = employee.id;
+                                employeeList.style.display = "none";
+
+                                // Hide all cards
+                                professionalCards.forEach(card => card.style.display = "none");
+
+                                // Show only matching card
+                                let selectedCard = document.getElementById(`employee-${employee.id}`);
+                                if (selectedCard) {
+                                    selectedCard.style.display = "flex";
+                                }
+                            };
+
+                            employeeList.appendChild(item);
+                        });
+                    } else {
+                        employeeList.innerHTML = `<div class="list-group-item text-muted">No results found</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error);
+                    employeeList.innerHTML = `<div class="list-group-item text-danger">Error fetching results</div>`;
+                });
+        } else {
+            employeeList.style.display = "none";
+            professionalCards.forEach(card => card.style.display = "flex");
+        }
+    });
+});
+</script>
 
 <style>
     /* Dashboard Header */

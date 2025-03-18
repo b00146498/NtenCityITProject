@@ -111,6 +111,8 @@ Route::get('/test-appointment-notification', function() {
 Route::get('/search-clients', [App\Http\Controllers\ClientController::class, 'searchClients']);
 Route::get('/search-clients', [PersonalisedTrainingPlanController::class, 'searchClients'])->name('search.clients');
 
+Route::get('/search-employees', [App\Http\Controllers\EmployeeController::class, 'searchEmployees'])->name('search.employees');
+
 // Calendar Display Route (Using CalendarController)
 Route::get('/calendar/display', [CalendarController::class, 'display'])
     ->name('calendar.display')

@@ -187,4 +187,19 @@ class employeeController extends AppBaseController
      *
      * @return Response
      */
+    public function searchEmployees(Request $request)
+    {
+        $query = $request->query('query');
+
+        if (!$query) {
+            return response()->json([]); // Return empty array if no query
+        }
+
+        $employees = \App\Models\Employee::where('emp_first_name', 'LIKE', "%{$query}%")
+                        ->orWhere('emp_surname', 'LIKE', "%{$query}%")
+                        ->orderBy('emp_first_name', 'asc')
+                        ->get(['id', 'emp_first_name', 'emp_surname', 'role']);
+
+        return response()->json($employees);
+    }
 }
