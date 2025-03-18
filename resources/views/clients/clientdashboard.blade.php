@@ -21,35 +21,20 @@
         <i class="fas fa-search search-icon"></i>
     </div>
 
-    <!-- List of Professionals -->
     <h3 class="section-title">List of Professionals</h3>
 
-    <div class="professional-card">
-        <div class="info">
-            <h4>Dr. Andrew</h4>
-            <p>MB, BS</p>
-            <p>Experienced physiotherapist specializing in sports injuries.</p>
+    @forelse($employees as $employee)
+        <div class="professional-card">
+            <div class="info">
+                <h4>{{ $employee->emp_first_name }} {{ $employee->emp_surname }}</h4>
+                <p>{{ $employee->role }}</p>
+                <p>Contact: {{ $employee->contact_number }}</p>
+            </div>
+            <button class="book-btn">Book</button>
         </div>
-        <button class="book-btn">Book</button>
-    </div>
-
-    <div class="professional-card">
-        <div class="info">
-            <h4>Dr. Julie</h4>
-            <p>MB, BS</p>
-            <p>10 years of experience in fitness and therapy.</p>
-        </div>
-        <button class="book-btn">Book</button>
-    </div>
-
-    <div class="professional-card">
-        <div class="info">
-            <h4>Dr. Ross</h4>
-            <p>MB, BS</p>
-            <p>Expert in sports medicine and rehabilitation.</p>
-        </div>
-        <button class="book-btn">Book</button>
-    </div>
+    @empty
+        <p>No professionals available in your selected practice.</p>
+    @endforelse
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
@@ -106,7 +91,8 @@
 
     /* Professional Cards */
     .professional-card {
-        background: #FFF7ED;
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
         padding: 15px;
         border-radius: 10px;
         margin-bottom: 10px;
@@ -129,12 +115,11 @@
         position: fixed;
         bottom: 0;
         width: 100%;
-        max-width: 400px;
         background: white;
         display: flex;
         justify-content: space-around;
         padding: 10px;
-        box-shadow: 0px -2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
     }
 
     .nav-item {
@@ -147,6 +132,16 @@
     .nav-item i {
         font-size: 20px;
         display: block;
+    }
+    body, html {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #F3F3F3;
     }
 </style>
 

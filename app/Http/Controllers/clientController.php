@@ -196,7 +196,17 @@ class clientController extends AppBaseController
     }
     public function clientdashboard()
     {
-        return view('clients.clientdashboard');
+        // Get the logged-in client
+        $client = auth()->user()->client;
+
+        if (!$client) {
+            return redirect()->route('login')->with('error', 'You must be logged in as a client.');
+        }
+
+        // Get employees who work at the same practice as the client
+        $employees = \App\Models\Employee::where('practice_id', $client->practice_id)->get();
+
+        return view('clients.clientdashboard', compact('employees'));
     }
 
 

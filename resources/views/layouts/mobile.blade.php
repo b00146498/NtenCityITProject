@@ -20,7 +20,9 @@
         }
         /* Mobile Frame */
         .mobile-container {
-            max-width: 350px;
+            width: 100%;
+            max-width: 380px; /* Increase this value to make it bigger */
+            min-width: 380px; /* Ensures it doesn't get too small */
             margin: auto;
             padding: 20px;
             background: white;
@@ -71,8 +73,8 @@
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            width: 100%;
-            max-width: 400px;
+            max-width: 380px;
+            min-width: 380px;
             background: white;
             display: flex;
             justify-content: space-around;
