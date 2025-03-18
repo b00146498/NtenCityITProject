@@ -197,3 +197,25 @@ Route::get('/progress', function () {
 
     return view('clients.progress', ['exerciseVideo' => $exercise ? $exercise->exercise_video_link : null]);
 })->name('progress');
+
+Route::get('/workoutlogs', function () {
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect('/login');
+    }
+
+    // Find the client linked to the logged-in user
+    $client = Client::where('userid', $user->id)->first();
+
+    if (!$client) {
+        return redirect('/clientdashboard')->with('error', 'Client not found.');
+    }
+
+    // Get the workout logs (exercises) assigned to this client
+    $workoutLogs = TpeLog::whereHas('trainingPlan', function ($query) use ($client) {
+        $query->where('client_id', $client->id);
+    })->with('standardExercise')->get();
+
+    return view('clients.workoutlogs', compact('workoutLogs'));
+})->name('workoutlogs');
