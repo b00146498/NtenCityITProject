@@ -72,4 +72,7 @@ class personalisedtrainingplan extends Model
     {
         return $this->hasMany(Tpelog::class, 'plan_id');
     }
+    public function tpelogs() {
+        return $this->hasMany(TpeLog::class, 'plan_id');
+    }
 }

@@ -119,6 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <style>
     /* Ensure full-page layout */
+
 html, body {
     width: 100%;
     height: 100%;
@@ -133,7 +134,7 @@ html, body {
 
 /* Main container */
 .mobile-container {
-    max-width: 450px;
+    max-width: 350px;
     width: 100%;
     margin: auto;
     padding: 20px;
@@ -208,7 +209,7 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 450px; /* Matches the mobile display width */
+    max-width: 350px; /* Matches the mobile display width */
     background: white;
     display: flex;
     justify-content: space-around;

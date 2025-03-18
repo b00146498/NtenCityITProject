@@ -9,6 +9,10 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\tpelogController;
 use App\Http\Controllers\personalisedtrainingplanController;
+use App\Models\Client;
+use App\Models\PersonalisedTrainingPlan;
+use App\Models\TpeLog;
+use App\Models\StandardExercises;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 
@@ -156,6 +160,35 @@ Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.s
 Route::get('/calendar/display', [AppointmentController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointment/json', 'App\Http\Controllers\AppointmentController@getAppointments')->name('appointment.json')->middleware('auth');
 
+
+
 Route::get('/progress', function () {
-    return view('clients.progress');
+    $user = Auth::user();
+
+    if (!$user) {
+        return redirect('/login');
+    }
+
+    // Find the client linked to the logged-in user
+    $client = Client::where('userid', $user->id)->first();
+
+    if (!$client) {
+        return redirect('/clientdashboard')->with('error', 'Client not found.');
+    }
+
+    // Get the latest training plan for the client
+    $trainingPlan = PersonalisedTrainingPlan::where('client_id', $client->id)->latest()->first();
+
+    if (!$trainingPlan) {
+        return view('clients.progress', ['exerciseVideo' => null]);
+    }
+
+    // Find the most recent exercise linked to the training plan
+    $exercise = TpeLog::where('plan_id', $trainingPlan->id)
+        ->join('standardexercises', 'tpelog.exercise_id', '=', 'standardexercises.id')
+        ->select('standardexercises.exercise_video_link')
+        ->latest('tpelog.created_at')
+        ->first();
+
+    return view('clients.progress', ['exerciseVideo' => $exercise ? $exercise->exercise_video_link : null]);
 })->name('progress');
