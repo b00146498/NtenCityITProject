@@ -30,7 +30,7 @@
                 <p>{{ $employee->role }}</p>
                 <p>Contact: {{ $employee->contact_number }}</p>
             </div>
-            <button class="book-btn">Book</button>
+            <a href="{{ url('/appointments?employee_id=' . $employee->id) }}" class="book-btn">Book</a>
         </div>
     @empty
         <p>No professionals available in your selected practice.</p>
