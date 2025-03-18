@@ -156,3 +156,6 @@ Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.s
 Route::get('/calendar/display', [AppointmentController::class, 'display'])->name('calendar.display')->middleware('auth');
 Route::get('/appointment/json', 'App\Http\Controllers\AppointmentController@getAppointments')->name('appointment.json')->middleware('auth');
 
+Route::get('/progress', function () {
+    return view('clients.progress');
+})->name('progress');
