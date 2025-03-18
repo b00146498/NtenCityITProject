@@ -36,9 +36,10 @@
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-        <a href="{{ url('/client/clientdashboard') }}" class="nav-item"><i class="fas fa-home"></i></a>
+    <a href="{{ url('/client/clientdashboard') }}" class="nav-item"><i class="fas fa-home"></i></a>
         <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></i></a>
         <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></i></a>
+        <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>
         <a href="#" class="nav-item"><i class="fas fa-comment"></i></a>
         <a href="#" class="nav-item"><i class="fas fa-user"></i></a>
     </nav>
@@ -113,14 +114,14 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .exercise-container {
-    text-align: center;
+    text-align: Left;
     margin-top: 20px;
 }
 
 .exercise-iframe {
     width: 100%;
-    max-width: 400px;
-    height: 250px;
+    max-width: 330px;
+    height: 180px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
