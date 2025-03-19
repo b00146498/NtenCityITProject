@@ -13,11 +13,6 @@ class ProfileController extends Controller
         return view('profile.index', compact('user'));
     }
     
-    public function history()
-    {
-        return view('profile.history');
-    }
-    
     public function personalDetails()
     {
         $user = Auth::user();
