@@ -120,10 +120,24 @@
     <!-- Logo on the Left -->
     <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
 
-    <!-- User Name on the Right -->
+    <!-- User Profile and Name on the Right -->
     @auth
-        <div class="user-info">
-            <i class="fas fa-user"></i> {{ Auth::user()->name }}
+        <div class="user-info dropdown">
+            <a class="dropdown-toggle text-decoration-none text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user"></i> {{ Auth::user()->name }}
+            </a>
+            <ul class="dropdown-menu custom-dropdown dropdown-menu-end" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item custom-dropdown-item" href="{{ route('profile') }}"><i class="fas fa-id-card me-2"></i> My Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item custom-dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
+                </li>
+            </ul>
         </div>
     @endauth
 </div>
