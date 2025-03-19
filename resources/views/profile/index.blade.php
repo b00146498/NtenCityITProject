@@ -12,6 +12,13 @@
                             <i class="fa fa-user" style="font-size: 50px; color: #666;"></i>
                         </div>
                     </div>
+                    @if(isset($employee) && $employee)
+                        <h5 class="text-white">{{ $employee->emp_first_name }} {{ $employee->emp_surname }}</h5>
+                        <p class="text-white mb-0">{{ $employee->role }}</p>
+                    @elseif(isset($client) && $client)
+                        <h5 class="text-white">{{ $client->first_name }} {{ $client->surname }}</h5>
+                        <p class="text-white mb-0">Client</p>
+                    @endif
                 </div>
 
                 <div class="card-body p-0">
