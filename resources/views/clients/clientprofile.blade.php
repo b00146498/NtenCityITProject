@@ -36,7 +36,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ url('/profile/about') }}">
+            <a href="{{ route('clients.about') }}">
                 <i class="fas fa-info-circle"></i> About
                 <i class="fas fa-chevron-right chevron-icon"></i>
             </a>
@@ -162,12 +162,10 @@
     border-bottom: 1px solid #ddd;
     }
 
-    /* Make sure last item doesn't have a border */
     .profile-menu li:last-child {
         border-bottom: none;
     }
 
-    /* Standard styling for links and buttons */
     .profile-menu a,
     .logout-button {
         display: flex;

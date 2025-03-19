@@ -42,6 +42,10 @@ Route::post('/logout', function (Request $request) {
 
 require __DIR__.'/auth.php';
 
+Route::get('/clients/about', function () {
+    return view('clients.about'); 
+})->name('clients.about');
+
 // CRUD Routes for Employees, Clients, and Practices
 Route::resource('employees', App\Http\Controllers\EmployeeController::class);
 Route::resource('clients', App\Http\Controllers\ClientController::class);
@@ -196,4 +200,6 @@ Route::get('/workoutlogs', function () {
 })->name('workoutlogs');
 
 Route::get('/clientprofile', [ClientProfileController::class, 'index'])->name('clientprofile')->middleware('auth');
+
+
 

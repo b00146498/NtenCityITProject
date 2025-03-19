@@ -115,7 +115,7 @@
                 <label for="role" class="block font-medium text-sm text-gray-700">Role:</label>
                 <select id="role" name="role" class="form-control" required>
                     <option value="client">Client</option>
-                    <option value="employee">Employee</option>
+                    <option value="employee">Professional</option>
                 </select>
             </div> 
 
