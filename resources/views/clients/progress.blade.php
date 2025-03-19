@@ -29,7 +29,7 @@
         <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></i></a>
         <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>
         <a href="#" class="nav-item"><i class="fas fa-comment"></i></a>
-        <a href="#" class="nav-item"><i class="fas fa-user"></i></a>
+        <a href="{{ url('/clientprofile') }}" class="nav-item"><i class="fas fa-user"></i></a>
     </nav>
 
 

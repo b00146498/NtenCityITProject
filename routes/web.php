@@ -14,6 +14,7 @@ use App\Models\Client;
 use App\Models\PersonalisedTrainingPlan;
 use App\Models\TpeLog;
 use App\Models\StandardExercises;
+use App\Http\Controllers\ClientProfileController;
 
 /* |-------------------------------------------------------------------------- | Web Routes |-------------------------------------------------------------------------- */
 
@@ -192,3 +193,6 @@ Route::get('/workoutlogs', function () {
 
     return view('clients.workoutlogs', compact('workoutLogs'));
 })->name('workoutlogs');
+
+Route::get('/clientprofile', [ClientProfileController::class, 'index'])->name('clientprofile')->middleware('auth');
+
