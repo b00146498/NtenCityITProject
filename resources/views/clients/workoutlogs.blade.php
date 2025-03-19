@@ -9,39 +9,56 @@
         <!-- User Name on the Right -->
         @auth
             <div class="user-info">
-                {{ Auth::user()->name }}<i class="fas fa-user"></i>
+                {{ Auth::user()->name }} <i class="fas fa-user"></i>
             </div>
         @endauth
     </div>
 
     <!-- Workout Logs Heading -->
-    <h2 class="workout-heading">Workout Logs</h2>
+    <h2 class="workout-heading">To do:</h2>
 
+    <div class="content">
     @forelse ($workoutLogs as $log)
         <div class="workout-card">
             <div class="workout-info">
-                <h4>{{ $log->standardExercise->exercise_name }}</h4>
+                <h2>{{ $log->standardExercise->exercise_name }}</h2>
                 <p><strong>Sets:</strong> {{ $log->num_sets }} | <strong>Reps:</strong> {{ $log->num_reps }}</p>
                 <p><strong>Intensity:</strong> {{ $log->intensity }}</p>
                 <p><strong>Duration:</strong> {{ $log->minutes }} minutes</p>
+                <p><strong>Times per Week:</strong> x{{ $log->times_per_week }}</p>
+                <p><strong>Incline:</strong> {{ $log->incline }}°</p>
             </div>
-            <input type="checkbox" class="completion-checkbox" data-id="{{ $log->id }}">
+            <div class="checkbox-wrapper">
+                <input type="checkbox" class="completion-checkbox" data-id="{{ $log->id }}">
+            </div>
         </div>
     @empty
         <p class="no-workout">No workouts assigned yet.</p>
     @endforelse
 
+        <!-- Separated Exercise Video Section -->
+        <h2 class="video-heading">Exercise Video</h2>
+
+        @if ($workoutLogs->isNotEmpty() && !empty($workoutLogs->first()->standardExercise->exercise_video_link))
+            <div class="exercise-video">
+                <iframe width="100%" height="200" 
+                        src="{{ $workoutLogs->first()->standardExercise->exercise_video_link }}" 
+                        frameborder="0" allowfullscreen></iframe>
+            </div>
+        @else
+            <p class="no-exercise">No exercise video available.</p>
+        @endif
+    </div>
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-    <a href="{{ url('/client/clientdashboard') }}" class="nav-item"><i class="fas fa-home"></i></a>
-        <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></i></a>
-        <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></i></a>
+        <a href="{{ url('/client/clientdashboard') }}" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></a>
+        <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></a>
         <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>
         <a href="#" class="nav-item"><i class="fas fa-comment"></i></a>
         <a href="#" class="nav-item"><i class="fas fa-user"></i></a>
     </nav>
-
 @endsection
 
 <script>
@@ -56,7 +73,7 @@
                 fetch(`/update-workout-log/${logId}`, {
                     method: "POST",
                     headers: {
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ completed })
@@ -69,47 +86,16 @@
 </script>
 
 <style>
-    .workout-heading {
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-        color: #C96E04;
-        margin-top: 20px;
-    }
-
-    .workout-card {
-        background: rgba(212, 175, 55, 0.15);
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .completion-checkbox {
-        width: 20px;
-        height: 20px;
-        accent-color: #C96E04;
-    }
-
-    .no-workout {
-        text-align: center;
-        font-style: italic;
-        color: gray;
-        margin-top: 15px;
-    }
     html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #F3F3F3;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #F3F3F3;
+        overflow-x: hidden;
     }
 
     /* Main container */
@@ -120,21 +106,21 @@
         padding: 20px;
         background: white;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 15px; /* Rounded corners on all sides */
+        border-radius: 15px;
         display: flex;
         flex-direction: column;
-        min-height: 100vh; /* Makes sure the page is at least full height */
+        min-height: 100vh;
         position: relative;
-        overflow: hidden; /* Prevents scrollbar inside container */
+        overflow: hidden;
     }
 
     /* Make content scrollable */
     .content {
         flex: 1;
         overflow-y: auto;
-        padding-bottom: 80px; /* Prevents content from overlapping with bottom nav */
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* Internet Explorer/Edge */
+        padding-bottom: 80px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
 
     /* Dashboard Header */
@@ -159,6 +145,81 @@
         font-size: 18px;
         margin-left: 10px;
     }
+
+    /* Workout Heading */
+    .workout-heading {
+        text-align: Left;
+        font-size: 24px;
+        font-weight: bold;
+        color: #C96E04;
+        margin-top: 20px;
+    }
+
+    .workout-card {
+    background: rgba(212, 175, 55, 0.15);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Ensures vertical centering */
+    position: relative;
+    }
+
+    /* Checkbox Wrapper: Aligns it to the Middle Right */
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center; /* Centers checkbox vertically */
+        justify-content: center;
+        height: 100%; /* Ensure it takes full height of the card */
+    }
+
+    /* Styles for the Checkbox */
+    .completion-checkbox {
+        width: 22px;
+        height: 22px;
+        accent-color: #C96E04;
+    }
+
+    .no-workout {
+        text-align: center;
+        font-style: italic;
+        color: gray;
+        margin-top: 15px;
+    }
+
+    /* Exercise Video Section */
+    .video-heading {
+        text-align: Left;
+        font-size: 20px;
+        font-weight: bold;
+        color: #C96E04;
+        margin-top: 20px;
+    }
+
+    .exercise-video {
+        margin-top: 15px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .exercise-video iframe {
+        width: 100%;
+        max-width: 330px;
+        height: 180px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .no-exercise {
+        text-align: center;
+        font-style: italic;
+        color: gray;
+        margin-top: 15px;
+    }
+
     /* Bottom Navigation */
     .bottom-nav {
         position: fixed;
@@ -166,7 +227,7 @@
         left: 50%;
         transform: translateX(-50%);
         width: 100%;
-        max-width: 350px; /* Matches the mobile display width */
+        max-width: 350px;
         background: white;
         display: flex;
         justify-content: space-around;
@@ -174,7 +235,7 @@
         box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
         border-top: 1px solid #ccc;
         z-index: 1000;
-        border-radius: 0 0 15px 15px; /* Rounded bottom corners */
+        border-radius: 0 0 15px 15px;
     }
 
     /* Navigation Items */

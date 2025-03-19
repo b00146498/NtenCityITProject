@@ -25,7 +25,9 @@
         <div id="employee-list" class="list-group shadow-sm position-absolute w-100 bg-white rounded border border-secondary" style="max-height: 200px; overflow-y: auto; display: none;"></div>
     </div>
 
-    <h3 class="section-title">List of Professionals</h3>
+    <h3 class="section-title">
+        Practice: {{ $employees->first()->practice->company_name ?? 'List of Professionals' }}
+    </h3>
 
     @forelse($employees as $employee)
         <div class="professional-card" id="employee-{{ $employee->id }}">

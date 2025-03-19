@@ -18,19 +18,7 @@
 
     <h2 class="progress-heading">My Progress</h2>
 
-    @if ($exerciseVideo)
-        <div class="exercise-container">
-            <h4>Exercise Video</h4>
-            <iframe 
-                src="{{ $exerciseVideo }}" 
-                frameborder="0" 
-                allowfullscreen
-                class="exercise-iframe">
-            </iframe>
-        </div>
-    @else
-        <p class="no-exercise">No training plan or exercise video found.</p>
-    @endif
+    
 
 
 

@@ -168,34 +168,7 @@ Route::get('/calendar/display', [AppointmentController::class, 'display'])->name
 Route::get('/appointment/json', 'App\Http\Controllers\AppointmentController@getAppointments')->name('appointment.json')->middleware('auth');
 
 Route::get('/progress', function () {
-    $user = Auth::user();
-
-    if (!$user) {
-        return redirect('/login');
-    }
-
-    // Find the client linked to the logged-in user
-    $client = Client::where('userid', $user->id)->first();
-
-    if (!$client) {
-        return redirect('/clientdashboard')->with('error', 'Client not found.');
-    }
-
-    // Get the latest training plan for the client
-    $trainingPlan = PersonalisedTrainingPlan::where('client_id', $client->id)->latest()->first();
-
-    if (!$trainingPlan) {
-        return view('clients.progress', ['exerciseVideo' => null]);
-    }
-
-    // Find the most recent exercise linked to the training plan
-    $exercise = TpeLog::where('plan_id', $trainingPlan->id)
-        ->join('standardexercises', 'tpelog.exercise_id', '=', 'standardexercises.id')
-        ->select('standardexercises.exercise_video_link')
-        ->latest('tpelog.created_at')
-        ->first();
-
-    return view('clients.progress', ['exerciseVideo' => $exercise ? $exercise->exercise_video_link : null]);
+    return view('clients.progress');
 })->name('progress');
 
 Route::get('/workoutlogs', function () {
