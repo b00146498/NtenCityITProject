@@ -85,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/personal-details', [ProfileController::class, 'personalDetails'])->name('profile.personal-details');
     Route::get('/profile/about', [ProfileController::class, 'about'])->name('profile.about');
     Route::get('/profile/help', [ProfileController::class, 'help'])->name('profile.help');
+    Route::post('/profile/personal-details', [ProfileController::class, 'updatePersonalDetails'])->name('profile.update-details');
 });
 
 Route::get('/simple-test', function() {
