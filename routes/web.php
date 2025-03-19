@@ -37,6 +37,7 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     
     return redirect()->route('login');
+    //return redirect('/login');
 })->name('logout');
 
 require __DIR__.'/auth.php';

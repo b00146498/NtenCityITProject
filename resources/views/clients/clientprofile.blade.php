@@ -48,10 +48,13 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('logout') }}">
-                <i class="fas fa-sign-out-alt"></i> Log out
-                <i class="fas fa-chevron-right chevron-icon"></i>
-            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="logout-form">
+                @csrf
+                <button type="submit">
+                    <i class="fas fa-sign-out-alt"></i> Log out
+                    <i class="fas fa-chevron-right chevron-icon"></i>
+                </button>
+            </form>
         </li>
     </ul>
 </div>
@@ -152,36 +155,73 @@
     }
 
     .profile-menu li {
-        display: flex;
-        align-items: center;
-        padding: 12px 15px;
-        border-bottom: 1px solid #ddd; /* Optional: Adds a subtle divider */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
     }
 
+    /* Make sure last item doesn't have a border */
     .profile-menu li:last-child {
         border-bottom: none;
     }
 
-    .profile-menu a {
+    /* Standard styling for links and buttons */
+    .profile-menu a,
+    .logout-button {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: space-between; /* Ensures icon and text align properly */
         width: 100%;
         text-decoration: none;
         color: #333;
         font-size: 16px;
         font-weight: 500;
-        padding: 8px 10px;
+        padding: 12px 15px; /* Adjust padding to be the same for all items */
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
     }
 
-    .profile-menu a i:first-child {
-        margin-right: 12px; /* Adjusts space between main icon & text */
+    /* Fix Logout Form Styling */
+    .logout-form {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Ensure the button behaves like an anchor tag */
+    .logout-button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+        background: none;
+        border: none;
+        padding: 12px 15px; /* Matches other menu items */
+    }
+
+    /* Make icons align consistently */
+    .profile-menu i {
+        margin-right: 12px;
         font-size: 18px;
     }
 
+    /* Adjust Chevron Icon */
     .chevron-icon {
-        margin-left: auto; /* Pushes the chevron to the far right */
+        margin-left: auto;
         font-size: 14px;
         color: #888;
     }
+
+    /* Hover effect for all menu items */
+    .profile-menu a:hover,
+    .logout-button:hover {
+        color: #C96E04;
+    }
+
+    
 </style>
