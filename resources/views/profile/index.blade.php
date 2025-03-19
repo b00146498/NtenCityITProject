@@ -16,13 +16,6 @@
 
                 <div class="card-body p-0">
                     <div class="list-group rounded-0">
-                        <a href="{{ route('profile.history') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 border-start-0 border-end-0">
-                            <div>
-                                <i class="fa fa-history me-3"></i>
-                                History
-                            </div>
-                            <i class="fa fa-chevron-right"></i>
-                        </a>
                         <a href="{{ route('profile.personal-details') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 border-start-0 border-end-0">
                             <div>
                                 <i class="fa fa-user me-3"></i>
