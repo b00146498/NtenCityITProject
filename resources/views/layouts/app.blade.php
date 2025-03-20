@@ -138,13 +138,9 @@
         </li>
         @auth
         <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="appointmentsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="fas fa-calendar-alt"></i> Appointments
-    </a>
-    <ul class="dropdown-menu custom-dropdown" aria-labelledby="appointmentsDropdown">
-        <li><a class="dropdown-item custom-dropdown-item" href="{{ url('/appointments') }}">View Appointments</a></li>
-        <li><a class="dropdown-item custom-dropdown-item" href="{{ url('/calendar/display') }}">Employee Appointment</a></li>
-    </ul>
+        <a class="nav-link" href="{{ url('/calendar/display') }}">
+            <i class="fas fa-calendar-alt"></i> Appointments
+        </a>
 </li>
 
         @endauth 

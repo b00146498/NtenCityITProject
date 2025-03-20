@@ -143,93 +143,145 @@
 </style>
 @endpush
 
-@push('scripts')
+@push('js_scripts')
 <script>
-$(document).ready(function() {
-    // Handle appointment view button click
-    $('.view-appointment').click(function() {
-        var appointmentId = $(this).data('appointment-id');
-        
-        // Clear previous content
-        $('#appointmentDetails').html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p>Loading appointment details...</p></div>');
-        
-        // Show modal
-        $('#appointmentDetailsModal').modal('show');
-        
-        // Fetch appointment details
-        $.ajax({
-            url: '/api/appointments/' + appointmentId,
-            type: 'GET',
-            success: function(response) {
-                // Format appointment details
-                var html = '<div class="card">';
-                html += '<div class="card-body">';
-                
-                // Basic details
-                html += '<h5 class="card-title">Appointment #' + response.id + '</h5>';
-                html += '<div class="row">';
-                
-                // Date and time
-                html += '<div class="col-md-6">';
-                html += '<p><strong>Date:</strong> ' + formatDate(response.booking_date) + '</p>';
-                html += '<p><strong>Time:</strong> ' + formatTime(response.start_time) + ' - ' + formatTime(response.end_time) + '</p>';
-                html += '<p><strong>Status:</strong> <span class="badge badge-' + getStatusBadgeColor(response.status) + '">' + capitalizeFirstLetter(response.status) + '</span></p>';
-                html += '</div>';
-                
-                // Client and employee info
-                html += '<div class="col-md-6">';
-                html += '<p><strong>Client ID:</strong> ' + response.client_id + '</p>';
-                html += '<p><strong>Employee ID:</strong> ' + response.employee_id + '</p>';
-                html += '<p><strong>Practice ID:</strong> ' + response.practice_id + '</p>';
-                html += '</div>';
-                html += '</div>';
-                
-                // Notes
-                if (response.notes) {
-                    html += '<hr><h6>Notes:</h6>';
-                    html += '<p>' + response.notes + '</p>';
-                }
-                
-                html += '</div>'; // card-body
-                html += '</div>'; // card
-                
-                // Update modal content
-                $('#appointmentDetails').html(html);
-            },
-            error: function(xhr) {
-                $('#appointmentDetails').html('<div class="alert alert-danger">Error loading appointment details. Please try again.</div>');
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all the view appointment buttons
+    const viewButtons = document.querySelectorAll('.view-appointment');
+    
+    // Log to confirm our script is running
+    console.log('Found ' + viewButtons.length + ' appointment buttons');
+    
+    // Add click event listener to each button
+    viewButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get the appointment ID from the data attribute
+            const appointmentId = this.getAttribute('data-appointment-id');
+            console.log('Viewing appointment ID: ' + appointmentId);
+            
+            // Create modal if it doesn't exist
+            let modalElement = document.getElementById('appointmentModal');
+            if (!modalElement) {
+                const modalHTML = `
+                    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="appointmentModalLabel">Appointment Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body" id="appointmentModalBody">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading appointment details...</p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                modalElement = document.getElementById('appointmentModal');
             }
+            
+            // Get the modal body where we'll put the content
+            const modalBody = document.getElementById('appointmentModalBody');
+            
+            // Show loading state
+            modalBody.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading appointment details...</p>
+                </div>
+            `;
+            
+            // Initialize Bootstrap 5 modal
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            
+            // Fetch appointment details
+            fetch('/api/appointments/' + appointmentId)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Format the date and time
+                    const date = new Date(data.booking_date).toLocaleDateString('en-US', {
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                    });
+                    
+                    // Format times
+                    const startTime = formatTime(data.start_time);
+                    const endTime = formatTime(data.end_time);
+                    
+                    // Update modal content
+                    modalBody.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Appointment #${data.id}</h5>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p><strong>Date:</strong> ${date}</p>
+                                        <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+                                        <p><strong>Status:</strong> <span class="badge bg-${getStatusBadgeColor(data.status)}">${capitalizeFirstLetter(data.status)}</span></p>
+                                    </div>
+                                </div>
+                                ${data.notes ? `<hr><h6>Notes:</h6><p>${data.notes}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching appointment details:', error);
+                    modalBody.innerHTML = `
+                        <div class="alert alert-danger">
+                            <p>Error loading appointment details: ${error.message}</p>
+                        </div>
+                    `;
+                });
         });
     });
     
     // Helper functions
-    function formatDate(dateString) {
-        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-    
     function formatTime(timeString) {
-        var timeParts = timeString.split(':');
-        var hours = parseInt(timeParts[0]);
-        var minutes = timeParts[1];
-        var ampm = hours >= 12 ? 'PM' : 'AM';
+        if (!timeString) return 'Unknown';
+        
+        const timeParts = timeString.split(':');
+        let hours = parseInt(timeParts[0]);
+        const minutes = timeParts[1];
+        const ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12;
         hours = hours ? hours : 12; // Convert 0 to 12
-        return hours + ':' + minutes + ' ' + ampm;
+        return `${hours}:${minutes} ${ampm}`;
     }
     
     function capitalizeFirstLetter(string) {
+        if (!string) return '';
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
     
     function getStatusBadgeColor(status) {
+        if (!status) return 'secondary'; // Default gray
+        
         switch(status.toLowerCase()) {
-            case 'confirmed': return 'success';
-            case 'pending': return 'warning';
-            case 'checked-in': return 'info';
-            case 'completed': return 'secondary';
-            case 'canceled': return 'danger';
-            default: return 'primary';
+            case 'confirmed': return 'success'; // Green
+            case 'pending': return 'warning';   // Yellow
+            case 'checked-in': return 'info';   // Blue
+            case 'completed': return 'secondary'; // Gray
+            case 'canceled': return 'danger';   // Red
+            default: return 'secondary';        // Gray
         }
     }
 });

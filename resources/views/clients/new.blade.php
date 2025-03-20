@@ -1,10 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.mobile')
 
 @section('content')
     <section class="content-header">
-        <h1>
-            Create Client Profile Form
-        </h1>
+        <h2 class="text-center" style="font-weight: bold; margin-bottom: 15px; color: #AD8A18;">Create Account</h2>
     </section>
     <div class="content">
         @include('basic-template::common.errors')

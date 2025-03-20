@@ -120,4 +120,12 @@ class client extends Model
     {
         return $this->email;
     }
+    public function practice()
+    {
+        return $this->belongsTo(Practice::class, 'practice_id');
+    }
+
+    public function trainingPlans() {
+        return $this->hasMany(PersonalisedTrainingPlan::class, 'client_id');
+    }
 }
