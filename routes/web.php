@@ -157,4 +157,14 @@ Route::get('/login', function () {
 })->name('login');
 
 require __DIR__.'/auth.php';
+
+Route::get('/client/clientdashboard', [App\Http\Controllers\ClientController::class, 'clientdashboard'])
+    ->name('client.clientdashboard')
+    ->middleware('auth');
+
+Route::get('/alerts', function () {
+    return view('clients.alerts');
+})->name('alerts');
+
+
  
