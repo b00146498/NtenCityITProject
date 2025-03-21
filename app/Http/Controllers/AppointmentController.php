@@ -322,50 +322,25 @@ class AppointmentController extends AppBaseController
 
 public function upcomingAppointments()
 {
-    try {
-        $user = auth()->user();
+    // Check if the user is logged in, but don't require it
+    $clientId = auth()->check() ? auth()->user()->id : null;
 
-        if (!$user) {
-            throw new \Exception("No authenticated user");
-        }
-
-        $appointments = \App\Models\Appointment::where('client_id', $user->id)
-            ->whereDate('booking_date', '>=', now())
-            ->with(['employee', 'practice']) // Eager load relationships
-            ->orderBy('booking_date', 'asc')
-            ->get();
-
-        if ($appointments->isEmpty()) {
-            throw new \Exception("No appointments found");
-        }
-
-        return view('clients.alerts', compact('appointments'));
-    } catch (\Exception $e) {
-        // Fallback: Inject mock data if something goes wrong
-        $mockAppointments = collect([
-            (object)[
-                'id' => 1,
-                'employee' => (object)['name' => 'John Doe'],
-                'practice' => (object)['name' => 'City Health'],
-                'booking_date' => now()->addDay()->toDateString(),
-                'start_time' => '10:00',
-                'end_time' => '11:00',
-                'status' => 'confirmed',
-            ],
-            (object)[
-                'id' => 2,
-                'employee' => (object)['name' => 'Sarah Lee'],
-                'practice' => (object)['name' => 'Prime Physio'],
-                'booking_date' => now()->addDays(2)->toDateString(),
-                'start_time' => '13:00',
-                'end_time' => '14:00',
-                'status' => 'pending',
-            ]
-        ]);
-
-        return view('clients.alerts', ['appointments' => $mockAppointments]);
+    // If not logged in, return an empty collection or sample data
+    if ($clientId) {
+        // Retrieve only upcoming appointments for this client
+        $appointments = \App\Models\Appointment::where('client_id', $clientId)
+                        ->whereDate('booking_date', '>=', now()) // Only future appointments
+                        ->orderBy('booking_date', 'asc')
+                        ->get();
+    } else {
+        // Provide an empty array or sample data for guests
+        $appointments = collect([]); // ✅ Empty collection
     }
+
+    return view('clients.alerts', compact('appointments'));
 }
+
+
 
 }
 
