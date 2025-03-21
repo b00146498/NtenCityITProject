@@ -59,10 +59,31 @@ class ProfileController extends Controller
                 'street' => 'required|string|max:255',
                 'city' => 'required|string|max:50',
                 'county' => 'required|string|max:50',
+                'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
             
-            // Update the employee record
-            $employee->update($request->all());
+            // Handle profile picture upload
+            if ($request->hasFile('profile_picture')) {
+                $image = $request->file('profile_picture');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                
+                // Store image in the public/profile_pictures directory
+                $image->move(public_path('profile_pictures'), $imageName);
+                
+                // Update profile picture path in the database
+                $employee->profile_picture = 'profile_pictures/' . $imageName;
+            }
+            
+            // Update the employee record with form data
+            $employee->emp_first_name = $request->emp_first_name;
+            $employee->emp_surname = $request->emp_surname;
+            $employee->contact_number = $request->contact_number;
+            $employee->emergency_contact = $request->emergency_contact;
+            $employee->email = $request->email;
+            $employee->street = $request->street;
+            $employee->city = $request->city;
+            $employee->county = $request->county;
+            $employee->save();
             
             // Also update the user record email if needed
             if ($user->email != $request->email) {
@@ -71,6 +92,13 @@ class ProfileController extends Controller
             }
         } else if ($user->role === 'client') {
             // Handle client update logic here
+            $client = Client::where('userid', $user->id)->first();
+            
+            if (!$client) {
+                return redirect()->route('profile')->with('error', 'Client profile not found.');
+            }
+            
+            // Add client-specific validation and update logic here
         }
         
         return redirect()->route('profile.personal-details')
