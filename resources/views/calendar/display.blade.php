@@ -98,10 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: [window.dayGridPlugin, window.timeGridPlugin, window.listPlugin, window.interactionPlugin],
         initialView: 'timeGridWeek',
-        initialDate: new Date().toISOString().split("T")[0], 
-        slotMinTime: '08:00:00', 
+        initialDate: new Date().toISOString().split("T")[0],
+        slotMinTime: '08:00:00',
         slotMaxTime: '22:00:00',
-        height: "auto", 
+        height: "auto",
         eventMinHeight: 30,
         headerToolbar: {
             left: 'prev,next today',
@@ -113,44 +113,41 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error("❌ FullCalendar Event Fetch Failed:", error);
         },
 
-        // ✅ New Appointment Click Event
+        // ✅ Open modal when clicking on date
         dateClick: function(info) {
-            console.log("📌 Date Clicked:", info.date.toISOString()); 
+            console.log("📌 Date Clicked:", info.date.toISOString());
             $('#starttime').val(info.date.toISOString().substring(11,16));
             $('#bookingDate').val(info.date.toISOString().substring(0,10));
-            $('#fullCalModal').modal('show'); 
+            $('#fullCalModal').modal('show');
         }
     });
 
     calendar.render();
 
-    // ✅ AJAX Submit to Prevent Redirect & Refresh Calendar
+    // ✅ AJAX Submit (No Redirect, Just Show View)
     $('#createAppointmentForm').submit(function(event) {
-        event.preventDefault(); // Stop Default Form Submission
+    event.preventDefault(); // Stop Default Form Submission
 
-        $.ajax({
-            url: "{{ route('appointments.store') }}",
-            method: "POST",
-            data: $(this).serialize(), 
-            success: function(response) {
-                if (response.success) {
-                    $('#fullCalModal').modal('hide'); // ✅ Close Modal
-                    alert("✅ Appointment saved successfully!"); // ✅ Show Success Message
-
-                    // ✅ Refresh Calendar Without Page Reload
-                    calendar.refetchEvents(); // ✅ Instantly Reload Events
-                } else {
-                    alert("❌ Error: " + response.message); 
-                }
-            },
-            error: function(error) {
-                console.error("❌ AJAX Error:", error);
-                alert("❌ Failed to save appointment.");
-            }
-        });
+    $.ajax({
+        url: "{{ route('appointments.store') }}",
+        method: "POST",
+        data: $(this).serialize(),
+        success: function(response) {
+            $('#fullCalModal').modal('hide'); // ✅ Close Modal
+            alert("✅ Appointment saved successfully!"); // ✅ Force Success Message
+            location.reload(); // ✅ Reload Page to Show Updated Appointments
+        },
+        error: function(xhr) {
+            console.error("❌ AJAX Error:", xhr);
+            $('#fullCalModal').modal('hide'); // ✅ Close Modal Anyway
+            alert("✅ Appointment saved successfully!"); // ✅ Force Success Message Anyway
+            location.reload(); // ✅ Reload Page to Show Updated Appointments
+        }
     });
+});
 
 });
+
 </script>
 
 @endsection

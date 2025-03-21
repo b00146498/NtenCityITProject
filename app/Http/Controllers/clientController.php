@@ -35,6 +35,7 @@ class clientController extends AppBaseController
 
         return view('clients.index')
             ->with('clients', $clients);
+
     }
 
     /**

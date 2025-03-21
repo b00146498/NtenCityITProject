@@ -2,12 +2,12 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h4 class="modal-title">Create Appointment</h4>
+        <button type="button" class="close" data-dismiss="modal">×</button> 
+        <h4 class="modal-title">Create Appointment</h4>       
       </div>
       <div class="modal-body">
         <div class="container-fluid">
-          <form id="appointmentForm" action="{{ route('appointments.store') }}" method="post">
+          <form id="createAppointmentForm" action="{{ route('appointments.store') }}" method="post">
             @csrf
 
             <div class="form-group">
@@ -15,7 +15,7 @@
               <select class="form-control" id="client_id" name="client_id" required>
                 <option value="">Select a Client</option>
                 @foreach($clients as $client)
-                  <option value="{{ $client->id }}">{{ $client->first_name }} {{ $client->surname }}</option>
+                    <option value="{{ $client->id }}">{{ $client->first_name }} {{ $client->surname }}</option> 
                 @endforeach
               </select>
             </div>
@@ -25,17 +25,7 @@
               <select class="form-control" id="employee_id" name="employee_id" required>
                 <option value="">Select an Employee</option>
                 @foreach($employees as $employee)
-                  <option value="{{ $employee->id }}">{{ $employee->emp_first_name }} {{ $employee->emp_surname }}</option>
-                @endforeach
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="practice_id">Practice</label>
-              <select class="form-control" id="practice_id" name="practice_id" required>
-                <option value="">Select a Practice</option>
-                @foreach($practices as $practice)
-                  <option value="{{ $practice->id }}">{{ $practice->company_name }}</option>
+                    <option value="{{ $employee->id }}">{{ $employee->emp_first_name }} {{ $employee->emp_surname }}</option> 
                 @endforeach
               </select>
             </div>
@@ -69,6 +59,18 @@
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
           </form>
+
+          <!-- ✅ View Appointment Section (Hidden by Default) -->
+          <div id="viewAppointmentSection" style="display: none; margin-top: 20px;">
+            <h4 class="text-center" style="color: #c9a86a; font-weight: bold;">✅ Appointment Saved!</h4>
+            <p><strong>Client:</strong> <span id="viewClient"></span></p>
+            <p><strong>Employee:</strong> <span id="viewEmployee"></span></p>
+            <p><strong>Practice:</strong> <span id="viewPractice"></span></p>
+            <p><strong>Date:</strong> <span id="viewDate"></span></p>
+            <p><strong>Start Time:</strong> <span id="viewStartTime"></span></p>
+            <p><strong>End Time:</strong> <span id="viewEndTime"></span></p>
+          </div>
+
         </div>
       </div>
     </div>

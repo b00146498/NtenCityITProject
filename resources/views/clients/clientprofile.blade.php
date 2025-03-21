@@ -65,7 +65,7 @@
     <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></a>
     <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></a>
     <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>
-    <a href="#" class="nav-item"><i class="fas fa-comment"></i></a>
+    <a href="{{ url('/alerts') }}" class="nav-item"><i class="fas fa-comment"></i></a>
     <a href="{{ url('/clientprofile') }}" class="nav-item active"><i class="fas fa-user"></i></a>
 </nav>
 
