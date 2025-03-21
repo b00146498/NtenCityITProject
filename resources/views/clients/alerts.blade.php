@@ -28,17 +28,21 @@
 
     <!-- Appointment List -->
     <div class="appointment-list">
-        @foreach($appointments as $appointment)
-            <div class="appointment-card {{ strtolower($appointment->status) }}">
-                <div class="appointment-info">
-                    <h3>{{ $appointment->employee->name }}</h3>
-                    <p><strong>Practice:</strong> {{ $appointment->practice->name }}</p>
-                    <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($appointment->booking_date)->format('d M, Y') }}</p>
-                    <p><strong>Time:</strong> {{ $appointment->start_time }} - {{ $appointment->end_time }}</p>
+        @if($appointments->isNotEmpty())
+            @foreach($appointments as $appointment)
+                <div class="appointment-card {{ strtolower($appointment->status) }}">
+                    <div class="appointment-info">
+                        <h3>{{ optional($appointment->employee)->name ?? 'N/A' }}</h3>
+                        <p><strong>Practice:</strong> {{ optional($appointment->practice)->name ?? 'N/A' }}</p>
+                        <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($appointment->booking_date)->format('d M, Y') }}</p>
+                        <p><strong>Time:</strong> {{ $appointment->start_time }} - {{ $appointment->end_time }}</p>
+                    </div>
+                    <button class="view-btn" onclick="openModal({{ $appointment->id }})">View</button>
                 </div>
-                <button class="view-btn" onclick="openModal({{ $appointment->id }})">View</button>
-            </div>
-        @endforeach
+            @endforeach
+        @else
+            <p class="no-appointments">No upcoming appointments.</p>
+        @endif
     </div>
 </div>
 
@@ -102,6 +106,13 @@
     font-size: 20px;
     font-weight: bold;
     text-align: center;
+}
+
+/* No Appointments Message */
+.no-appointments {
+    text-align: center;
+    color: #777;
+    margin-top: 20px;
 }
 
 /* Tabs */
@@ -200,12 +211,14 @@ function openModal(id) {
     let appointment = @json($appointments);
     let selected = appointment.find(a => a.id === id);
 
-    document.getElementById('modalEmployee').innerText = selected.employee.name;
-    document.getElementById('modalPractice').innerText = selected.practice.name;
-    document.getElementById('modalDate').innerText = selected.booking_date;
-    document.getElementById('modalTime').innerText = selected.start_time + " - " + selected.end_time;
+    if (selected) {
+        document.getElementById('modalEmployee').innerText = selected.employee ? selected.employee.name : 'N/A';
+        document.getElementById('modalPractice').innerText = selected.practice ? selected.practice.name : 'N/A';
+        document.getElementById('modalDate').innerText = selected.booking_date;
+        document.getElementById('modalTime').innerText = selected.start_time + " - " + selected.end_time;
     
-    document.getElementById('appointmentModal').style.display = 'block';
+        document.getElementById('appointmentModal').style.display = 'block';
+    }
 }
 
 function closeModal() {
@@ -215,11 +228,7 @@ function closeModal() {
 function filterAppointments(type) {
     let allCards = document.querySelectorAll('.appointment-card');
     allCards.forEach(card => {
-        if (card.classList.contains(type)) {
-            card.style.display = 'flex';
-        } else {
-            card.style.display = 'none';
-        }
+        card.style.display = card.classList.contains(type) ? 'flex' : 'none';
     });
 }
 </script>
