@@ -269,76 +269,39 @@ class AppointmentController extends AppBaseController
     /**
      * Legacy method for payAppointment - Redirects to processPayment
      */
-    public function payAppointment($id)
+    public function upcomingAppointments()
     {
-        Log::info('Legacy payAppointment method called, redirecting to processPayment');
-        return $this->processPayment($id);
-    }
-    public function display()
-    {
-        $clients = \App\Models\Client::all(['id', 'first_name', 'surname']); // ✅ Clients' Full Names
-        $practices = \App\Models\Practice::all(['id', 'company_name']); // ✅ Practice Names
-        $employees = \DB::table('employee')->get(); // ✅ Explicitly fetch from 'employee' table
+        // Check if the user is logged in
+        $clientId = auth()->check() ? auth()->user()->id : null;
     
-        return view('calendar.display', compact('clients', 'practices', 'employees'));
-    }
+        if ($clientId) {
+            // ✅ Fetch real upcoming appointments for the logged-in client
+            $appointments = \App\Models\Appointment::where('client_id', $clientId)
+                            ->whereDate('booking_date', '>=', now()) // Future appointments only
+                            ->orderBy('booking_date', 'asc')
+                            ->get();
+        } else {
+            // 🔥 Generate dynamic sample data (always changes based on today’s date)
+            $daysAhead = [2, 3, 5, 7]; // Appointments spread out over the next week
+            $employees = ['John Doe', 'Sarah Lee', 'Emily Smith', 'Dr. Robert'];
+            $practices = ['City Health', 'Prime Physio', 'Wellness Center', 'Elite Therapy'];
     
-    /**
-     * Fetch appointments as JSON for FullCalendar.
-     */
-    /* public function getAppointments()
-    {
-        $appointments =  \App\Models\Appointment::all();
-
-        $events = [];
-
-        foreach ($appointments as $appointment) {
-            $events[] = [
-                'id'    => $appointment->id,
-                'title' => "Client #{$appointment->client_id} - {$appointment->status}",
-                'start' => "{$appointment->booking_date}T{$appointment->start_time}",
-                'end'   => "{$appointment->booking_date}T{$appointment->end_time}",
-                'color' => $this->getStatusColor($appointment->status),
-            ];
+            $appointments = collect(array_map(function ($index) use ($daysAhead, $employees, $practices) {
+                return (object)[
+                    'id' => $index + 1,
+                    'employee' => (object)['name' => $employees[$index]],
+                    'practice' => (object)['name' => $practices[$index]],
+                    'booking_date' => now()->addDays($daysAhead[$index])->format('Y-m-d'),
+                    'start_time' => rand(9, 16) . ':00', // Random hour between 9AM - 4PM
+                    'end_time' => rand(17, 19) . ':00', // Random hour between 5PM - 7PM
+                    'status' => 'upcoming',
+                ];
+            }, array_keys($daysAhead)));
         }
-
-        return response()->json($events);
-    } */
-    public function getAppointments()
-    {
-        //$this->view->disable();
-        $content = \App\Models\AppointmentEvent::all()->toJson();
-        //$content=$json_encode($events);
-        return response($content)->withHeaders([
-                'Content-Type' => 'application/json',
-                'charset' => 'UTF-8'
-            ]);
+    
+        return view('clients.alerts', compact('appointments'));
     }
-
-    public function create()
-{
-    return view('appointments.create'); // ✅ Make sure this view exists
-}
-
-public function upcomingAppointments()
-{
-    // Check if the user is logged in, but don't require it
-    $clientId = auth()->check() ? auth()->user()->id : null;
-
-    // If not logged in, return an empty collection or sample data
-    if ($clientId) {
-        // Retrieve only upcoming appointments for this client
-        $appointments = \App\Models\Appointment::where('client_id', $clientId)
-                        ->whereDate('booking_date', '>=', now()) // Only future appointments
-                        ->orderBy('booking_date', 'asc')
-                        ->get();
-    } else {
-        // Provide an empty array or sample data for guests
-        $appointments = collect([]); // ✅ Empty collection
-    }
-
-    return view('clients.alerts', compact('appointments'));
-}
+    
 
 
 

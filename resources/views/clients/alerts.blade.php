@@ -204,6 +204,41 @@
     z-index: 1000;
     border-radius: 0 0 15px 15px;
 }
+
+/* Style Edit Button */
+.edit-btn {
+    background: #c9a86a; /* Gold */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.edit-btn:hover {
+    background: #a8894f; /* Darker Gold */
+}
+
+/* Style Cancel Button */
+.cancel-btn {
+    background: #e63946; /* Red */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background: #c62828; /* Darker Red */
+}
+
 </style>
 
 <script>
