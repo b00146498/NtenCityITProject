@@ -319,4 +319,19 @@ class AppointmentController extends AppBaseController
 {
     return view('appointments.create'); // ✅ Make sure this view exists
 }
+
+public function upcomingAppointments()
+{
+    $clientId = auth()->user()->id; // Get the logged-in client's ID
+
+    // Retrieve only upcoming appointments for this client
+    $appointments = \App\Models\Appointment::where('client_id', $clientId)
+                    ->whereDate('booking_date', '>=', now()) // Only future appointments
+                    ->orderBy('booking_date', 'asc')
+                    ->get();
+
+    return view('clients.alerts', compact('appointments'));
 }
+}
+
+ 
