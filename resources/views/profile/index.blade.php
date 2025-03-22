@@ -8,9 +8,19 @@
                 <div class="card-header text-center border-0" style="background-color: #dbb959; padding: 2rem 0;">
                     <h3 class="text-white mb-4">My Profile</h3>
                     <div class="user-avatar mx-auto mb-3">
-                        <div style="width: 100px; height: 100px; background-color: #f5f5f5; border-radius: 50%; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
-                            <i class="fa fa-user" style="font-size: 50px; color: #666;"></i>
-                        </div>
+                        @if(isset($employee) && $employee && $employee->profile_picture)
+                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; overflow: hidden;">
+                                <img src="{{ asset($employee->profile_picture) }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        @elseif(isset($client) && $client && isset($client->profile_picture))
+                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; overflow: hidden;">
+                                <img src="{{ asset($client->profile_picture) }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        @else
+                            <div style="width: 100px; height: 100px; background-color: #f5f5f5; border-radius: 50%; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                                <i class="fa fa-user" style="font-size: 50px; color: #666;"></i>
+                            </div>
+                        @endif
                     </div>
                     @if(isset($employee) && $employee)
                         <h5 class="text-white">{{ $employee->emp_first_name }} {{ $employee->emp_surname }}</h5>
