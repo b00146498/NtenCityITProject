@@ -26,10 +26,32 @@
                         </div>
                     @endif
                     
-                    <form method="POST" action="{{ route('profile.update-details') }}">
+                    <form method="POST" action="{{ route('profile.update-details') }}" enctype="multipart/form-data">
                         @csrf
                         
                         @if(isset($employee) && $employee)
+                            <!-- Profile Picture Section -->
+                            <div class="mb-4 text-center">
+                                <div class="profile-picture-container mb-3">
+                                    @if($employee->profile_picture)
+                                        <img src="{{ asset($employee->profile_picture) }}" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                    @else
+                                        <div style="width: 150px; height: 150px; background-color: #f5f5f5; border-radius: 50%; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                                            <i class="fa fa-user" style="font-size: 80px; color: #666;"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="profile_picture" class="form-label">Change Profile Picture</label>
+                                    <input type="file" class="form-control @error('profile_picture') is-invalid @enderror" id="profile_picture" name="profile_picture">
+                                    <div class="form-text">Accepted formats: JPG, PNG, GIF (max 2MB)</div>
+                                    @error('profile_picture')
+                                        <span class="invalid-feedback">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            
                             <!-- Employee-specific form fields -->
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -115,4 +137,21 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('profile_picture').onchange = function(evt) {
+        const [file] = this.files;
+        if (file) {
+            const profileImg = document.querySelector('.profile-picture-container img');
+            if (profileImg) {
+                profileImg.src = URL.createObjectURL(file);
+            } else {
+                const container = document.querySelector('.profile-picture-container');
+                container.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="Profile Picture" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">`;
+            }
+        }
+    };
+});
+</script>
 @endsection
