@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use App\Models\Employee;
 use App\Models\Client;
 
@@ -64,8 +65,18 @@ class ProfileController extends Controller
             
             // Handle profile picture upload
             if ($request->hasFile('profile_picture')) {
+                // Delete old picture if it exists
+                if ($employee->profile_picture && File::exists(public_path($employee->profile_picture))) {
+                    File::delete(public_path($employee->profile_picture));
+                }
+                
                 $image = $request->file('profile_picture');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $imageName = 'employee_' . $employee->id . '_' . time() . '.' . $image->getClientOriginalExtension();
+                
+                // Create directory if it doesn't exist
+                if (!File::exists(public_path('profile_pictures'))) {
+                    File::makeDirectory(public_path('profile_pictures'), 0755, true);
+                }
                 
                 // Store image in the public/profile_pictures directory
                 $image->move(public_path('profile_pictures'), $imageName);
