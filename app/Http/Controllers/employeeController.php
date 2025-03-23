@@ -31,10 +31,16 @@ class employeeController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $employees = $this->employeeRepository->all();
+        $employee = Employee::with('practice')->where('userid', Auth::id())->first();
 
-        return view('employees.index')
-            ->with('employees', $employees);
+        if (!$employee) {
+            return redirect()->route('login')->with('error', 'Employee not found.');
+        }
+
+        return view('dashboard', [
+            'employee' => $employee,
+            'practice' => $employee->practice
+        ]);
     }
 
     /**
@@ -202,5 +208,9 @@ class employeeController extends AppBaseController
                         ->get(['id', 'emp_first_name', 'emp_surname', 'role']);
 
         return response()->json($employees);
+    }
+    public function practice()
+    {
+        return $this->belongsTo(\App\Models\Practice::class);
     }
 }

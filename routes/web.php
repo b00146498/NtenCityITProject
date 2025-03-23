@@ -19,6 +19,7 @@ use App\Models\Client;
 use App\Models\TpeLog;
 use App\Models\Appointment;
 use App\Models\Employee;
+use App\Http\Controllers\DashboardController;
 
 
 /* |-------------------------------------------------------------------------- 
@@ -194,3 +195,7 @@ Route::get('/dashboard', function () {
 
     return view('dashboard', compact('appointments', 'activeClients'));
 });
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');

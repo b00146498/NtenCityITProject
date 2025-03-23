@@ -3,9 +3,17 @@
 @section('content')
 <!-- Dashboard Header Row -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="h4 fw-bold text-dark mb-0">
-        {{ __('Welcome to your Dashboard') }}
-    </h2>
+    <div>
+        <h2 class="h4 fw-bold text-dark mb-1">
+            Welcome to your Dashboard, {{ $employee->emp_first_name }}!
+        </h2>
+        <p class="text-muted mb-0">
+            You’re currently working as a <strong>{{ $employee->role }}</strong> at <strong>{{ $company_name }}</strong>.
+        </p>
+    </div>
+
+
+
     
     <!-- Stats Boxes -->
     <div class="d-flex gap-3">
