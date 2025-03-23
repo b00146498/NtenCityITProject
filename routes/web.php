@@ -31,6 +31,9 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    Route::get('/employee/new/{userid}', [EmployeeController::class, 'new'])
+    ->name('employee.new');
+
     // Logout Route
     Route::post('/logout', function (Request $request) {
         Auth::logout();

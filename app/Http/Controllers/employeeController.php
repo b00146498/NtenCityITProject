@@ -85,7 +85,8 @@ class employeeController extends AppBaseController
 
         Flash::success('Employee saved successfully.');
 
-        return redirect(route('employees.index'));
+        return redirect()->route('employee.new', ['userid' => $employee->id])
+            ->with('success', 'Employee created successfully.');
     }
 
     /**
