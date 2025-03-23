@@ -17,6 +17,10 @@ use App\Http\Controllers\PracticeController;
 use App\Http\Controllers\StandardExercisesController;
 use App\Models\Client;
 use App\Models\TpeLog;
+use App\Models\Appointment;
+use App\Models\Employee;
+use App\Http\Controllers\DashboardController;
+
 
 /* |-------------------------------------------------------------------------- 
    | Web Routes 
@@ -30,6 +34,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    Route::get('/employee/new/{userid}', [EmployeeController::class, 'new'])
+    ->name('employee.new');
 
     // Logout Route
     Route::post('/logout', function (Request $request) {
@@ -169,3 +176,27 @@ Route::get('/alerts', function () {
 
 
 Route::get('/alerts', [AppointmentController::class, 'upcomingAppointments'])->name('alerts');
+
+Route::get('/dashboard', function () {
+    $userId = Auth::id();
+
+    $employee = \App\Models\Employee::where('userid', $userId)->first();
+
+    if (!$employee) {
+        return redirect('/')->with('error', 'Employee record not found for this user.');
+    }
+
+    $appointments = \App\Models\Appointment::where('employee_id', $employee->id)
+        ->whereDate('start_time', '>=', now())
+        ->get();
+
+    $activeClients = \App\Models\Client::where('practice_id', $employee->practice_id)
+        ->where('account_status', 'Active')
+        ->count();
+
+    return view('dashboard', compact('appointments', 'activeClients'));
+});
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');

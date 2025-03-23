@@ -24,7 +24,7 @@
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-    <a href="{{ url('/client/clientdashboard') }}" class="nav-item"><i class="fas fa-home"></i></a>
+        <a href="{{ url('/client/clientdashboard') }}" class="nav-item"><i class="fas fa-home"></i></a>
         <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></i></a>
         <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></i></a>
         <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>

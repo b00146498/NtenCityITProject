@@ -146,7 +146,7 @@
 <nav class="sidebar">
     <ul class="nav flex-column">
         <li class="nav-item">
-            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">
+            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
                 <i class="fas fa-home"></i> Home
             </a>
         </li>
