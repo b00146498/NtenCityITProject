@@ -170,4 +170,4 @@ Route::get('/alerts', function () {
 })->name('alerts');
 
 
- 
+Route::get('/alerts', [AppointmentController::class, 'upcomingAppointments'])->name('alerts');
