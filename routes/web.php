@@ -18,6 +18,7 @@ use App\Http\Controllers\StandardExercisesController;
 use App\Models\Client;
 use App\Models\TpeLog;
 
+
 /* |-------------------------------------------------------------------------- 
    | Web Routes 
    |-------------------------------------------------------------------------- */
