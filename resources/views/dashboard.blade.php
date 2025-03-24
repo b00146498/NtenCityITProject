@@ -83,6 +83,53 @@
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+
+<!-- Quick Actions Section -->
+<div class="container my-5">
+    <div class="row g-4 justify-content-center">
+
+        <!-- Add Client -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('clients.create') }}" class="action-card text-center">
+                <div class="icon-circle bg-primary-subtle text-primary">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <span class="action-text">Add Client</span>
+            </a>
+        </div>
+
+        <!-- Log Progress -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('diary-entries.index') }}" class="action-card text-center">
+                <div class="icon-circle bg-success-subtle text-success">
+                    <i class="fas fa-notes-medical"></i>
+                </div>
+                <span class="action-text">Log Progress</span>
+            </a>
+        </div>
+
+        <!-- Book Appointment -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('appointments.create') }}" class="action-card text-center">
+                <div class="icon-circle bg-warning-subtle text-warning">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <span class="action-text">Book Appointment</span>
+            </a>
+        </div>
+
+        <!-- Create Plan -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('personalisedTrainingPlans.create') }}" class="action-card text-center">
+                <div class="icon-circle bg-danger-subtle text-danger">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                <span class="action-text">Create Plan</span>
+            </a>
+        </div>
+
+    </div>
+</div>
 <style>
 .date-box {
         background: #f8f9fa;
@@ -90,6 +137,53 @@
         border-radius: 6px;
         font-size: 16px;
     }
+
+
+    .action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background-color: #fdfdfd;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #eee;
+    }
+
+    .action-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        text-decoration: none;
+    }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        background-color: #eee;
+    }
+
+    .action-text {
+        font-weight: 600;
+        font-size: 14px;
+        color: #222;
+    }
+
+    .icon-circle {
+    background-color: #fff8e1;
+    border: 2px solid #e0c36c;
+    color: #a68c30;
+}
+
+
 </style>
 
 @endsection
