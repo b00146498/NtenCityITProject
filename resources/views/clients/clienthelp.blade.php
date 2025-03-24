@@ -21,11 +21,11 @@
         <!-- Appointments -->
         <div class="accordion-item mb-2">
             <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                     Booking Appointments
                 </button>
             </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
                 <div class="accordion-body small">
                     <strong>How do I book an appointment?</strong>
                     <p>Go to your Client Dashboard. You’ll see a list of employees from your registered practice. Tap on an employee and then select “Book Appointment”. Choose a time and confirm.</p>
@@ -91,13 +91,13 @@
             <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
                 <div class="accordion-body small">
                     <strong>Update profile info:</strong>
-                    <p>Tap your profile at the top right, go to "Personal Details" to update info.</p>
+                    <p>Tap your profile at the bottom right, go to "Personal Details" to update info.</p>
 
                     <strong>Change profile picture:</strong>
                     <p>In "Personal Details", tap "Change Picture" to upload a new one.</p>
 
                     <strong>Logout:</strong>
-                    <p>Tap your profile icon and choose "Logout" from the dropdown.</p>
+                    <p>Tap your profile icon and choose "Logout" button at the bottom of the screen.</p>
                 </div>
             </div>
         </div>
@@ -138,7 +138,7 @@
     <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></a>
     <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></a>
     <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>
-    <a href="#" class="nav-item"><i class="fas fa-comment"></i></a>
+    <a href="{{ url('/alerts') }}" class="nav-item"><i class="fas fa-comment"></i></a>
     <a href="{{ url('/clientprofile') }}" class="nav-item active"><i class="fas fa-user"></i></a>
 </nav>
 <style>
@@ -181,7 +181,27 @@
     z-index: 1000;
     border-radius: 0 0 15px 15px;
     }
+    /* Accordion - Golden Theme */
+    .accordion-button {
+        background-color: #fff8e1; /* Light golden background */
+        color: #5c4600; /* Deep golden text */
+        font-weight: 600;
+    }
 
+    .accordion-button:not(.collapsed) {
+        background-color: #f2e1a5; /* Slightly darker when open */
+        color: #5c4600;
+        box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.125);
+    }
+
+    .accordion-button::after {
+        filter: hue-rotate(45deg); /* Optional: slightly color the icon */
+    }
+
+    .accordion-item {
+        border: 1px solid #f3da82;
+        border-radius: 8px;
+    }
 
 </style>
 @endsection
