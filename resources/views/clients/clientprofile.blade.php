@@ -24,12 +24,6 @@
     <!-- Profile Menu -->
     <ul class="profile-menu">
         <li>
-            <a href="{{ url('/profile/history') }}">
-                <i class="fas fa-history"></i> History
-                <i class="fas fa-chevron-right chevron-icon"></i>
-            </a>
-        </li>
-        <li>
             <a href="{{ url('/profile/personal-details') }}">
                 <i class="fas fa-user"></i> Personal Details
                 <i class="fas fa-chevron-right chevron-icon"></i>
