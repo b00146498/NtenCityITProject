@@ -200,3 +200,7 @@ Route::get('/dashboard', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth'])
     ->name('dashboard');
+
+Route::get('/client/help', function () {
+    return view('clients.clienthelp');
+})->name('client.help');

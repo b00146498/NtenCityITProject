@@ -21,7 +21,7 @@
     @forelse ($workoutLogs as $log)
         <div class="workout-card">
             <div class="workout-info">
-                <h2>{{ $log->standardExercise->exercise_name }}</h2>
+                <h3>{{ $log->standardExercise->exercise_name }}</h3>
                 <p><strong>Sets:</strong> {{ $log->num_sets }} | <strong>Reps:</strong> {{ $log->num_reps }}</p>
                 <p><strong>Intensity:</strong> {{ $log->intensity }}</p>
                 <p><strong>Duration:</strong> {{ $log->minutes }} minutes</p>

@@ -28,7 +28,7 @@
         <div class="feature">
             <i class="fas fa-calendar-check feature-icon"></i>
             <div>
-                <h3>Easy Appointments</h3>
+                <h4>Easy Appointments</h4>
                 <p>Clients can book, reschedule, and manage their sessions anytime.</p>
             </div>
         </div>
@@ -36,7 +36,7 @@
         <div class="feature">
             <i class="fas fa-chart-line feature-icon"></i>
             <div>
-                <h3>Progress Tracking</h3>
+                <h4>Progress Tracking</h4>
                 <p>Monitor workout logs, recovery progress, and key health stats.</p>
             </div>
         </div>
@@ -44,7 +44,7 @@
         <div class="feature">
             <i class="fas fa-video feature-icon"></i>
             <div>
-                <h3>Video Resources</h3>
+                <h4>Video Resources</h4>
                 <p>Access exercise demonstrations and training plans for better results.</p>
             </div>
         </div>
@@ -52,7 +52,7 @@
         <div class="feature">
             <i class="fas fa-bell feature-icon"></i>
             <div>
-                <h3>Smart Notifications</h3>
+                <h4>Smart Notifications</h4>
                 <p>Get instant alerts for upcoming sessions, updates, and reminders.</p>
             </div>
         </div>
@@ -60,7 +60,7 @@
         <div class="feature">
             <i class="fas fa-lock feature-icon"></i>
             <div>
-                <h3>Secure & Reliable</h3>
+                <h4>Secure & Reliable</h4>
                 <p>We ensure your data remains safe and confidential at all times.</p>
             </div>
         </div>
@@ -72,7 +72,7 @@
     </p>
 
     <h2 class="section-heading">Need Help?</h2>
-    <p class="about-text">Visit our <a href="{{ url('/profile/help') }}" class="help-link">Help Section</a> or contact <a href="mailto:support@ntencity.com" class="help-link">support@ntencity.com</a>.</p>
+    <p class="about-text">Visit our <a href="{{ route('client.help') }}" class="help-link">Help Section</a> or contact <a href="mailto:support@ntencity.com" class="help-link">support@ntencity.com</a>.</p>
 </div>
 
 <!-- Bottom Navigation -->
@@ -81,7 +81,7 @@
     <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></a>
     <a href="{{ url('/appointments') }}" class="nav-item"><i class="fas fa-clock"></i></a>
     <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>
-    <a href="#" class="nav-item"><i class="fas fa-comment"></i></a>
+    <a href="{{ url('/alerts') }}" class="nav-item"><i class="fas fa-comment"></i></a>
     <a href="{{ url('/clientprofile') }}" class="nav-item active"><i class="fas fa-user"></i></a>
 </nav>
 

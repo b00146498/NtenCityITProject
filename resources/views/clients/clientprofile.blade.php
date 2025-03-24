@@ -36,7 +36,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ url('/profile/help') }}">
+            <a href="{{ route('client.help') }}">
                 <i class="fas fa-question-circle"></i> Help
                 <i class="fas fa-chevron-right chevron-icon"></i>
             </a>
