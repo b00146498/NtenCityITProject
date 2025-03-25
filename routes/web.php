@@ -29,8 +29,8 @@ use App\Http\Controllers\DashboardController;
 Route::get('/', function () {
     return view('welcome');
 });
-// Commenting out this line temporarily to allow routes work without being logged in 
-//Route::middleware(['auth'])->group(function () {
+
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
@@ -41,6 +41,8 @@ Route::get('/', function () {
 
     Route::get('/employee/new/{userid}', [EmployeeController::class, 'new'])
     ->name('employee.new');
+
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
 
     // Logout Route
     Route::post('/logout', function (Request $request) {
@@ -157,16 +159,11 @@ Route::get('/', function () {
             \Log::error('Error creating simple notification: ' . $e->getMessage());
             return 'Error: ' . $e->getMessage();
         }
-		
     });
 
     // Appointment JSON API
     Route::get('/appointment/json', [AppointmentController::class, 'getAppointments'])->name('appointment.json');
-	Route::get('/appointment/upcoming', [AppointmentController::class, 'upcoming'])->name('appointment.upcoming');
-
-
-// Commenting out this line temporarily to allow routes work without being logged in 
-// });
+});
 
 // Public Routes
 Route::get('/login', function () {
@@ -184,7 +181,7 @@ Route::get('/alerts', function () {
 })->name('alerts');
 
 
-Route::get('/alerts', [AppointmentController::class, 'upcomingAppointments'])->name('alerts');
+Route::get('/alerts', [AppointmentController::class, 'upcoming'])->name('alerts');
 
 Route::get('/dashboard', function () {
     $userId = Auth::id();

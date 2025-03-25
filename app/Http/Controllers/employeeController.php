@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CreateemployeeRequest;
 use App\Http\Requests\UpdateemployeeRequest;
 use App\Repositories\employeeRepository;
