@@ -35,6 +35,10 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    Route::get('/client/new/{userid}', 'App\Http\Controllers\clientController@new')->name('client.new');
+    Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
+
+
     Route::get('/employee/new/{userid}', [EmployeeController::class, 'new'])
     ->name('employee.new');
 

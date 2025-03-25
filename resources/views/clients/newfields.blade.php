@@ -86,7 +86,7 @@
         </div>
         <div class="form-group col-sm-12">
             {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
-            <a href="{!! route('customers.index') !!}" class="btn btn-default">Cancel</a>
+            <a href="{!! route('clients.index') !!}" class="btn btn-default">Cancel</a>
         </div>
     </div>
 </div>
