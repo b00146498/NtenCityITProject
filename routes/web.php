@@ -29,8 +29,8 @@ use App\Http\Controllers\DashboardController;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::middleware(['auth'])->group(function () {
+// Commenting out this line temporarily to allow routes work without being logged in 
+//Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
@@ -157,11 +157,16 @@ Route::middleware(['auth'])->group(function () {
             \Log::error('Error creating simple notification: ' . $e->getMessage());
             return 'Error: ' . $e->getMessage();
         }
+		
     });
 
     // Appointment JSON API
     Route::get('/appointment/json', [AppointmentController::class, 'getAppointments'])->name('appointment.json');
-});
+	Route::get('/appointment/upcoming', [AppointmentController::class, 'upcoming'])->name('appointment.upcoming');
+
+
+// Commenting out this line temporarily to allow routes work without being logged in 
+// });
 
 // Public Routes
 Route::get('/login', function () {

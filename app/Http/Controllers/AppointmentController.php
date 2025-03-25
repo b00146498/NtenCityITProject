@@ -269,38 +269,22 @@ class AppointmentController extends AppBaseController
     /**
      * Legacy method for payAppointment - Redirects to processPayment
      */
-    public function upcomingAppointments()
+    public function upcoming()
     {
-        // Check if the user is logged in
-        $clientId = auth()->check() ? auth()->user()->id : null;
+		//$client = Auth()::user()->client;
+        
+        
     
-        if ($clientId) {
-            // ✅ Fetch real upcoming appointments for the logged-in client
-            $appointments = \App\Models\Appointment::where('client_id', $clientId)
-                            ->whereDate('booking_date', '>=', now()) // Future appointments only
-                            ->orderBy('booking_date', 'asc')
-                            ->get();
-        } else {
-            // 🔥 Generate dynamic sample data (always changes based on today’s date)
-            $daysAhead = [2, 3, 5, 7]; // Appointments spread out over the next week
-            $employees = ['John Doe', 'Sarah Lee', 'Emily Smith', 'Dr. Robert'];
-            $practices = ['City Health', 'Prime Physio', 'Wellness Center', 'Elite Therapy'];
+       /* $appointments = \App\Models\Appointment::where('client_id', $client->id)
+                        ->whereDate('booking_date', '>=', now())
+                        ->orderBy('booking_date', 'asc')
+                        ->get(); */
+		
+		$appointments = $this->appointmentRepository->all();
     
-            $appointments = collect(array_map(function ($index) use ($daysAhead, $employees, $practices) {
-                return (object)[
-                    'id' => $index + 1,
-                    'employee' => (object)['name' => $employees[$index]],
-                    'practice' => (object)['name' => $practices[$index]],
-                    'booking_date' => now()->addDays($daysAhead[$index])->format('Y-m-d'),
-                    'start_time' => rand(9, 16) . ':00', // Random hour between 9AM - 4PM
-                    'end_time' => rand(17, 19) . ':00', // Random hour between 5PM - 7PM
-                    'status' => 'upcoming',
-                ];
-            }, array_keys($daysAhead)));
-        }
-    
-        return view('clients.alerts', compact('appointments'));
+        return view('appointments.appointmentindex', compact('appointments'));
     }
+    
     
 
 
