@@ -184,7 +184,7 @@ Route::get('/alerts', function () {
 })->name('alerts');
 
 
-Route::get('/alerts', [AppointmentController::class, 'upcomingAppointments'])->name('alerts');
+Route::get('/alerts', [AppointmentController::class, 'upcoming'])->name('alerts');
 
 Route::get('/dashboard', function () {
     $userId = Auth::id();
