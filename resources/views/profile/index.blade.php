@@ -7,21 +7,34 @@
             <div class="card border-0 rounded-0">
                 <div class="card-header text-center border-0" style="background-color: #dbb959; padding: 2rem 0;">
                     <h3 class="text-white mb-4">My Profile</h3>
-                    <div class="user-avatar mx-auto mb-3">
+                    
+                    <div class="user-avatar mx-auto mb-3 position-relative" style="width: 100px; height: 100px; cursor: pointer;">
+                        <input type="file" id="profile-picture-input" name="profile_picture" style="display: none;" accept="image/*">
+                        
                         @if(isset($employee) && $employee && $employee->profile_picture)
-                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; overflow: hidden;">
-                                <img src="{{ asset($employee->profile_picture) }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
-                        @elseif(isset($client) && $client && isset($client->profile_picture))
-                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; overflow: hidden;">
-                                <img src="{{ asset($client->profile_picture) }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
-                            </div>
+                            <img src="{{ asset($employee->profile_picture) }}" 
+                                 id="profile-picture-preview"
+                                 alt="Profile Picture" 
+                                 style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                        @elseif(isset($client) && $client && $client->profile_picture)
+                            <img src="{{ asset($client->profile_picture) }}" 
+                                 id="profile-picture-preview"
+                                 alt="Profile Picture" 
+                                 style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                         @else
-                            <div style="width: 100px; height: 100px; background-color: #f5f5f5; border-radius: 50%; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                            <div id="profile-picture-preview" 
+                                 style="width: 100%; height: 100%; background-color: #f5f5f5; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
                                 <i class="fa fa-user" style="font-size: 50px; color: #666;"></i>
                             </div>
                         @endif
+                        
+                        <div class="position-absolute top-0 start-0 w-100 h-100" 
+                             style="border-radius: 50%; background: rgba(0,0,0,0.3); display: none; justify-content: center; align-items: center;" 
+                             id="upload-overlay">
+                            <i class="fa fa-camera text-white" style="font-size: 24px;"></i>
+                        </div>
                     </div>
+
                     @if(isset($employee) && $employee)
                         <h5 class="text-white">{{ $employee->emp_first_name }} {{ $employee->emp_surname }}</h5>
                         <p class="text-white mb-0">{{ $employee->role }}</p>
@@ -72,7 +85,82 @@
     @csrf
 </form>
 
+@endsection
+
+@push('scripts')
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarContainer = document.querySelector('.user-avatar');
+    const profilePictureInput = document.getElementById('profile-picture-input');
+    const profilePicturePreview = document.getElementById('profile-picture-preview');
+    const uploadOverlay = document.getElementById('upload-overlay');
+
+    // Click to trigger file input
+    avatarContainer.addEventListener('click', () => {
+        profilePictureInput.click();
+    });
+
+    // Show/hide upload overlay
+    avatarContainer.addEventListener('mouseenter', () => {
+        uploadOverlay.style.display = 'flex';
+    });
+
+    avatarContainer.addEventListener('mouseleave', () => {
+        uploadOverlay.style.display = 'none';
+    });
+
+    // Handle file selection
+    profilePictureInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // Preview the image
+                if (profilePicturePreview.tagName.toLowerCase() === 'div') {
+                    // If it's the default icon, replace with an img
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.id = 'profile-picture-preview';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.borderRadius = '50%';
+                    img.style.objectFit = 'cover';
+                    profilePicturePreview.parentNode.replaceChild(img, profilePicturePreview);
+                } else {
+                    profilePicturePreview.src = e.target.result;
+                }
+                
+                // Prepare FormData for upload
+                const formData = new FormData();
+                formData.append('profile_picture', file);
+
+                // Send AJAX request to upload
+                fetch('{{ route("profile.upload-picture") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Optional: show success message
+                        console.log('Profile picture updated');
+                    }
+                })
+                .catch(error => {
+                    console.error('Upload error:', error);
+                    // Optionally revert preview
+                });
+            };
+
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
 function confirmLogout(event) {
     event.preventDefault();
     if (confirm('Are you sure you want to log out?')) {
@@ -80,4 +168,4 @@ function confirmLogout(event) {
     }
 }
 </script>
-@endsection
+@endpush
