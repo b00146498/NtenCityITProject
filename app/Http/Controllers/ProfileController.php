@@ -25,6 +25,77 @@ class ProfileController extends Controller
         return view('profile.index', compact('user', 'employee', 'client'));
     }
     
+    public function uploadProfilePicture(Request $request)
+    {
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        $user = Auth::user();
+
+        if ($request->hasFile('profile_picture')) {
+            // Determine if it's an employee or client
+            if ($user->role === 'employee') {
+                $employee = Employee::where('userid', $user->id)->first();
+                
+                // Delete old picture if it exists
+                if ($employee->profile_picture && File::exists(public_path($employee->profile_picture))) {
+                    File::delete(public_path($employee->profile_picture));
+                }
+                
+                $image = $request->file('profile_picture');
+                $imageName = 'employee_' . $employee->id . '_' . time() . '.' . $image->getClientOriginalExtension();
+                
+                // Create directory if it doesn't exist
+                if (!File::exists(public_path('profile_pictures'))) {
+                    File::makeDirectory(public_path('profile_pictures'), 0755, true);
+                }
+                
+                // Store image in the public/profile_pictures directory
+                $image->move(public_path('profile_pictures'), $imageName);
+                
+                // Update profile picture path in the database
+                $employee->profile_picture = 'profile_pictures/' . $imageName;
+                $employee->save();
+
+                return response()->json([
+                    'success' => true, 
+                    'path' => 'profile_pictures/' . $imageName
+                ]);
+
+            } elseif ($user->role === 'client') {
+                $client = Client::where('userid', $user->id)->first();
+                
+                // Delete old picture if it exists
+                if ($client->profile_picture && File::exists(public_path($client->profile_picture))) {
+                    File::delete(public_path($client->profile_picture));
+                }
+                
+                $image = $request->file('profile_picture');
+                $imageName = 'client_' . $client->id . '_' . time() . '.' . $image->getClientOriginalExtension();
+                
+                // Create directory if it doesn't exist
+                if (!File::exists(public_path('profile_pictures'))) {
+                    File::makeDirectory(public_path('profile_pictures'), 0755, true);
+                }
+                
+                // Store image in the public/profile_pictures directory
+                $image->move(public_path('profile_pictures'), $imageName);
+                
+                // Update profile picture path in the database
+                $client->profile_picture = 'profile_pictures/' . $imageName;
+                $client->save();
+
+                return response()->json([
+                    'success' => true, 
+                    'path' => 'profile_pictures/' . $imageName
+                ]);
+            }
+        }
+
+        return response()->json(['success' => false], 400);
+    }
+    
     public function personalDetails()
     {
         $user = Auth::user();
