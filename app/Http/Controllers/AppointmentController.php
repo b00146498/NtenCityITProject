@@ -269,17 +269,22 @@ class AppointmentController extends AppBaseController
     /**
      * Legacy method for payAppointment - Redirects to processPayment
      */
-public function upcoming()
+public function upcoming(Request $request)
 {
-    // Just use the known client ID = 5 for David
-    $appointments = \App\Models\Appointment::where('client_id', 5)
-                    ->whereDate('booking_date', '>=', now()->toDateString())
+    $clientId = 5; // hardcoded for now
+
+    // default to confirmed if no status passed
+    $status = $request->get('status', 'confirmed');
+
+    $appointments = \App\Models\Appointment::with('employee')
+                    ->where('client_id', $clientId)
+                    ->where('status', $status)
                     ->orderBy('booking_date', 'asc')
+                    ->orderBy('start_time', 'asc')
                     ->get();
 
     return view('appointments.appointmentindex', compact('appointments'));
 }
-
 
 }
 
