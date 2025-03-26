@@ -42,7 +42,10 @@ class employee extends Model
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
+
     protected $dates = ['deleted_at'];
+
+
 
     public $fillable = [
         'emp_first_name',
@@ -62,8 +65,7 @@ class employee extends Model
         'username',
         'password',
         'practice_id',
-        'userid',
-        'profile_picture'
+        'userid'
     ];
 
     /**
@@ -90,8 +92,7 @@ class employee extends Model
         'username' => 'string',
         'password' => 'string',
         'practice_id' => 'integer',
-        'userid' => 'integer',
-        'profile_picture' => 'string'
+        'userid' => 'integer'
     ];
 
     /**
@@ -124,14 +125,13 @@ class employee extends Model
     {
         return $this->hasMany(DiaryEntry::class, 'employee_id');
     }
-
     public function practice()
     {
         return $this->belongsTo(Practice::class, 'practice_id');
     }
-
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'userid', 'id');
+        return $this->belongsTo(\App\User::class,'userid','id');
     }
+
 }
