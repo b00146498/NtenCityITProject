@@ -17,7 +17,7 @@
 
 <section class="content-header">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    
+
     <!-- Functional Filter Tabs -->
     <div class="tab-container">
         <a href="{{ url('/alerts?status=confirmed') }}" class="tab-btn tab-upcoming {{ request('status') == 'confirmed' || request('status') == null ? 'active' : '' }}">Upcoming</a>
