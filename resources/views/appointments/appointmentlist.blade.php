@@ -1,12 +1,13 @@
 @foreach ($appointments as $appointment)
     <div class="appointment-card">
         <div class="appointment-left">
-		<i class="fas fa-calendar-alt"></i>
-            <div class="appointment-date">
-                {{ \Carbon\Carbon::parse($appointment->booking_date)->format('D, M j Y') }}
-            </div>
-            <div class="appointment-time">
-                {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }}
+            <div class="appointment-time-full">
+                <i class="fas fa-calendar-alt calendar-icon"></i>
+                <span class="datetime-text">
+                    {{ \Carbon\Carbon::parse($appointment->booking_date)->format('D, M j Y') }},
+                    {{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }} – 
+                    {{ \Carbon\Carbon::parse($appointment->end_time)->format('h:i A') }}
+                </span>
             </div>
         </div>
 
@@ -29,31 +30,40 @@
 .appointment-card {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     background: #f9f9f9;
     padding: 16px;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     margin-bottom: 20px;
     flex-wrap: wrap;
+    min-height: 110px;
 }
 
 .appointment-left {
-    flex: 1;
-    font-weight: bold;
-    font-size: 1rem;
-    color: #333;
+    flex: 2;
+    display: flex;
+    align-items: center;
 }
 
-.appointment-date {
+.appointment-time-full {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 0.95rem;
-    color: #555;
+    color: #444;
+    flex-wrap: wrap;
 }
 
-.appointment-time {
-    font-size: 1.25rem;
+.calendar-icon {
     color: #C96E04;
-    font-weight: bold;
+    font-size: 1.1rem;
+    margin-right: 4px;
+}
+
+.datetime-text {
+    font-weight: 500;
+    color: #333;
 }
 
 .appointment-right {
@@ -99,5 +109,4 @@
     font-weight: bold;
     text-decoration: none;
 }
-
 </style>
