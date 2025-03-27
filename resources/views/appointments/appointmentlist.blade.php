@@ -1,5 +1,5 @@
 @foreach ($appointments as $appointment)
-    <div class="appointment-card">
+<div class="appointment-card {{ $appointment->status === 'completed' ? 'completed' : '' }}">
         <div class="appointment-left">
             <div class="appointment-time-full">
                 <i class="fas fa-calendar-alt calendar-icon"></i>
@@ -115,4 +115,23 @@
     font-weight: bold;
     text-decoration: none;
 }
+
+/* Completed appointment card style */
+.appointment-card.completed {
+    background-color: #f1fdf5; /* soft green tone */
+    border-left: 5px solid #28a745; /* green accent bar */
+    opacity: 0.95;
+    position: relative;
+}
+
+.appointment-card.completed::before {
+    content: '✓';
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 1.2rem;
+    color: #28a745;
+    font-weight: bold;
+}
+
 </style>
