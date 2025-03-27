@@ -26,21 +26,39 @@ class ProfileController extends Controller
         if ($user->role === 'employee') {
             $employee = Employee::where('userid', $user->id)->first();
             
+            // Debug: Check if employee has a profile picture
+            \Log::info('Employee profile accessed', [
+                'employee_id' => $employee ? $employee->id : 'null',
+                'profile_picture' => $employee ? $employee->profile_picture : 'null'
+            ]);
+            
             // Ensure full path is used for profile picture
             if ($employee && $employee->profile_picture) {
                 if (!str_starts_with($employee->profile_picture, 'profile_pictures/')) {
                     $employee->profile_picture = 'profile_pictures/' . $employee->profile_picture;
                     $employee->save();
+                    \Log::info('Updated employee profile picture path', [
+                        'new_path' => $employee->profile_picture
+                    ]);
                 }
             }
         } else if ($user->role === 'client') {
             $client = Client::where('userid', $user->id)->first();
+            
+            // Debug: Check if client has a profile picture
+            \Log::info('Client profile accessed', [
+                'client_id' => $client ? $client->id : 'null',
+                'profile_picture' => $client ? $client->profile_picture : 'null'
+            ]);
             
             // Similar logic for client
             if ($client && $client->profile_picture) {
                 if (!str_starts_with($client->profile_picture, 'profile_pictures/')) {
                     $client->profile_picture = 'profile_pictures/' . $client->profile_picture;
                     $client->save();
+                    \Log::info('Updated client profile picture path', [
+                        'new_path' => $client->profile_picture
+                    ]);
                 }
             }
         }
@@ -50,11 +68,20 @@ class ProfileController extends Controller
     
     public function uploadProfilePicture(Request $request)
     {
+        \Log::info('Profile picture upload initiated', [
+            'user_id' => Auth::id(),
+            'user_role' => Auth::user()->role
+        ]);
+        
         $validator = Validator::make($request->all(), [
             'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         if ($validator->fails()) {
+            \Log::warning('Profile picture validation failed', [
+                'errors' => $validator->errors()->first('profile_picture')
+            ]);
+            
             return response()->json([
                 'success' => false, 
                 'errors' => $validator->errors()->first('profile_picture')
@@ -69,11 +96,20 @@ class ProfileController extends Controller
                 if ($user->role === 'employee') {
                     $employee = Employee::where('userid', $user->id)->first();
                     
+                    \Log::info('Employee profile picture upload', [
+                        'employee_id' => $employee->id,
+                        'old_picture' => $employee->profile_picture
+                    ]);
+                    
                     // Delete old picture if it exists
                     $this->deleteOldProfilePicture($employee->profile_picture);
                     
                     $image = $request->file('profile_picture');
                     $imageName = 'employee_' . $employee->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
+                    
+                    \Log::info('Generated image name', [
+                        'image_name' => $imageName
+                    ]);
                     
                     // Ensure the directory exists in storage
                     Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
@@ -89,17 +125,37 @@ class ProfileController extends Controller
                     $path = 'profile_pictures/' . $imageName;
                     Storage::disk('public')->put($path, $processedImage->__toString());
                     
+                    \Log::info('Image saved to storage', [
+                        'path' => $path,
+                        'full_url' => Storage::url($path),
+                        'exists' => Storage::disk('public')->exists($path)
+                    ]);
+                    
                     // Update profile picture path in the database
                     $employee->profile_picture = $path;
                     $employee->save();
+                    
+                    \Log::info('Employee profile updated', [
+                        'profile_picture' => $employee->profile_picture
+                    ]);
 
                     return response()->json([
                         'success' => true, 
-                        'path' => Storage::url($path)
+                        'path' => Storage::url($path),
+                        'debug_info' => [
+                            'stored_path' => $path,
+                            'full_url' => Storage::url($path),
+                            'file_exists' => Storage::disk('public')->exists($path)
+                        ]
                     ]);
 
                 } elseif ($user->role === 'client') {
                     $client = Client::where('userid', $user->id)->first();
+                    
+                    \Log::info('Client profile picture upload', [
+                        'client_id' => $client->id,
+                        'old_picture' => $client->profile_picture
+                    ]);
                     
                     // Delete old picture if it exists
                     $this->deleteOldProfilePicture($client->profile_picture);
@@ -107,6 +163,10 @@ class ProfileController extends Controller
                     $image = $request->file('profile_picture');
                     $imageName = 'client_' . $client->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
                     
+                    \Log::info('Generated image name', [
+                        'image_name' => $imageName
+                    ]);
+                    
                     // Ensure the directory exists in storage
                     Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
                     
@@ -121,18 +181,38 @@ class ProfileController extends Controller
                     $path = 'profile_pictures/' . $imageName;
                     Storage::disk('public')->put($path, $processedImage->__toString());
                     
+                    \Log::info('Image saved to storage', [
+                        'path' => $path,
+                        'full_url' => Storage::url($path),
+                        'exists' => Storage::disk('public')->exists($path)
+                    ]);
+                    
                     // Update profile picture path in the database
                     $client->profile_picture = $path;
                     $client->save();
+                    
+                    \Log::info('Client profile updated', [
+                        'profile_picture' => $client->profile_picture
+                    ]);
 
                     return response()->json([
                         'success' => true, 
-                        'path' => Storage::url($path)
+                        'path' => Storage::url($path),
+                        'debug_info' => [
+                            'stored_path' => $path,
+                            'full_url' => Storage::url($path),
+                            'file_exists' => Storage::disk('public')->exists($path)
+                        ]
                     ]);
                 }
 
             } catch (\Exception $e) {
-                \Log::error('Profile Picture Upload Error: ' . $e->getMessage());
+                \Log::error('Profile Picture Upload Error: ' . $e->getMessage(), [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
                 return response()->json([
                     'success' => false, 
                     'message' => 'An error occurred while uploading the profile picture: ' . $e->getMessage()
@@ -140,6 +220,7 @@ class ProfileController extends Controller
             }
         }
 
+        \Log::warning('Profile picture upload failed - no file provided');
         return response()->json(['success' => false], 400);
     }
     
@@ -243,12 +324,16 @@ class ProfileController extends Controller
     {
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
+            \Log::info('Deleted old profile picture', ['path' => $path]);
+        } else if ($path) {
+            \Log::warning('Could not delete old profile picture - file does not exist', ['path' => $path]);
         }
     }
 
     private function ensureProfilePictureDirectory()
     {
         Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
+        \Log::info('Ensured profile pictures directory exists');
     }
 
     private function handleProfilePictureUpload($model, $image)
@@ -271,6 +356,11 @@ class ProfileController extends Controller
         // Save the processed image to storage
         $path = 'profile_pictures/' . $imageName;
         Storage::disk('public')->put($path, $processedImage->__toString());
+        
+        \Log::info('Profile picture uploaded via form handler', [
+            'path' => $path,
+            'exists' => Storage::disk('public')->exists($path)
+        ]);
         
         // Update profile picture path in the database
         $model->profile_picture = $path;
