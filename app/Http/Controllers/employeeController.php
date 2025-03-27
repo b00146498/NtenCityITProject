@@ -52,6 +52,8 @@ class employeeController extends AppBaseController
         return view('employees.index', compact('employees'));
     }
 
+
+
     /**
      * Show the form for creating a new employee.
      *

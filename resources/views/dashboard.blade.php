@@ -115,7 +115,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('diary-entries.index') }}" class="action-card text-center">
                 <div class="icon-circle bg-success-subtle text-success">
-                    <i class="fas fa-notes-medical"></i>
+                    <img src="{{ asset('progress.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Log Progress</span>
             </a>
@@ -151,24 +151,25 @@
         font-size: 16px;
     }
 
-
     .action-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px;
-    background-color: #fdfdfd;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: all 0.3s ease-in-out;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        border: 1px solid #eee;
+        position: relative;
+        overflow: hidden;
     }
 
     .action-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
         text-decoration: none;
     }
 
@@ -181,75 +182,32 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 10px;
-        background-color: #eee;
+        background-color: #fff8e1;
+        border: 2px solid #e0c36c;
+        color: #a68c30;
+        transition: transform 0.4s ease;
+    }
+
+    .action-card:hover .icon-circle {
+        transform: rotate(15deg) scale(1.15);
     }
 
     .action-text {
         font-weight: 600;
         font-size: 14px;
         color: #222;
+        transition: color 0.3s ease;
     }
 
-    .icon-circle {
-    background-color: #fff8e1;
-    border: 2px solid #e0c36c;
-    color: #a68c30;
-}
-
-
-
-
-.action-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid #eee;
-    position: relative;
-    overflow: hidden;
-}
-
-.action-card:hover {
-    transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
-    text-decoration: none;
-}
-
-.icon-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    background-color: #fff8e1;
-    border: 2px solid #e0c36c;
-    color: #a68c30;
-    transition: transform 0.4s ease;
-}
-
-.action-card:hover .icon-circle {
-    transform: rotate(15deg) scale(1.15);
-}
-
-.action-text {
-    font-weight: 600;
-    font-size: 14px;
-    color: #222;
-    transition: color 0.3s ease;
-}
-
-.action-card:hover .action-text {
-    color: #C9A86A;
-}
+    .action-card:hover .action-text {
+        color: #C9A86A;
+    }
+    .progress-icon {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
 
 
 </style>
