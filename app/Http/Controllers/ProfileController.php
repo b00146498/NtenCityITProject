@@ -24,8 +24,24 @@ class ProfileController extends Controller
         
         if ($user->role === 'employee') {
             $employee = Employee::where('userid', $user->id)->first();
+            
+            // Ensure full path is used for profile picture
+            if ($employee && $employee->profile_picture) {
+                if (!str_starts_with($employee->profile_picture, 'profile_pictures/')) {
+                    $employee->profile_picture = 'profile_pictures/' . $employee->profile_picture;
+                    $employee->save();
+                }
+            }
         } else if ($user->role === 'client') {
             $client = Client::where('userid', $user->id)->first();
+            
+            // Similar logic for client
+            if ($client && $client->profile_picture) {
+                if (!str_starts_with($client->profile_picture, 'profile_pictures/')) {
+                    $client->profile_picture = 'profile_pictures/' . $client->profile_picture;
+                    $client->save();
+                }
+            }
         }
         
         return view('profile.index', compact('user', 'employee', 'client'));
