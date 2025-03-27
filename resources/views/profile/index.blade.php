@@ -97,47 +97,73 @@
 document.addEventListener('DOMContentLoaded', function() {
     const avatarContainer = document.querySelector('.user-avatar');
     const profilePictureInput = document.getElementById('profile-picture-input');
-    const profilePicturePreview = document.getElementById('profile-picture-preview');
+    let profilePicturePreview = document.getElementById('profile-picture-preview');
     const uploadOverlay = document.getElementById('upload-overlay');
-    // Get the CSRF token from the hidden form
     const csrfToken = document.querySelector('input[name="_token"]').value;
 
     // Click to trigger file input
-    avatarContainer.addEventListener('click', () => {
-        profilePictureInput.click();
-    });
+    if (avatarContainer) {
+        avatarContainer.addEventListener('click', () => {
+            profilePictureInput.click();
+        });
+    }
 
     // Show/hide upload overlay
-    avatarContainer.addEventListener('mouseenter', () => {
-        uploadOverlay.style.display = 'flex';
-    });
+    if (avatarContainer && uploadOverlay) {
+        avatarContainer.addEventListener('mouseenter', () => {
+            uploadOverlay.style.display = 'flex';
+        });
 
-    avatarContainer.addEventListener('mouseleave', () => {
-        uploadOverlay.style.display = 'none';
-    });
+        avatarContainer.addEventListener('mouseleave', () => {
+            uploadOverlay.style.display = 'none';
+        });
+    }
 
     // Handle file selection
-    profilePictureInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
             console.log('File selected:', file.name, file.type, file.size);
+            
+            // Validate file type
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp'];
+            if (!validImageTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPEG, PNG, GIF, WebP)');
+                return;
+            }
             
             const reader = new FileReader();
             
             reader.onload = function(e) {
-                // Preview the image
-                if (profilePicturePreview.tagName.toLowerCase() === 'div') {
-                    // If it's the default icon, replace with an img
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.id = 'profile-picture-preview';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.borderRadius = '50%';
-                    img.style.objectFit = 'cover';
-                    profilePicturePreview.parentNode.replaceChild(img, profilePicturePreview);
-                } else {
-                    profilePicturePreview.src = e.target.result;
+                try {
+                    // Preview the image
+                    if (profilePicturePreview && profilePicturePreview.tagName && profilePicturePreview.tagName.toLowerCase() === 'div') {
+                        // Create a new image element
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.id = 'profile-picture-preview';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.borderRadius = '50%';
+                        img.style.objectFit = 'cover';
+                        
+                        // Replace the div with the new image
+                        if (profilePicturePreview.parentNode) {
+                            profilePicturePreview.parentNode.replaceChild(img, profilePicturePreview);
+                            profilePicturePreview = img; // Update the reference
+                        } else {
+                            console.error('Cannot replace profile picture: parent node is null');
+                        }
+                    } else if (profilePicturePreview) {
+                        // Just update the src of the existing image
+                        profilePicturePreview.src = e.target.result;
+                    } else {
+                        console.error('Profile picture preview element not found');
+                    }
+                } catch (error) {
+                    console.error('Error updating preview image:', error);
                 }
                 
                 // Prepare FormData for upload
@@ -146,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('_token', csrfToken);
                 
                 console.log('Sending request to:', '{{ route("profile.upload-picture") }}');
-                console.log('With CSRF token:', csrfToken);
                 
                 // Send AJAX request to upload
                 fetch('{{ route("profile.upload-picture") }}', {
@@ -158,7 +183,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => {
                     console.log('Response status:', response.status);
-                    return response.json();
+                    if (!response.ok) {
+                        throw new Error('Server returned ' + response.status + ' ' + response.statusText);
+                    }
+                    return response.text().then(text => {
+                        try {
+                            return text ? JSON.parse(text) : {};
+                        } catch (e) {
+                            console.error('Error parsing response as JSON:', e);
+                            console.log('Raw response:', text);
+                            throw new Error('Invalid JSON response from server');
+                        }
+                    });
                 })
                 .then(data => {
                     console.log('Upload response:', data);
@@ -182,17 +218,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.error('Upload error:', error);
-                    alert('Error uploading profile picture. Please try again.');
+                    alert('Error uploading profile picture. Please try again. ' + error.message);
                 });
+            };
+            
+            reader.onerror = function(e) {
+                console.error('FileReader error:', e);
+                alert('Error reading the image file. Please try again.');
             };
 
             reader.readAsDataURL(file);
-        }
-    });
+        });
+    }
     
     // Check if we have a saved path in localStorage
     const savedPath = localStorage.getItem('profilePicturePath');
-    if (savedPath && profilePicturePreview && profilePicturePreview.tagName.toLowerCase() === 'img') {
+    if (savedPath && profilePicturePreview && profilePicturePreview.tagName && profilePicturePreview.tagName.toLowerCase() === 'img') {
         console.log('Restoring profile picture from saved path:', savedPath);
         profilePicturePreview.src = savedPath;
     }
