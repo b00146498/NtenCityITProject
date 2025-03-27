@@ -70,16 +70,19 @@ class ProfileController extends Controller
     {
         \Log::info('Profile picture upload initiated', [
             'user_id' => Auth::id(),
-            'user_role' => Auth::user()->role
+            'user_role' => Auth::user()->role,
+            'content_type' => $request->file('profile_picture') ? $request->file('profile_picture')->getMimeType() : 'none'
         ]);
         
+        // Updated validator to accept webp format
         $validator = Validator::make($request->all(), [
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
 
         if ($validator->fails()) {
             \Log::warning('Profile picture validation failed', [
-                'errors' => $validator->errors()->first('profile_picture')
+                'errors' => $validator->errors()->first('profile_picture'),
+                'mime_type' => $request->file('profile_picture') ? $request->file('profile_picture')->getMimeType() : 'none'
             ]);
             
             return response()->json([
@@ -98,17 +101,23 @@ class ProfileController extends Controller
                     
                     \Log::info('Employee profile picture upload', [
                         'employee_id' => $employee->id,
-                        'old_picture' => $employee->profile_picture
+                        'old_picture' => $employee->profile_picture,
+                        'mime_type' => $request->file('profile_picture')->getMimeType()
                     ]);
                     
                     // Delete old picture if it exists
                     $this->deleteOldProfilePicture($employee->profile_picture);
                     
                     $image = $request->file('profile_picture');
-                    $imageName = 'employee_' . $employee->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
+                    // Handle WebP format: convert to jpg for better compatibility
+                    $extension = $image->getMimeType() == 'image/webp' ? 'jpg' : $image->getClientOriginalExtension();
+                    $imageName = 'employee_' . $employee->id . '_' . Str::random(10) . '.' . $extension;
                     
                     \Log::info('Generated image name', [
-                        'image_name' => $imageName
+                        'image_name' => $imageName,
+                        'original_extension' => $image->getClientOriginalExtension(),
+                        'mime_type' => $image->getMimeType(),
+                        'final_extension' => $extension
                     ]);
                     
                     // Ensure the directory exists in storage
@@ -118,8 +127,14 @@ class ProfileController extends Controller
                     $processedImage = Image::make($image)
                         ->fit(300, 300, function ($constraint) {
                             $constraint->upsize();
-                        })
-                        ->encode($image->getClientOriginalExtension(), 75);
+                        });
+                    
+                    // Convert WebP to JPEG if needed
+                    if ($image->getMimeType() == 'image/webp') {
+                        $processedImage->encode('jpg', 90);
+                    } else {
+                        $processedImage->encode($extension, 75);
+                    }
                     
                     // Save the processed image to storage
                     $path = 'profile_pictures/' . $imageName;
@@ -154,17 +169,21 @@ class ProfileController extends Controller
                     
                     \Log::info('Client profile picture upload', [
                         'client_id' => $client->id,
-                        'old_picture' => $client->profile_picture
+                        'old_picture' => $client->profile_picture,
+                        'mime_type' => $request->file('profile_picture')->getMimeType()
                     ]);
                     
                     // Delete old picture if it exists
                     $this->deleteOldProfilePicture($client->profile_picture);
                     
                     $image = $request->file('profile_picture');
-                    $imageName = 'client_' . $client->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
+                    // Handle WebP format: convert to jpg for better compatibility
+                    $extension = $image->getMimeType() == 'image/webp' ? 'jpg' : $image->getClientOriginalExtension();
+                    $imageName = 'client_' . $client->id . '_' . Str::random(10) . '.' . $extension;
                     
                     \Log::info('Generated image name', [
-                        'image_name' => $imageName
+                        'image_name' => $imageName,
+                        'mime_type' => $image->getMimeType()
                     ]);
                     
                     // Ensure the directory exists in storage
@@ -174,8 +193,14 @@ class ProfileController extends Controller
                     $processedImage = Image::make($image)
                         ->fit(300, 300, function ($constraint) {
                             $constraint->upsize();
-                        })
-                        ->encode($image->getClientOriginalExtension(), 75);
+                        });
+                    
+                    // Convert WebP to JPEG if needed
+                    if ($image->getMimeType() == 'image/webp') {
+                        $processedImage->encode('jpg', 90);
+                    } else {
+                        $processedImage->encode($extension, 75);
+                    }
                     
                     // Save the processed image to storage
                     $path = 'profile_pictures/' . $imageName;
@@ -261,7 +286,7 @@ class ProfileController extends Controller
                     'street' => 'required|string|max:255',
                     'city' => 'required|string|max:50',
                     'county' => 'required|string|max:50',
-                    'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+                    'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
                 ];
 
                 // Validate the request with custom error messages
@@ -341,7 +366,9 @@ class ProfileController extends Controller
         // Delete old picture if it exists
         $this->deleteOldProfilePicture($model->profile_picture);
         
-        $imageName = $model->getTable() . '_' . $model->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
+        // Handle WebP format: convert to jpg for better compatibility
+        $extension = $image->getMimeType() == 'image/webp' ? 'jpg' : $image->getClientOriginalExtension();
+        $imageName = $model->getTable() . '_' . $model->id . '_' . Str::random(10) . '.' . $extension;
         
         // Ensure the directory exists
         $this->ensureProfilePictureDirectory();
@@ -350,8 +377,14 @@ class ProfileController extends Controller
         $processedImage = Image::make($image)
             ->fit(300, 300, function ($constraint) {
                 $constraint->upsize();
-            })
-            ->encode($image->getClientOriginalExtension(), 75);
+            });
+        
+        // Convert WebP to JPEG if needed
+        if ($image->getMimeType() == 'image/webp') {
+            $processedImage->encode('jpg', 90);
+        } else {
+            $processedImage->encode($extension, 75);
+        }
         
         // Save the processed image to storage
         $path = 'profile_pictures/' . $imageName;
@@ -359,7 +392,9 @@ class ProfileController extends Controller
         
         \Log::info('Profile picture uploaded via form handler', [
             'path' => $path,
-            'exists' => Storage::disk('public')->exists($path)
+            'exists' => Storage::disk('public')->exists($path),
+            'mime_type' => $image->getMimeType(),
+            'extension' => $extension
         ]);
         
         // Update profile picture path in the database
