@@ -81,6 +81,11 @@
     </div>
 </div>
 
+<!-- Hidden form for CSRF token -->
+<form id="csrf-form" style="display: none;">
+    @csrf
+</form>
+
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
     @csrf
 </form>
@@ -94,6 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const profilePictureInput = document.getElementById('profile-picture-input');
     const profilePicturePreview = document.getElementById('profile-picture-preview');
     const uploadOverlay = document.getElementById('upload-overlay');
+    // Get the CSRF token from the hidden form
+    const csrfToken = document.querySelector('input[name="_token"]').value;
 
     // Click to trigger file input
     avatarContainer.addEventListener('click', () => {
@@ -113,6 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
     profilePictureInput.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
+            console.log('File selected:', file.name, file.type, file.size);
+            
             const reader = new FileReader();
             
             reader.onload = function(e) {
@@ -134,16 +143,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Prepare FormData for upload
                 const formData = new FormData();
                 formData.append('profile_picture', file);
-                formData.append('_token', '{{ csrf_token() }}');
-
+                formData.append('_token', csrfToken);
+                
+                console.log('Sending request to:', '{{ route("profile.upload-picture") }}');
+                console.log('With CSRF token:', csrfToken);
+                
                 // Send AJAX request to upload
                 fetch('{{ route("profile.upload-picture") }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    credentials: 'same-origin'
+                        'X-CSRF-TOKEN': csrfToken
+                    }
                 })
                 .then(response => {
                     console.log('Response status:', response.status);
@@ -154,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.success) {
                         console.log('Profile picture updated successfully');
                         console.log('Path returned:', data.path);
-                        console.log('Debug info:', data.debug_info);
                         
                         // Update the image source with the server-side path
                         const img = document.getElementById('profile-picture-preview');
@@ -162,13 +172,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             img.src = data.path;
                             console.log('Updated image source to:', img.src);
                             
-                            // Save the path to localStorage as a backup
+                            // Save the path to localStorage
                             localStorage.setItem('profilePicturePath', data.path);
                         }
+                    } else {
+                        console.error('Upload failed:', data.errors || data.message || 'Unknown error');
+                        alert('Failed to upload profile picture: ' + (data.errors || data.message || 'Unknown error'));
                     }
                 })
                 .catch(error => {
                     console.error('Upload error:', error);
+                    alert('Error uploading profile picture. Please try again.');
                 });
             };
 
@@ -176,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Check if we have a saved path in localStorage (as a backup)
+    // Check if we have a saved path in localStorage
     const savedPath = localStorage.getItem('profilePicturePath');
     if (savedPath && profilePicturePreview && profilePicturePreview.tagName.toLowerCase() === 'img') {
         console.log('Restoring profile picture from saved path:', savedPath);
