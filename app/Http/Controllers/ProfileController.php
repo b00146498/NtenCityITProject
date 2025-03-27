@@ -99,6 +99,15 @@ class ProfileController extends Controller
                 if ($user->role === 'employee') {
                     $employee = Employee::where('userid', $user->id)->first();
                     
+                    // Check if employee exists
+                    if (!$employee) {
+                        \Log::error('Employee record not found for user', ['user_id' => $user->id]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Employee record not found. Please contact administrator.'
+                        ], 404);
+                    }
+                    
                     \Log::info('Employee profile picture upload', [
                         'employee_id' => $employee->id,
                         'old_picture' => $employee->profile_picture,
@@ -167,6 +176,15 @@ class ProfileController extends Controller
                 } elseif ($user->role === 'client') {
                     $client = Client::where('userid', $user->id)->first();
                     
+                    // Check if client exists
+                    if (!$client) {
+                        \Log::error('Client record not found for user', ['user_id' => $user->id]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Client record not found. Please contact administrator.'
+                        ], 404);
+                    }
+                    
                     \Log::info('Client profile picture upload', [
                         'client_id' => $client->id,
                         'old_picture' => $client->profile_picture,
@@ -229,6 +247,13 @@ class ProfileController extends Controller
                             'file_exists' => Storage::disk('public')->exists($path)
                         ]
                     ]);
+                } else {
+                    // User role is neither employee nor client
+                    \Log::error('Invalid user role for profile picture upload', ['role' => $user->role]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid user role. Profile pictures are only available for employees and clients.'
+                    ], 400);
                 }
 
             } catch (\Exception $e) {
@@ -363,6 +388,12 @@ class ProfileController extends Controller
 
     private function handleProfilePictureUpload($model, $image)
     {
+        // Make sure model is not null
+        if (!$model) {
+            \Log::error('Cannot upload profile picture - model is null');
+            return;
+        }
+        
         // Delete old picture if it exists
         $this->deleteOldProfilePicture($model->profile_picture);
         
