@@ -108,8 +108,23 @@
     padding: 6px 12px;
     border-radius: 8px;
     font-weight: bold;
+    font-size: 0.85rem;
+    text-decoration: none;
+    line-height: 1;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+
+.btn-view:hover {
+    background: #222;
+    color: white;
     text-decoration: none;
 }
+
 
 .btn-cancel {
     background: white;
@@ -118,7 +133,13 @@
     padding: 6px 12px;
     border-radius: 8px;
     font-weight: bold;
+    font-size: 0.85rem;
     text-decoration: none;
+    transition: background 0.2s ease-in-out;
+}
+
+.btn-cancel:hover {
+    background: #ffeaea;
 }
 
 /* Completed appointment card style */
@@ -138,5 +159,4 @@
     color: #28a745;
     font-weight: bold;
 }
-
 </style>
