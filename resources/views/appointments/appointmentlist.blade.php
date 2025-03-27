@@ -125,7 +125,6 @@
     text-decoration: none;
 }
 
-
 .btn-cancel {
     background: white;
     border: 2px solid #E63946;
@@ -135,8 +134,13 @@
     font-weight: bold;
     font-size: 0.85rem;
     text-decoration: none;
-    transition: background 0.2s ease-in-out;
+    line-height: 1;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 
 .btn-cancel:hover {
     background: #ffeaea;
