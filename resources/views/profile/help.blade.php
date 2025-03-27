@@ -150,3 +150,35 @@
     </div>
 </div>
 @endsection
+<style>
+/* Headings */
+h2, h4, h5 {
+    font-weight: bold;
+    color: #333 !important;
+    line-height: 1.4;
+}
+
+h2, .section-heading {
+    font-size: 22px;
+    border-bottom: 2px solid #C96E04;
+    padding-bottom: 8px;
+    margin: 20px 0 10px;
+}
+
+h4 {
+    font-size: 18px;
+    color: #444;
+    margin: 16px 0 6px;
+}
+
+h5 {
+    font-size: 16px;
+    color: #555;
+    margin: 12px 0 5px;
+}
+
+/* Optional: Add animation or smooth transition */
+.section-heading, h4, h5 {
+    transition: all 0.3s ease-in-out;
+}
+</style>

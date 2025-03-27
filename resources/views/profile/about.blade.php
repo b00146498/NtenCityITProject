@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <div class="container">
     <div class="row">
         <div class="col-12 mb-4">
@@ -62,3 +65,29 @@
         </div>
     </div>
 </div>
+@endsection
+
+<style>
+h2, h4, h5 {
+    color: #333333;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 2.2rem;
+    border-bottom: 2px solid #dbb959;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+h4 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    color: #444;
+}
+
+h5 {
+    font-size: 1.2rem;
+    color: #555;
+}
+</style>
