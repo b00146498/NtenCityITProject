@@ -12,6 +12,19 @@
         </p>
     </div>
 
+    @if ($weather)
+    <div class="card shadow mb-3" style="border-left: 5px solid #C9A86A;">
+        <div class="card-body">
+            <h5 class="card-title">🌤 Weather in {{ $weather['name'] }}</h5>
+            <p>
+                Temperature: <strong>{{ $weather['main']['temp'] }}°C</strong><br>
+                Condition: {{ ucfirst($weather['weather'][0]['description']) }}<br>
+                Wind: {{ $weather['wind']['speed'] }} m/s
+            </p>
+        </div>
+    </div>
+    @endif
+
 
 
     
