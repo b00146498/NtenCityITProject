@@ -1,4 +1,4 @@
-@extends('layouts.mobile')
+@extends('layouts.mobile') 
 
 @section('content')
 
@@ -14,6 +14,22 @@
 
 <section class="content-header">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- Date Strip -->
+    <div class="date-strip">
+        @for ($i = 0; $i < 7; $i++)
+            @php
+                $date = \Carbon\Carbon::now()->addDays($i);
+            @endphp
+            <button class="date-btn {{ request('day') == $date->toDateString() ? 'active' : '' }}"
+                onclick="window.location.href='?status={{ request('status', 'confirmed') }}&day={{ $date->toDateString() }}'">
+                <div class="day">{{ $date->format('D') }}</div>
+                <div class="date">{{ $date->format('j') }}</div>
+            </button>
+        @endfor
+    </div>
+
+    <!-- Status Tabs -->
     <div class="tab-container">
         <a href="{{ url('/alerts?status=confirmed') }}" class="tab-btn tab-upcoming {{ request('status') == 'confirmed' || request('status') == null ? 'active' : '' }}">Upcoming</a>
         <a href="{{ url('/alerts?status=completed') }}" class="tab-btn tab-completed {{ request('status') == 'completed' ? 'active' : '' }}">Completed</a>
@@ -116,6 +132,39 @@
         border-radius: 0 0 15px 15px;
     }
 
+    /* Date Strip Styling */
+    .date-strip {
+        display: flex;
+        justify-content: space-between;
+        overflow-x: auto;
+        padding: 10px 0;
+        margin-bottom: 10px;
+        gap: 8px;
+    }
+
+    .date-btn {
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        padding: 6px 12px;
+        text-align: center;
+        font-size: 0.85rem;
+        min-width: 50px;
+        color: #333;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .date-btn .day {
+        font-weight: bold;
+    }
+
+    .date-btn.active {
+        background-color: #C96E04;
+        color: white;
+        border-color: #C96E04;
+    }
+
     /* Filter Tabs */
     .tab-container {
         display: flex;
@@ -143,7 +192,7 @@
     }
 
     .tab-completed {
-        background-color: #28a745; /* Green for success */
+        background-color: #28a745;
     }
 
     .tab-cancelled {

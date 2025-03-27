@@ -271,20 +271,24 @@ class AppointmentController extends AppBaseController
      */
 public function upcoming(Request $request)
 {
-    $clientId = 5; // hardcoded for now
+    $clientId = 5; // keep this hardcoded for now
 
-    // default to confirmed if no status passed
     $status = $request->get('status', 'confirmed');
+    $day = $request->get('day'); // Optional date from mini calendar filter
 
     $appointments = \App\Models\Appointment::with('employee')
-                    ->where('client_id', $clientId)
-                    ->where('status', $status)
-                    ->orderBy('booking_date', 'asc')
-                    ->orderBy('start_time', 'asc')
-                    ->get();
+        ->where('client_id', $clientId)
+        ->where('status', $status)
+        ->when($day, function ($query) use ($day) {
+            $query->whereDate('booking_date', $day);
+        })
+        ->orderBy('booking_date', 'asc')
+        ->orderBy('start_time', 'asc')
+        ->get();
 
     return view('appointments.appointmentindex', compact('appointments'));
 }
+
 
 public function cancel($id)
 {
