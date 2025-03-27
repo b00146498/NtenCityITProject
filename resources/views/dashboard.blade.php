@@ -135,7 +135,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('personalisedTrainingPlans.create') }}" class="action-card text-center">
                 <div class="icon-circle bg-danger-subtle text-danger">
-                    <i class="fas fa-dumbbell"></i>
+                    <img src="{{ asset('report.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Create Plan</span>
             </a>
