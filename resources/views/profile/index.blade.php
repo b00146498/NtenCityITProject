@@ -143,16 +143,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Upload response:', data);
                     if (data.success) {
-                        // Optional: show success message
-                        console.log('Profile picture updated');
+                        console.log('Profile picture updated successfully');
+                        // Update the image source with the server-side path
+                        const img = document.getElementById('profile-picture-preview');
+                        if (img) {
+                            img.src = '{{ asset('') }}' + data.path;
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('Upload error:', error);
-                    // Optionally revert preview
                 });
             };
 
