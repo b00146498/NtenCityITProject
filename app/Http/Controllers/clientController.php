@@ -29,13 +29,30 @@ class clientController extends AppBaseController
      *
      * @return Response
      */
-    public function index(Request $request)
+    /*public function index(Request $request)
     {
         $clients = $this->clientRepository->all();
 
         return view('clients.index')
             ->with('clients', $clients);
 
+    }*/
+
+    public function index()
+    {
+        $user = auth()->user();
+
+        // Get the logged-in employee
+        $employee = \App\Models\Employee::where('userid', $user->id)->first();
+
+        if (!$employee) {
+            return redirect()->route('login')->with('error', 'Only employees can view clients.');
+        }
+
+        // Only fetch clients tied to the same practice as the logged-in employee
+        $clients = \App\Models\Client::where('practice_id', $employee->practice_id)->get();
+
+        return view('clients.index', compact('clients'));
     }
 
     /**
