@@ -26,13 +26,31 @@ class AuthenticatedSessionController extends Controller
      * @param  \App\Http\Requests\Auth\LoginRequest  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(LoginRequest $request)
+    /*public function store(LoginRequest $request)
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
         return redirect()->intended(RouteServiceProvider::HOME);
+    }*/
+
+    public function store(LoginRequest $request) // ✅ Use LoginRequest here
+    {
+        $request->authenticate(); // ✅ Valid on LoginRequest
+
+        $request->session()->regenerate();
+
+        $user = Auth::user();
+
+        // Custom redirect for client
+        $client = \App\Models\Client::where('userid', $user->id)->first();
+
+        if ($client) {
+            return redirect()->route('client.clientdashboard');
+        }
+
+        return redirect()->route('dashboard');
     }
 
     /**
