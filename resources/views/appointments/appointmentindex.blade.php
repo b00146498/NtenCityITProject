@@ -128,14 +128,14 @@
     .tab-btn {
         border: none;
         color: white;
-        padding: 10px 18px;
-        border-radius: 20px;
+        padding: 10px 20px;
+        border-radius: 30px;
         font-weight: bold;
         font-size: 1rem;
         cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.25s ease-in-out;
         text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
     .tab-upcoming {
@@ -143,7 +143,7 @@
     }
 
     .tab-completed {
-        background-color: #666666;
+        background-color: #28a745; /* Green for success */
     }
 
     .tab-cancelled {
@@ -151,9 +151,14 @@
     }
 
     .tab-btn.active {
-        border: 2px solid white;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
         opacity: 0.95;
+    }
+
+    .tab-btn:hover {
+        opacity: 0.85;
+        transform: scale(1.05);
     }
 
     /* Modal Styling */
@@ -178,6 +183,7 @@
         width: 360px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         animation: fadeIn 0.3s ease;
+        position: relative;
     }
 
     .modal-title {
