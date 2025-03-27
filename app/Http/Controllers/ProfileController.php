@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\Employee;
 use App\Models\Client;
@@ -74,8 +75,8 @@ class ProfileController extends Controller
                     $image = $request->file('profile_picture');
                     $imageName = 'employee_' . $employee->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
                     
-                    // Create directory if it doesn't exist
-                    $this->ensureProfilePictureDirectory();
+                    // Ensure the directory exists in storage
+                    Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
                     
                     // Resize and optimize the image
                     $processedImage = Image::make($image)
@@ -84,16 +85,17 @@ class ProfileController extends Controller
                         })
                         ->encode($image->getClientOriginalExtension(), 75);
                     
-                    // Save the processed image
-                    $processedImage->save(public_path('profile_pictures/' . $imageName));
+                    // Save the processed image to storage
+                    $path = 'profile_pictures/' . $imageName;
+                    Storage::disk('public')->put($path, $processedImage->__toString());
                     
                     // Update profile picture path in the database
-                    $employee->profile_picture = 'profile_pictures/' . $imageName;
+                    $employee->profile_picture = $path;
                     $employee->save();
 
                     return response()->json([
                         'success' => true, 
-                        'path' => 'profile_pictures/' . $imageName
+                        'path' => Storage::url($path)
                     ]);
 
                 } elseif ($user->role === 'client') {
@@ -105,8 +107,8 @@ class ProfileController extends Controller
                     $image = $request->file('profile_picture');
                     $imageName = 'client_' . $client->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
                     
-                    // Create directory if it doesn't exist
-                    $this->ensureProfilePictureDirectory();
+                    // Ensure the directory exists in storage
+                    Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
                     
                     // Resize and optimize the image
                     $processedImage = Image::make($image)
@@ -115,16 +117,17 @@ class ProfileController extends Controller
                         })
                         ->encode($image->getClientOriginalExtension(), 75);
                     
-                    // Save the processed image
-                    $processedImage->save(public_path('profile_pictures/' . $imageName));
+                    // Save the processed image to storage
+                    $path = 'profile_pictures/' . $imageName;
+                    Storage::disk('public')->put($path, $processedImage->__toString());
                     
                     // Update profile picture path in the database
-                    $client->profile_picture = 'profile_pictures/' . $imageName;
+                    $client->profile_picture = $path;
                     $client->save();
 
                     return response()->json([
                         'success' => true, 
-                        'path' => 'profile_pictures/' . $imageName
+                        'path' => Storage::url($path)
                     ]);
                 }
 
@@ -238,16 +241,14 @@ class ProfileController extends Controller
     // Helper methods
     private function deleteOldProfilePicture($path)
     {
-        if ($path && File::exists(public_path($path))) {
-            File::delete(public_path($path));
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
     }
 
     private function ensureProfilePictureDirectory()
     {
-        if (!File::exists(public_path('profile_pictures'))) {
-            File::makeDirectory(public_path('profile_pictures'), 0755, true);
-        }
+        Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
     }
 
     private function handleProfilePictureUpload($model, $image)
@@ -257,7 +258,7 @@ class ProfileController extends Controller
         
         $imageName = $model->getTable() . '_' . $model->id . '_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
         
-        // Create directory if it doesn't exist
+        // Ensure the directory exists
         $this->ensureProfilePictureDirectory();
         
         // Resize and optimize the image
@@ -267,10 +268,11 @@ class ProfileController extends Controller
             })
             ->encode($image->getClientOriginalExtension(), 75);
         
-        // Save the processed image
-        $processedImage->save(public_path('profile_pictures/' . $imageName));
+        // Save the processed image to storage
+        $path = 'profile_pictures/' . $imageName;
+        Storage::disk('public')->put($path, $processedImage->__toString());
         
         // Update profile picture path in the database
-        $model->profile_picture = 'profile_pictures/' . $imageName;
+        $model->profile_picture = $path;
     }
 }
