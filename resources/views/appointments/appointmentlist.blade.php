@@ -19,7 +19,13 @@
             <div class="trainer-role">Physiotherapist</div>
 
             <div class="action-buttons">
-                <a href="#" class="btn-view">View</a>
+							<a href="javascript:void(0);" class="btn-view"
+			   onclick="openModal({
+				   date: '{{ \Carbon\Carbon::parse($appointment->booking_date)->format('D, M j Y') }}',
+				   time: '{{ \Carbon\Carbon::parse($appointment->start_time)->format('h:i A') }} – {{ \Carbon\Carbon::parse($appointment->end_time)->format('h:i A') }}',
+				   trainer: '{{ $appointment->employee->emp_first_name }} {{ $appointment->employee->emp_surname }}',
+				   notes: '{{ $appointment->notes }}'
+			   })">View</a>
                 <a href="#" class="btn-cancel">Cancel</a>
             </div>
         </div>

@@ -4,10 +4,7 @@
 
 <!-- Dashboard Header -->
 <div class="dashboard-header">
-    <!-- Logo on the Left -->
     <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
-
-    <!-- User Name on the Right -->
     @auth
         <div class="user-info">
             {{ Auth::user()->name }} <i class="fas fa-user"></i>
@@ -17,8 +14,6 @@
 
 <section class="content-header">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-    <!-- Functional Filter Tabs -->
     <div class="tab-container">
         <a href="{{ url('/alerts?status=confirmed') }}" class="tab-btn tab-upcoming {{ request('status') == 'confirmed' || request('status') == null ? 'active' : '' }}">Upcoming</a>
         <a href="{{ url('/alerts?status=completed') }}" class="tab-btn tab-completed {{ request('status') == 'completed' ? 'active' : '' }}">Completed</a>
@@ -28,13 +23,22 @@
 
 <div class="content">
     <div class="clearfix"></div>
-
     @include('flash::message')
-
     <div class="clearfix"></div>
     <div class="box box-primary">
         <div class="box-body">
             @include('appointments.appointmentlist')
+        </div>
+    </div>
+</div>
+
+<!-- Modal Structure -->
+<div id="appointmentModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h3 class="modal-title">Appointment Details</h3>
+        <div id="modal-body">
+            <!-- Filled dynamically -->
         </div>
     </div>
 </div>
@@ -49,6 +53,23 @@
 </nav>
 
 @endsection
+
+<!-- Scripts -->
+<script>
+    function openModal(appointment) {
+        document.getElementById('modal-body').innerHTML = `
+            <p><strong>Date:</strong> ${appointment.date}</p>
+            <p><strong>Time:</strong> ${appointment.time}</p>
+            <p><strong>Trainer:</strong> ${appointment.trainer}</p>
+            <p><strong>Notes:</strong> ${appointment.notes || 'None'}</p>
+        `;
+        document.getElementById('appointmentModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('appointmentModal').style.display = 'none';
+    }
+</script>
 
 <style>
     h1, h2, h3, h4, h5, h6 {
@@ -95,7 +116,7 @@
         border-radius: 0 0 15px 15px;
     }
 
-    /* Appointment Filter Tabs */
+    /* Filter Tabs */
     .tab-container {
         display: flex;
         justify-content: center;
@@ -133,5 +154,50 @@
         border: 2px solid white;
         transform: translateY(-1px);
         opacity: 0.95;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        max-width: 90%;
+        width: 360px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-title {
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+        color: #C96E04;
+        font-weight: bold;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 18px;
+        right: 22px;
+        font-size: 1.5rem;
+        color: #666;
+        cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
