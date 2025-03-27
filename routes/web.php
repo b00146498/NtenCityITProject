@@ -210,3 +210,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::get('/client/help', function () {
     return view('clients.clienthelp');
 })->name('client.help');
+
+Route::get('/client/profile/edit', [ClientController::class, 'editClientProfile'])->name('client.editprofile');
+

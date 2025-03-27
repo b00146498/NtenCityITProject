@@ -210,5 +210,13 @@ class clientController extends AppBaseController
         return view('clients.clientdashboard', compact('employees'));
     }
 
+    public function editClientProfile()
+    {
+        $client = auth()->user(); // or fetch client by ID if needed
+        $practices = Practice::all();
+        
+        return view('clients.clienteditprofile', compact('client', 'practices'));
+    }
+
 
 }
