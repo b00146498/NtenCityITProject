@@ -12,12 +12,12 @@
                         <input type="file" id="profile-picture-input" name="profile_picture" style="display: none;" accept="image/*">
                         
                         @if(isset($employee) && $employee && $employee->profile_picture)
-                            <img src="{{ asset($employee->profile_picture) }}" 
+                            <img src="{{ asset('storage/' . $employee->profile_picture) }}" 
                                  id="profile-picture-preview"
                                  alt="Profile Picture" 
                                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                         @elseif(isset($client) && $client && $client->profile_picture)
-                            <img src="{{ asset($client->profile_picture) }}" 
+                            <img src="{{ asset('storage/' . $client->profile_picture) }}" 
                                  id="profile-picture-preview"
                                  alt="Profile Picture" 
                                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Update the image source with the server-side path
                         const img = document.getElementById('profile-picture-preview');
                         if (img) {
-                            img.src = '{{ asset('') }}' + data.path;
+                            img.src = data.path;
                         }
                     }
                 })
