@@ -125,7 +125,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('appointments.create') }}" class="action-card text-center">
                 <div class="icon-circle bg-warning-subtle text-warning">
-                    <i class="fas fa-calendar-plus"></i>
+                    <img src="{{ asset('booking.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Book Appointment</span>
             </a>
