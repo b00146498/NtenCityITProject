@@ -26,7 +26,12 @@
 				   trainer: '{{ $appointment->employee->emp_first_name }} {{ $appointment->employee->emp_surname }}',
 				   notes: '{{ $appointment->notes }}'
 			   })">View</a>
-                <a href="#" class="btn-cancel">Cancel</a>
+						<form action="{{ route('appointments.cancel', $appointment->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+			@csrf
+			@method('PATCH')
+			<button type="submit" class="btn-cancel">Cancel</button>
+		</form>
+
             </div>
         </div>
     </div>

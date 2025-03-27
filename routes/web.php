@@ -216,3 +216,4 @@ Route::get('/client/help', function () {
 
 Route::get('/client/profile/edit', [ClientController::class, 'editClientProfile'])->name('client.editprofile');
 
+Route::patch('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
