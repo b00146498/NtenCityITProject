@@ -85,6 +85,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/about', [ProfileController::class, 'about'])->name('profile.about');
     Route::get('/profile/help', [ProfileController::class, 'help'])->name('profile.help');
     Route::post('/profile/personal-details', [ProfileController::class, 'updatePersonalDetails'])->name('profile.update-details');
+// pp routes
+    Route::post('/profile/upload-picture', [ProfileController::class, 'uploadProfilePicture'])
+    ->name('profile.upload-picture');
 
     // Search Routes
     Route::get('/search-clients', [ClientController::class, 'searchClients'])->name('search.clients');
