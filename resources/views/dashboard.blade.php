@@ -105,7 +105,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('clients.create') }}" class="action-card text-center">
                 <div class="icon-circle bg-primary-subtle text-primary">
-                    <i class="fas fa-user-plus"></i>
+                    <img src="{{ asset('clients.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Add Client</span>
             </a>
