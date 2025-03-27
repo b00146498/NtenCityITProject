@@ -171,7 +171,7 @@
             </ul>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->is('employees') ? 'active' : '' }}" href="{{ url('/employees') }}">
+            <a class="nav-link {{ request()->routeIs('employees.index') ? 'active' : '' }}" href="{{ route('employees.index') }}">
                 <i class="fas fa-user-tie"></i> Employee
             </a>
         </li>

@@ -30,7 +30,7 @@ class employeeController extends AppBaseController
      *
      * @return Response
      */
-    public function index(Request $request)
+    /*public function index(Request $request)
     {
         $employee = Employee::with('practice')->where('userid', Auth::id())->first();
 
@@ -42,6 +42,14 @@ class employeeController extends AppBaseController
             'employee' => $employee,
             'practice' => $employee->practice
         ]);
+    }*/
+
+
+    public function index()
+    {
+        $employees = Employee::with('practice')->get();
+
+        return view('employees.index', compact('employees'));
     }
 
     /**
