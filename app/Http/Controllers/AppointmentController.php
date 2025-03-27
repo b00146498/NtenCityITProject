@@ -286,6 +286,15 @@ public function upcoming(Request $request)
     return view('appointments.appointmentindex', compact('appointments'));
 }
 
+public function cancel($id)
+{
+    $appointment = \App\Models\Appointment::findOrFail($id);
+    $appointment->status = 'canceled';
+    $appointment->save();
+
+    return back()->with('success', 'Appointment has been canceled.');
+}
+
 }
 
  

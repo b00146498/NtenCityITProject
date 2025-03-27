@@ -1,5 +1,5 @@
 @foreach ($appointments as $appointment)
-    <div class="appointment-card">
+<div class="appointment-card {{ $appointment->status === 'completed' ? 'completed' : '' }}">
         <div class="appointment-left">
             <div class="appointment-time-full">
                 <i class="fas fa-calendar-alt calendar-icon"></i>
@@ -26,7 +26,12 @@
 				   trainer: '{{ $appointment->employee->emp_first_name }} {{ $appointment->employee->emp_surname }}',
 				   notes: '{{ $appointment->notes }}'
 			   })">View</a>
-                <a href="#" class="btn-cancel">Cancel</a>
+						<form action="{{ route('appointments.cancel', $appointment->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+			@csrf
+			@method('PATCH')
+			<button type="submit" class="btn-cancel">Cancel</button>
+		</form>
+
             </div>
         </div>
     </div>
@@ -103,6 +108,20 @@
     padding: 6px 12px;
     border-radius: 8px;
     font-weight: bold;
+    font-size: 0.85rem;
+    text-decoration: none;
+    line-height: 1;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+
+.btn-view:hover {
+    background: #222;
+    color: white;
     text-decoration: none;
 }
 
@@ -113,6 +132,35 @@
     padding: 6px 12px;
     border-radius: 8px;
     font-weight: bold;
+    font-size: 0.85rem;
     text-decoration: none;
+    line-height: 1;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.btn-cancel:hover {
+    background: #ffeaea;
+}
+
+/* Completed appointment card style */
+.appointment-card.completed {
+    background-color: #f1fdf5; /* soft green tone */
+    border-left: 5px solid #28a745; /* green accent bar */
+    opacity: 0.95;
+    position: relative;
+}
+
+.appointment-card.completed::before {
+    content: '✓';
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 1.2rem;
+    color: #28a745;
+    font-weight: bold;
 }
 </style>
