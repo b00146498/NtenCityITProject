@@ -12,12 +12,12 @@
                         <input type="file" id="profile-picture-input" name="profile_picture" style="display: none;" accept="image/*">
                         
                         @if(isset($employee) && $employee && $employee->profile_picture)
-                            <img src="{{ asset($employee->profile_picture) }}" 
+                            <img src="{{ asset('storage/' . $employee->profile_picture) }}" 
                                  id="profile-picture-preview"
                                  alt="Profile Picture" 
                                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                         @elseif(isset($client) && $client && $client->profile_picture)
-                            <img src="{{ asset($client->profile_picture) }}" 
+                            <img src="{{ asset('storage/' . $client->profile_picture) }}" 
                                  id="profile-picture-preview"
                                  alt="Profile Picture" 
                                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
@@ -81,6 +81,11 @@
     </div>
 </div>
 
+<!-- Hidden form for CSRF token -->
+<form id="csrf-form" style="display: none;">
+    @csrf
+</form>
+
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
     @csrf
 </form>
@@ -92,73 +97,146 @@
 document.addEventListener('DOMContentLoaded', function() {
     const avatarContainer = document.querySelector('.user-avatar');
     const profilePictureInput = document.getElementById('profile-picture-input');
-    const profilePicturePreview = document.getElementById('profile-picture-preview');
+    let profilePicturePreview = document.getElementById('profile-picture-preview');
     const uploadOverlay = document.getElementById('upload-overlay');
+    const csrfToken = document.querySelector('input[name="_token"]').value;
 
     // Click to trigger file input
-    avatarContainer.addEventListener('click', () => {
-        profilePictureInput.click();
-    });
+    if (avatarContainer) {
+        avatarContainer.addEventListener('click', () => {
+            profilePictureInput.click();
+        });
+    }
 
     // Show/hide upload overlay
-    avatarContainer.addEventListener('mouseenter', () => {
-        uploadOverlay.style.display = 'flex';
-    });
+    if (avatarContainer && uploadOverlay) {
+        avatarContainer.addEventListener('mouseenter', () => {
+            uploadOverlay.style.display = 'flex';
+        });
 
-    avatarContainer.addEventListener('mouseleave', () => {
-        uploadOverlay.style.display = 'none';
-    });
+        avatarContainer.addEventListener('mouseleave', () => {
+            uploadOverlay.style.display = 'none';
+        });
+    }
 
     // Handle file selection
-    profilePictureInput.addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            console.log('File selected:', file.name, file.type, file.size);
+            
+            // Validate file type
+            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp'];
+            if (!validImageTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPEG, PNG, GIF, WebP)');
+                return;
+            }
+            
             const reader = new FileReader();
             
             reader.onload = function(e) {
-                // Preview the image
-                if (profilePicturePreview.tagName.toLowerCase() === 'div') {
-                    // If it's the default icon, replace with an img
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.id = 'profile-picture-preview';
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.borderRadius = '50%';
-                    img.style.objectFit = 'cover';
-                    profilePicturePreview.parentNode.replaceChild(img, profilePicturePreview);
-                } else {
-                    profilePicturePreview.src = e.target.result;
+                try {
+                    // Preview the image
+                    if (profilePicturePreview && profilePicturePreview.tagName && profilePicturePreview.tagName.toLowerCase() === 'div') {
+                        // Create a new image element
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.id = 'profile-picture-preview';
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.borderRadius = '50%';
+                        img.style.objectFit = 'cover';
+                        
+                        // Replace the div with the new image
+                        if (profilePicturePreview.parentNode) {
+                            profilePicturePreview.parentNode.replaceChild(img, profilePicturePreview);
+                            profilePicturePreview = img; // Update the reference
+                        } else {
+                            console.error('Cannot replace profile picture: parent node is null');
+                        }
+                    } else if (profilePicturePreview) {
+                        // Just update the src of the existing image
+                        profilePicturePreview.src = e.target.result;
+                    } else {
+                        console.error('Profile picture preview element not found');
+                    }
+                } catch (error) {
+                    console.error('Error updating preview image:', error);
                 }
                 
                 // Prepare FormData for upload
                 const formData = new FormData();
                 formData.append('profile_picture', file);
-
+                formData.append('_token', csrfToken);
+                
+                console.log('Sending request to:', '{{ route("profile.upload-picture") }}');
+                
                 // Send AJAX request to upload
                 fetch('{{ route("profile.upload-picture") }}', {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        'X-CSRF-TOKEN': csrfToken
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error('Server returned ' + response.status + ' ' + response.statusText);
+                    }
+                    return response.text().then(text => {
+                        try {
+                            return text ? JSON.parse(text) : {};
+                        } catch (e) {
+                            console.error('Error parsing response as JSON:', e);
+                            console.log('Raw response:', text);
+                            throw new Error('Invalid JSON response from server');
+                        }
+                    });
+                })
                 .then(data => {
+                    console.log('Upload response:', data);
                     if (data.success) {
-                        // Optional: show success message
-                        console.log('Profile picture updated');
+                        console.log('Profile picture updated successfully');
+                        console.log('Path returned:', data.path);
+                        
+                        // Update the image source with the server-side path
+                        const img = document.getElementById('profile-picture-preview');
+                        if (img) {
+                            img.src = data.path;
+                            console.log('Updated image source to:', img.src);
+                            
+                            // Save the path to localStorage
+                            localStorage.setItem('profilePicturePath', data.path);
+                        }
+                    } else {
+                        console.error('Upload failed:', data.errors || data.message || 'Unknown error');
+                        alert('Failed to upload profile picture: ' + (data.errors || data.message || 'Unknown error'));
                     }
                 })
                 .catch(error => {
                     console.error('Upload error:', error);
-                    // Optionally revert preview
+                    alert('Error uploading profile picture. Please try again. ' + error.message);
                 });
+            };
+            
+            reader.onerror = function(e) {
+                console.error('FileReader error:', e);
+                alert('Error reading the image file. Please try again.');
             };
 
             reader.readAsDataURL(file);
-        }
-    });
+        });
+    }
+    
+    // Check if we have a saved path in localStorage
+    const savedPath = localStorage.getItem('profilePicturePath');
+    if (savedPath && profilePicturePreview && profilePicturePreview.tagName && profilePicturePreview.tagName.toLowerCase() === 'img') {
+        console.log('Restoring profile picture from saved path:', savedPath);
+        profilePicturePreview.src = savedPath;
+    }
 });
 
 function confirmLogout(event) {
