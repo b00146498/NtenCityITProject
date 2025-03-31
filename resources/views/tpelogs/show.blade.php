@@ -22,6 +22,12 @@
             <div class="d-flex justify-content-end mt-3 no-print">
                 <a href="{!! route('tpelogs.index') !!}" class="btn btn-outline-dark px-4 py-2">Back</a>
             </div>
+
+            <div id="print-area">
+                @include('tpelogs.show_fields')
+            </div>
+
+            <button onclick="window.print()" class="btn btn-warning mt-3 no-print">Print / Save as PDF</button>
         </div>
     </div>
 </div>
@@ -54,7 +60,12 @@
         left: 0;
         top: 0;
         width: 100%;
+<<<<<<< HEAD
         padding: 10px;
+=======
+        margin: 0;
+        padding: 0;
+>>>>>>> abd2327c01dee8f7b3c7ffa470c3abd42669ff7a
         background: white;
         z-index: 9999;
     }
@@ -71,11 +82,16 @@
     table {
         width: 100%;
         border-collapse: collapse;
+<<<<<<< HEAD
         font-size: 10pt;
+=======
+        font-size: 12pt;
+>>>>>>> abd2327c01dee8f7b3c7ffa470c3abd42669ff7a
     }
 
     th, td {
         border: 1px solid #000;
+<<<<<<< HEAD
         padding: 6px;
         text-align: left;
     }
@@ -95,3 +111,18 @@
     }
 }
 </style>
+=======
+        padding: 10px;
+        text-align: left;
+    }
+
+    .no-print, .sidebar, nav, .navbar, footer {
+        display: none !important;
+    }
+}
+</style>
+
+
+
+
+>>>>>>> abd2327c01dee8f7b3c7ffa470c3abd42669ff7a
