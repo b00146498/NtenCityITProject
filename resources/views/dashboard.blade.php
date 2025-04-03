@@ -29,20 +29,68 @@
 
     
     <!-- Stats Boxes -->
-    <div class="d-flex gap-3">
-        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center">
-            <i class="fas fa-calendar-day text-primary me-2"></i>
-            <span class="fw-bold">{{ now()->format('d/m/Y') }}</span>
+    <div class="d-flex gap-3 flex-wrap">
+        <!-- Today’s Date -->
+        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center stat-box">
+            <i class="fas fa-calendar-day text-primary me-2 fs-5"></i>
+            <div class="d-flex flex-column">
+                <span class="fw-bold text-muted">Today</span>
+                <span class="fw-bold">{{ now()->format('d/m/Y') }}</span>
+            </div>
         </div>
 
-        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center">
-            <i class="fas fa-clock text-success me-2"></i>
-            <span class="fw-bold">{{ $appointments->count() }} Upcoming</span>
+        <!-- Upcoming Appointments with hover -->
+        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center position-relative stat-box-hover">
+            <i class="fas fa-clock text-success me-2 fs-5"></i>
+            <div class="d-flex flex-column">
+                <span class="fw-bold text-muted">Appointments</span>
+                <span class="fw-bold">{{ $appointments->count() }} Upcoming</span>
+            </div>
+
+            <!-- Hover Box -->
+            <div class="stat-preview">
+                @forelse ($appointments->take(3) as $appt)
+                    <div class="stat-preview-item">
+                        <div><strong>{{ $appt->client->name ?? 'Unnamed' }}</strong></div>
+                        <small>{{ \Carbon\Carbon::parse($appt->start_time)->format('d M Y, H:i') }}</small>
+                    </div>
+                @empty
+                    <div class="stat-preview-item text-muted">No upcoming appointments</div>
+                @endforelse
+
+                @if ($appointments->count() > 3)
+                    <div class="text-center p-2">
+                        <a href="{{ route('appointments.index') }}" class="text-decoration-none">View All</a>
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center">
-            <i class="fas fa-user-friends text-warning me-2"></i>
-            <span class="fw-bold">{{ $activeClients }} Active Clients</span>
+        <!-- Active Clients with hover -->
+        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center position-relative stat-box-hover">
+            <i class="fas fa-user-friends text-warning me-2 fs-5"></i>
+            <div class="d-flex flex-column">
+                <span class="fw-bold text-muted">Clients</span>
+                <span class="fw-bold">{{ $activeClients }} Active</span>
+            </div>
+
+            <!-- Hover Preview -->
+            <div class="stat-preview">
+                @forelse ($clients->take(3) as $client)
+                    <div class="stat-preview-item">
+                        <strong>{{ $client->first_name ?? 'Unnamed' }}</strong>
+                        <small class="d-block text-muted">Joined: {{ \Carbon\Carbon::parse($client->created_at)->format('d M Y') }}</small>
+                    </div>
+                @empty
+                    <div class="stat-preview-item text-muted">No active clients</div>
+                @endforelse
+
+                @if ($clients->count() > 3)
+                    <div class="text-center p-2">
+                        <a href="{{ route('clients.index') }}" class="text-decoration-none">View All</a>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -207,6 +255,39 @@
         height: 42px;
         object-fit: contain;
         transition: transform 0.3s ease;
+    }
+
+
+
+    .stat-box-hover {
+    position: relative;
+    }
+
+    .stat-preview {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 999;
+        width: 250px;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        display: none;
+        padding: 0.5rem;
+    }
+
+    .stat-box-hover:hover .stat-preview {
+        display: block;
+    }
+
+    .stat-preview-item {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .stat-preview-item:last-child {
+        border-bottom: none;
     }
 
 

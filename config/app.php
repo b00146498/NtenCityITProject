@@ -165,7 +165,7 @@ return [
         /*
          * Package Service Providers...
          */
-        Intervention\Image\ImageServiceProvider::class, // Added Intervention Image provider
+        //Intervention\Image\ImageServiceProvider::class, // Added Intervention Image provider
 
         /*
          * Application Service Providers...
@@ -233,7 +233,7 @@ return [
         'Form'      => Collective\Html\FormFacade::class,
         'Html'      => Collective\Html\HtmlFacade::class,
         'Flash'     => Laracasts\Flash\Flash::class,
-        'Image'     => Intervention\Image\Facades\Image::class, // Added Intervention Image facade
+        //'Image'     => Intervention\Image\Facades\Image::class, // Added Intervention Image facade
     ],
 
 ];

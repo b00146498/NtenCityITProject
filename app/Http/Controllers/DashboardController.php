@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Client;
 use App\Models\Employee;
 use App\Services\WeatherService;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
@@ -61,6 +62,8 @@ class DashboardController extends Controller
         $clients = \App\Models\Client::where('practice_id', $employee->practice_id)->get();
         $activeClients = $clients->where('account_status', 'Active')->count();
 
+        $activeClients = $clients->where('account_status', 'Active')->count();
+
         $company_name = optional($employee->practice)->company_name ?? 'Unknown Practice';
 
         // Get weather data
@@ -72,7 +75,7 @@ class DashboardController extends Controller
             'employee',
             'company_name',
             'activeClients',
-            'weather' // Pass weather to view
+            'weather' 
         ));
     }
 

@@ -14,6 +14,7 @@ use App\Models\Client;
 use App\Models\Practice;
 use App\Models\User;
 use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
 
 class ProfileController extends Controller
 {
@@ -430,5 +431,13 @@ class ProfileController extends Controller
         
         // Update profile picture path in the database
         $model->profile_picture = $path;
+    }
+    public function store(Request $request, ImageManager $imageManager)
+    {
+        $image = $imageManager->read($request->file('photo')->getPathname());
+
+        $resized = $image->scale(width: 300, height: 300);
+
+        $resized->toPng()->save(storage_path('app/public/image.png'));
     }
 }
