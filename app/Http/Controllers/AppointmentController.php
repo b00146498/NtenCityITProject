@@ -290,6 +290,7 @@ public function upcoming(Request $request)
 }
 
 
+
 public function cancel($id)
 {
     $appointment = \App\Models\Appointment::findOrFail($id);

@@ -1,4 +1,4 @@
-@extends('layouts.mobile') 
+@extends('layouts.mobile')
 
 @section('content')
 
@@ -15,18 +15,28 @@
 <section class="content-header">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-    <!-- Date Strip -->
-    <div class="date-strip">
-        @for ($i = 0; $i < 7; $i++)
-            @php
-                $date = \Carbon\Carbon::now()->addDays($i);
-            @endphp
-            <button class="date-btn {{ request('day') == $date->toDateString() ? 'active' : '' }}"
-                onclick="window.location.href='?status={{ request('status', 'confirmed') }}&day={{ $date->toDateString() }}'">
-                <div class="day">{{ $date->format('D') }}</div>
-                <div class="date">{{ $date->format('j') }}</div>
-            </button>
-        @endfor
+    <!-- Enhanced Date Strip with Arrows -->
+    <div class="date-strip-wrapper">
+        <button class="arrow-btn left" onclick="scrollDateStrip(-100)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div class="date-strip" id="dateStrip">
+            @for ($i = 0; $i < 7; $i++)
+                @php
+                    $date = \Carbon\Carbon::now()->addDays($i);
+                    $isToday = $date->isToday();
+                @endphp
+                <button class="date-button {{ request('day') == $date->toDateString() ? 'active' : '' }} {{ $isToday ? 'today' : '' }}"
+                    onclick="window.location.href='?status={{ request('status', 'confirmed') }}&day={{ $date->toDateString() }}'">
+                    {{ $date->format('D') }}<br>{{ $date->format('j') }}
+                </button>
+            @endfor
+        </div>
+
+        <button class="arrow-btn right" onclick="scrollDateStrip(100)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
     </div>
 
     <!-- Status Tabs -->
@@ -38,9 +48,7 @@
 </section>
 
 <div class="content">
-    <div class="clearfix"></div>
     @include('flash::message')
-    <div class="clearfix"></div>
     <div class="box box-primary">
         <div class="box-body">
             @include('appointments.appointmentlist')
@@ -85,14 +93,14 @@
     function closeModal() {
         document.getElementById('appointmentModal').style.display = 'none';
     }
+
+    function scrollDateStrip(distance) {
+        const strip = document.getElementById('dateStrip');
+        strip.scrollBy({ left: distance, behavior: 'smooth' });
+    }
 </script>
 
 <style>
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: bold !important;
-        font-size: 3rem !important;
-    }
-
     .dashboard-header {
         display: flex;
         justify-content: space-between;
@@ -132,40 +140,76 @@
         border-radius: 0 0 15px 15px;
     }
 
-    /* Date Strip Styling */
-    .date-strip {
+    .date-strip-wrapper {
         display: flex;
-        justify-content: space-between;
-        overflow-x: auto;
-        padding: 10px 0;
-        margin-bottom: 10px;
-        gap: 8px;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin: 0 auto 20px;
+        max-width: 95%;
     }
 
-    .date-btn {
-        background: white;
-        border: 1px solid #ccc;
-        border-radius: 12px;
-        padding: 6px 12px;
-        text-align: center;
-        font-size: 0.85rem;
-        min-width: 50px;
-        color: #333;
+    .arrow-btn {
+        background: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        color: #C96E04;
         cursor: pointer;
         transition: 0.2s ease;
     }
 
-    .date-btn .day {
-        font-weight: bold;
+    .arrow-btn:hover {
+        background-color: #f2f2f2;
     }
 
-    .date-btn.active {
+    .date-strip {
+        display: flex;
+        overflow-x: auto;
+        gap: 12px;
+        flex: 1;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .date-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    .date-button {
+        flex: 0 0 auto;
+        text-align: center;
+        border: 2px solid #ddd;
+        border-radius: 16px;
+        padding: 10px 12px;
+        background-color: white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        min-width: 55px;
+        transition: 0.3s ease;
+        font-size: 0.9rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .date-button:hover {
+        background-color: #f3f3f3;
+        transform: translateY(-1px);
+    }
+
+    .date-button.active {
         background-color: #C96E04;
         color: white;
         border-color: #C96E04;
+        font-weight: bold;
     }
 
-    /* Filter Tabs */
+    .date-button.today:not(.active) {
+        border-color: #C96E04;
+        box-shadow: 0 0 0 2px rgba(201, 110, 4, 0.3);
+    }
+
     .tab-container {
         display: flex;
         justify-content: center;
@@ -210,7 +254,6 @@
         transform: scale(1.05);
     }
 
-    /* Modal Styling */
     .modal-overlay {
         display: none;
         position: fixed;
