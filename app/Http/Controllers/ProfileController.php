@@ -5,8 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\Employee;
 use App\Models\Client;
+use App\Models\Practice;
+use App\Models\User;
+use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
 
 class ProfileController extends Controller
 {
@@ -18,8 +26,42 @@ class ProfileController extends Controller
         
         if ($user->role === 'employee') {
             $employee = Employee::where('userid', $user->id)->first();
+            
+            // Debug: Check if employee has a profile picture
+            \Log::info('Employee profile accessed', [
+                'employee_id' => $employee ? $employee->id : 'null',
+                'profile_picture' => $employee ? $employee->profile_picture : 'null'
+            ]);
+            
+            // Ensure full path is used for profile picture
+            if ($employee && $employee->profile_picture) {
+                if (!str_starts_with($employee->profile_picture, 'profile_pictures/')) {
+                    $employee->profile_picture = 'profile_pictures/' . $employee->profile_picture;
+                    $employee->save();
+                    \Log::info('Updated employee profile picture path', [
+                        'new_path' => $employee->profile_picture
+                    ]);
+                }
+            }
         } else if ($user->role === 'client') {
             $client = Client::where('userid', $user->id)->first();
+            
+            // Debug: Check if client has a profile picture
+            \Log::info('Client profile accessed', [
+                'client_id' => $client ? $client->id : 'null',
+                'profile_picture' => $client ? $client->profile_picture : 'null'
+            ]);
+            
+            // Similar logic for client
+            if ($client && $client->profile_picture) {
+                if (!str_starts_with($client->profile_picture, 'profile_pictures/')) {
+                    $client->profile_picture = 'profile_pictures/' . $client->profile_picture;
+                    $client->save();
+                    \Log::info('Updated client profile picture path', [
+                        'new_path' => $client->profile_picture
+                    ]);
+                }
+            }
         }
         
         return view('profile.index', compact('user', 'employee', 'client'));
@@ -27,72 +69,209 @@ class ProfileController extends Controller
     
     public function uploadProfilePicture(Request $request)
     {
-        $request->validate([
-            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        \Log::info('Profile picture upload initiated', [
+            'user_id' => Auth::id(),
+            'user_role' => Auth::user()->role,
+            'content_type' => $request->file('profile_picture') ? $request->file('profile_picture')->getMimeType() : 'none'
         ]);
+        
+        // Updated validator to accept webp format
+        $validator = Validator::make($request->all(), [
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            \Log::warning('Profile picture validation failed', [
+                'errors' => $validator->errors()->first('profile_picture'),
+                'mime_type' => $request->file('profile_picture') ? $request->file('profile_picture')->getMimeType() : 'none'
+            ]);
+            
+            return response()->json([
+                'success' => false, 
+                'errors' => $validator->errors()->first('profile_picture')
+            ], 400);
+        }
 
         $user = Auth::user();
 
         if ($request->hasFile('profile_picture')) {
-            // Determine if it's an employee or client
-            if ($user->role === 'employee') {
-                $employee = Employee::where('userid', $user->id)->first();
-                
-                // Delete old picture if it exists
-                if ($employee->profile_picture && File::exists(public_path($employee->profile_picture))) {
-                    File::delete(public_path($employee->profile_picture));
-                }
-                
-                $image = $request->file('profile_picture');
-                $imageName = 'employee_' . $employee->id . '_' . time() . '.' . $image->getClientOriginalExtension();
-                
-                // Create directory if it doesn't exist
-                if (!File::exists(public_path('profile_pictures'))) {
-                    File::makeDirectory(public_path('profile_pictures'), 0755, true);
-                }
-                
-                // Store image in the public/profile_pictures directory
-                $image->move(public_path('profile_pictures'), $imageName);
-                
-                // Update profile picture path in the database
-                $employee->profile_picture = 'profile_pictures/' . $imageName;
-                $employee->save();
+            try {
+                // Determine if it's an employee or client
+                if ($user->role === 'employee') {
+                    $employee = Employee::where('userid', $user->id)->first();
+                    
+                    // Check if employee exists
+                    if (!$employee) {
+                        \Log::error('Employee record not found for user', ['user_id' => $user->id]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Employee record not found. Please contact administrator.'
+                        ], 404);
+                    }
+                    
+                    \Log::info('Employee profile picture upload', [
+                        'employee_id' => $employee->id,
+                        'old_picture' => $employee->profile_picture,
+                        'mime_type' => $request->file('profile_picture')->getMimeType()
+                    ]);
+                    
+                    // Delete old picture if it exists
+                    $this->deleteOldProfilePicture($employee->profile_picture);
+                    
+                    $image = $request->file('profile_picture');
+                    // Handle WebP format: convert to jpg for better compatibility
+                    $extension = $image->getMimeType() == 'image/webp' ? 'jpg' : $image->getClientOriginalExtension();
+                    $imageName = 'employee_' . $employee->id . '_' . Str::random(10) . '.' . $extension;
+                    
+                    \Log::info('Generated image name', [
+                        'image_name' => $imageName,
+                        'original_extension' => $image->getClientOriginalExtension(),
+                        'mime_type' => $image->getMimeType(),
+                        'final_extension' => $extension
+                    ]);
+                    
+                    // Ensure the directory exists in storage
+                    Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
+                    
+                    // Resize and optimize the image
+                    $processedImage = Image::make($image)
+                        ->fit(300, 300, function ($constraint) {
+                            $constraint->upsize();
+                        });
+                    
+                    // Convert WebP to JPEG if needed
+                    if ($image->getMimeType() == 'image/webp') {
+                        $processedImage->encode('jpg', 90);
+                    } else {
+                        $processedImage->encode($extension, 75);
+                    }
+                    
+                    // Save the processed image to storage
+                    $path = 'profile_pictures/' . $imageName;
+                    Storage::disk('public')->put($path, $processedImage->__toString());
+                    
+                    \Log::info('Image saved to storage', [
+                        'path' => $path,
+                        'full_url' => Storage::url($path),
+                        'exists' => Storage::disk('public')->exists($path)
+                    ]);
+                    
+                    // Update profile picture path in the database
+                    $employee->profile_picture = $path;
+                    $employee->save();
+                    
+                    \Log::info('Employee profile updated', [
+                        'profile_picture' => $employee->profile_picture
+                    ]);
 
-                return response()->json([
-                    'success' => true, 
-                    'path' => 'profile_pictures/' . $imageName
+                    return response()->json([
+                        'success' => true, 
+                        'path' => Storage::url($path),
+                        'debug_info' => [
+                            'stored_path' => $path,
+                            'full_url' => Storage::url($path),
+                            'file_exists' => Storage::disk('public')->exists($path)
+                        ]
+                    ]);
+
+                } elseif ($user->role === 'client') {
+                    $client = Client::where('userid', $user->id)->first();
+                    
+                    // Check if client exists
+                    if (!$client) {
+                        \Log::error('Client record not found for user', ['user_id' => $user->id]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Client record not found. Please contact administrator.'
+                        ], 404);
+                    }
+                    
+                    \Log::info('Client profile picture upload', [
+                        'client_id' => $client->id,
+                        'old_picture' => $client->profile_picture,
+                        'mime_type' => $request->file('profile_picture')->getMimeType()
+                    ]);
+                    
+                    // Delete old picture if it exists
+                    $this->deleteOldProfilePicture($client->profile_picture);
+                    
+                    $image = $request->file('profile_picture');
+                    // Handle WebP format: convert to jpg for better compatibility
+                    $extension = $image->getMimeType() == 'image/webp' ? 'jpg' : $image->getClientOriginalExtension();
+                    $imageName = 'client_' . $client->id . '_' . Str::random(10) . '.' . $extension;
+                    
+                    \Log::info('Generated image name', [
+                        'image_name' => $imageName,
+                        'mime_type' => $image->getMimeType()
+                    ]);
+                    
+                    // Ensure the directory exists in storage
+                    Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
+                    
+                    // Resize and optimize the image
+                    $processedImage = Image::make($image)
+                        ->fit(300, 300, function ($constraint) {
+                            $constraint->upsize();
+                        });
+                    
+                    // Convert WebP to JPEG if needed
+                    if ($image->getMimeType() == 'image/webp') {
+                        $processedImage->encode('jpg', 90);
+                    } else {
+                        $processedImage->encode($extension, 75);
+                    }
+                    
+                    // Save the processed image to storage
+                    $path = 'profile_pictures/' . $imageName;
+                    Storage::disk('public')->put($path, $processedImage->__toString());
+                    
+                    \Log::info('Image saved to storage', [
+                        'path' => $path,
+                        'full_url' => Storage::url($path),
+                        'exists' => Storage::disk('public')->exists($path)
+                    ]);
+                    
+                    // Update profile picture path in the database
+                    $client->profile_picture = $path;
+                    $client->save();
+                    
+                    \Log::info('Client profile updated', [
+                        'profile_picture' => $client->profile_picture
+                    ]);
+
+                    return response()->json([
+                        'success' => true, 
+                        'path' => Storage::url($path),
+                        'debug_info' => [
+                            'stored_path' => $path,
+                            'full_url' => Storage::url($path),
+                            'file_exists' => Storage::disk('public')->exists($path)
+                        ]
+                    ]);
+                } else {
+                    // User role is neither employee nor client
+                    \Log::error('Invalid user role for profile picture upload', ['role' => $user->role]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid user role. Profile pictures are only available for employees and clients.'
+                    ], 400);
+                }
+
+            } catch (\Exception $e) {
+                \Log::error('Profile Picture Upload Error: ' . $e->getMessage(), [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString()
                 ]);
-
-            } elseif ($user->role === 'client') {
-                $client = Client::where('userid', $user->id)->first();
                 
-                // Delete old picture if it exists
-                if ($client->profile_picture && File::exists(public_path($client->profile_picture))) {
-                    File::delete(public_path($client->profile_picture));
-                }
-                
-                $image = $request->file('profile_picture');
-                $imageName = 'client_' . $client->id . '_' . time() . '.' . $image->getClientOriginalExtension();
-                
-                // Create directory if it doesn't exist
-                if (!File::exists(public_path('profile_pictures'))) {
-                    File::makeDirectory(public_path('profile_pictures'), 0755, true);
-                }
-                
-                // Store image in the public/profile_pictures directory
-                $image->move(public_path('profile_pictures'), $imageName);
-                
-                // Update profile picture path in the database
-                $client->profile_picture = 'profile_pictures/' . $imageName;
-                $client->save();
-
                 return response()->json([
-                    'success' => true, 
-                    'path' => 'profile_pictures/' . $imageName
-                ]);
+                    'success' => false, 
+                    'message' => 'An error occurred while uploading the profile picture: ' . $e->getMessage()
+                ], 500);
             }
         }
 
+        \Log::warning('Profile picture upload failed - no file provided');
         return response()->json(['success' => false], 400);
     }
     
@@ -101,6 +280,7 @@ class ProfileController extends Controller
         $user = Auth::user();
         $employee = null;
         $client = null;
+        $practices = Practice::all(); // Load all practices for potential use
         
         if ($user->role === 'employee') {
             $employee = Employee::where('userid', $user->id)->first();
@@ -108,83 +288,76 @@ class ProfileController extends Controller
             $client = Client::where('userid', $user->id)->first();
         }
         
-        return view('profile.personal-details', compact('user', 'employee', 'client'));
+        return view('profile.personal-details', compact('user', 'employee', 'client', 'practices'));
     }
     
     public function updatePersonalDetails(Request $request)
     {
         $user = Auth::user();
         
-        if ($user->role === 'employee') {
-            $employee = Employee::where('userid', $user->id)->first();
-            
-            if (!$employee) {
-                return redirect()->route('profile')->with('error', 'Employee profile not found.');
-            }
-            
-            $request->validate([
-                'emp_first_name' => 'required|string|max:50',
-                'emp_surname' => 'required|string|max:50',
-                'contact_number' => 'required|string|max:15',
-                'emergency_contact' => 'required|string|max:50',
-                'email' => 'required|email|max:255|unique:employee,email,' . $employee->id,
-                'street' => 'required|string|max:255',
-                'city' => 'required|string|max:50',
-                'county' => 'required|string|max:50',
-                'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-            ]);
-            
-            // Handle profile picture upload
-            if ($request->hasFile('profile_picture')) {
-                // Delete old picture if it exists
-                if ($employee->profile_picture && File::exists(public_path($employee->profile_picture))) {
-                    File::delete(public_path($employee->profile_picture));
+        try {
+            if ($user->role === 'employee') {
+                $employee = Employee::where('userid', $user->id)->first();
+                
+                if (!$employee) {
+                    return redirect()->route('profile')->with('error', 'Employee profile not found.');
                 }
                 
-                $image = $request->file('profile_picture');
-                $imageName = 'employee_' . $employee->id . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $validationRules = [
+                    'emp_first_name' => 'required|string|max:50',
+                    'emp_surname' => 'required|string|max:50',
+                    'contact_number' => 'required|string|max:15',
+                    'emergency_contact' => 'required|string|max:50',
+                    'email' => 'required|email|max:255|unique:employee,email,' . $employee->id,
+                    'street' => 'required|string|max:255',
+                    'city' => 'required|string|max:50',
+                    'county' => 'required|string|max:50',
+                    'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+                ];
+
+                // Validate the request with custom error messages
+                $validatedData = $request->validate($validationRules, [
+                    'emp_first_name.required' => 'First name is required.',
+                    'emp_surname.required' => 'Surname is required.',
+                    'contact_number.required' => 'Contact number is required.',
+                    'emergency_contact.required' => 'Emergency contact is required.',
+                    'email.required' => 'Email is required.',
+                    'email.email' => 'Please enter a valid email address.',
+                    'street.required' => 'Street address is required.',
+                    'city.required' => 'City is required.',
+                    'county.required' => 'County is required.',
+                ]);
                 
-                // Create directory if it doesn't exist
-                if (!File::exists(public_path('profile_pictures'))) {
-                    File::makeDirectory(public_path('profile_pictures'), 0755, true);
+                // Handle profile picture upload
+                if ($request->hasFile('profile_picture')) {
+                    $this->handleProfilePictureUpload($employee, $request->file('profile_picture'));
                 }
                 
-                // Store image in the public/profile_pictures directory
-                $image->move(public_path('profile_pictures'), $imageName);
+                // Update the employee record with form data
+                $employee->fill($validatedData);
+                $employee->save();
                 
-                // Update profile picture path in the database
-                $employee->profile_picture = 'profile_pictures/' . $imageName;
-            }
+                // Also update the user record email if needed
+                if ($user->email != $request->email) {
+                    $user->email = $request->email;
+                    $user->save();
+                }
+
+                return redirect()->route('profile.personal-details')
+                                 ->with('success', 'Personal details updated successfully.');
+            } 
+        } catch (\Exception $e) {
+            // Log the full error for debugging
+            \Log::error('Profile Update Error: ' . $e->getMessage());
             
-            // Update the employee record with form data
-            $employee->emp_first_name = $request->emp_first_name;
-            $employee->emp_surname = $request->emp_surname;
-            $employee->contact_number = $request->contact_number;
-            $employee->emergency_contact = $request->emergency_contact;
-            $employee->email = $request->email;
-            $employee->street = $request->street;
-            $employee->city = $request->city;
-            $employee->county = $request->county;
-            $employee->save();
-            
-            // Also update the user record email if needed
-            if ($user->email != $request->email) {
-                $user->email = $request->email;
-                $user->save();
-            }
-        } else if ($user->role === 'client') {
-            // Handle client update logic here
-            $client = Client::where('userid', $user->id)->first();
-            
-            if (!$client) {
-                return redirect()->route('profile')->with('error', 'Client profile not found.');
-            }
-            
-            // Add client-specific validation and update logic here
+            // Return with a generic error message
+            return redirect()->back()
+                             ->with('error', 'An error occurred while updating your profile. ' . $e->getMessage())
+                             ->withInput();
         }
-        
-        return redirect()->route('profile.personal-details')
-                         ->with('success', 'Personal details updated successfully.');
+
+        // If not an employee, return with an error
+        return redirect()->route('profile')->with('error', 'Invalid user role.');
     }
     
     public function about()
@@ -195,5 +368,76 @@ class ProfileController extends Controller
     public function help()
     {
         return view('profile.help');
+    }
+
+    // Helper methods
+    private function deleteOldProfilePicture($path)
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+            \Log::info('Deleted old profile picture', ['path' => $path]);
+        } else if ($path) {
+            \Log::warning('Could not delete old profile picture - file does not exist', ['path' => $path]);
+        }
+    }
+
+    private function ensureProfilePictureDirectory()
+    {
+        Storage::disk('public')->makeDirectory('profile_pictures', 0755, true);
+        \Log::info('Ensured profile pictures directory exists');
+    }
+
+    private function handleProfilePictureUpload($model, $image)
+    {
+        // Make sure model is not null
+        if (!$model) {
+            \Log::error('Cannot upload profile picture - model is null');
+            return;
+        }
+        
+        // Delete old picture if it exists
+        $this->deleteOldProfilePicture($model->profile_picture);
+        
+        // Handle WebP format: convert to jpg for better compatibility
+        $extension = $image->getMimeType() == 'image/webp' ? 'jpg' : $image->getClientOriginalExtension();
+        $imageName = $model->getTable() . '_' . $model->id . '_' . Str::random(10) . '.' . $extension;
+        
+        // Ensure the directory exists
+        $this->ensureProfilePictureDirectory();
+        
+        // Resize and optimize the image
+        $processedImage = Image::make($image)
+            ->fit(300, 300, function ($constraint) {
+                $constraint->upsize();
+            });
+        
+        // Convert WebP to JPEG if needed
+        if ($image->getMimeType() == 'image/webp') {
+            $processedImage->encode('jpg', 90);
+        } else {
+            $processedImage->encode($extension, 75);
+        }
+        
+        // Save the processed image to storage
+        $path = 'profile_pictures/' . $imageName;
+        Storage::disk('public')->put($path, $processedImage->__toString());
+        
+        \Log::info('Profile picture uploaded via form handler', [
+            'path' => $path,
+            'exists' => Storage::disk('public')->exists($path),
+            'mime_type' => $image->getMimeType(),
+            'extension' => $extension
+        ]);
+        
+        // Update profile picture path in the database
+        $model->profile_picture = $path;
+    }
+    public function store(Request $request, ImageManager $imageManager)
+    {
+        $image = $imageManager->read($request->file('photo')->getPathname());
+
+        $resized = $image->scale(width: 300, height: 300);
+
+        $resized->toPng()->save(storage_path('app/public/image.png'));
     }
 }

@@ -29,20 +29,68 @@
 
     
     <!-- Stats Boxes -->
-    <div class="d-flex gap-3">
-        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center">
-            <i class="fas fa-calendar-day text-primary me-2"></i>
-            <span class="fw-bold">{{ now()->format('d/m/Y') }}</span>
+    <div class="d-flex gap-3 flex-wrap">
+        <!-- Today’s Date -->
+        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center stat-box">
+            <i class="fas fa-calendar-day text-primary me-2 fs-5"></i>
+            <div class="d-flex flex-column">
+                <span class="fw-bold text-muted">Today</span>
+                <span class="fw-bold">{{ now()->format('d/m/Y') }}</span>
+            </div>
         </div>
 
-        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center">
-            <i class="fas fa-clock text-success me-2"></i>
-            <span class="fw-bold">{{ $appointments->count() }} Upcoming</span>
+        <!-- Upcoming Appointments with hover -->
+        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center position-relative stat-box-hover">
+            <i class="fas fa-clock text-success me-2 fs-5"></i>
+            <div class="d-flex flex-column">
+                <span class="fw-bold text-muted">Appointments</span>
+                <span class="fw-bold">{{ $appointments->count() }} Upcoming</span>
+            </div>
+
+            <!-- Hover Box -->
+            <div class="stat-preview">
+                @forelse ($appointments->take(3) as $appt)
+                    <div class="stat-preview-item">
+                        <div><strong>{{ $appt->client->name ?? 'Unnamed' }}</strong></div>
+                        <small>{{ \Carbon\Carbon::parse($appt->start_time)->format('d M Y, H:i') }}</small>
+                    </div>
+                @empty
+                    <div class="stat-preview-item text-muted">No upcoming appointments</div>
+                @endforelse
+
+                @if ($appointments->count() > 3)
+                    <div class="text-center p-2">
+                        <a href="{{ route('appointments.index') }}" class="text-decoration-none">View All</a>
+                    </div>
+                @endif
+            </div>
         </div>
 
-        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center">
-            <i class="fas fa-user-friends text-warning me-2"></i>
-            <span class="fw-bold">{{ $activeClients }} Active Clients</span>
+        <!-- Active Clients with hover -->
+        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center position-relative stat-box-hover">
+            <i class="fas fa-user-friends text-warning me-2 fs-5"></i>
+            <div class="d-flex flex-column">
+                <span class="fw-bold text-muted">Clients</span>
+                <span class="fw-bold">{{ $activeClients }} Active</span>
+            </div>
+
+            <!-- Hover Preview -->
+            <div class="stat-preview">
+                @forelse ($clients->take(3) as $client)
+                    <div class="stat-preview-item">
+                        <strong>{{ $client->first_name ?? 'Unnamed' }}</strong>
+                        <small class="d-block text-muted">Joined: {{ \Carbon\Carbon::parse($client->created_at)->format('d M Y') }}</small>
+                    </div>
+                @empty
+                    <div class="stat-preview-item text-muted">No active clients</div>
+                @endforelse
+
+                @if ($clients->count() > 3)
+                    <div class="text-center p-2">
+                        <a href="{{ route('clients.index') }}" class="text-decoration-none">View All</a>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </div>
@@ -105,7 +153,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('clients.create') }}" class="action-card text-center">
                 <div class="icon-circle bg-primary-subtle text-primary">
-                    <i class="fas fa-user-plus"></i>
+                    <img src="{{ asset('clients.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Add Client</span>
             </a>
@@ -115,7 +163,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('diary-entries.index') }}" class="action-card text-center">
                 <div class="icon-circle bg-success-subtle text-success">
-                    <i class="fas fa-notes-medical"></i>
+                    <img src="{{ asset('progress.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Log Progress</span>
             </a>
@@ -125,7 +173,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('appointments.create') }}" class="action-card text-center">
                 <div class="icon-circle bg-warning-subtle text-warning">
-                    <i class="fas fa-calendar-plus"></i>
+                    <img src="{{ asset('booking.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Book Appointment</span>
             </a>
@@ -135,7 +183,7 @@
         <div class="col-6 col-md-3">
             <a href="{{ route('personalisedTrainingPlans.create') }}" class="action-card text-center">
                 <div class="icon-circle bg-danger-subtle text-danger">
-                    <i class="fas fa-dumbbell"></i>
+                    <img src="{{ asset('report.png') }}" alt="Book" class="progress-icon">
                 </div>
                 <span class="action-text">Create Plan</span>
             </a>
@@ -151,24 +199,25 @@
         font-size: 16px;
     }
 
-
     .action-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px;
-    background-color: #fdfdfd;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: all 0.3s ease-in-out;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        border: 1px solid #eee;
+        position: relative;
+        overflow: hidden;
     }
 
     .action-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
         text-decoration: none;
     }
 
@@ -181,75 +230,65 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 10px;
-        background-color: #eee;
+        background-color: #fff8e1;
+        border: 2px solid #e0c36c;
+        color: #a68c30;
+        transition: transform 0.4s ease;
+    }
+
+    .action-card:hover .icon-circle {
+        transform: rotate(15deg) scale(1.15);
     }
 
     .action-text {
         font-weight: 600;
         font-size: 14px;
         color: #222;
+        transition: color 0.3s ease;
     }
 
-    .icon-circle {
-    background-color: #fff8e1;
-    border: 2px solid #e0c36c;
-    color: #a68c30;
-}
+    .action-card:hover .action-text {
+        color: #C9A86A;
+    }
+    .progress-icon {
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
 
 
 
-
-.action-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid #eee;
+    .stat-box-hover {
     position: relative;
-    overflow: hidden;
-}
+    }
 
-.action-card:hover {
-    transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
-    text-decoration: none;
-}
+    .stat-preview {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 999;
+        width: 250px;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        display: none;
+        padding: 0.5rem;
+    }
 
-.icon-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    background-color: #fff8e1;
-    border: 2px solid #e0c36c;
-    color: #a68c30;
-    transition: transform 0.4s ease;
-}
+    .stat-box-hover:hover .stat-preview {
+        display: block;
+    }
 
-.action-card:hover .icon-circle {
-    transform: rotate(15deg) scale(1.15);
-}
+    .stat-preview-item {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid #f1f1f1;
+    }
 
-.action-text {
-    font-weight: 600;
-    font-size: 14px;
-    color: #222;
-    transition: color 0.3s ease;
-}
-
-.action-card:hover .action-text {
-    color: #C9A86A;
-}
+    .stat-preview-item:last-child {
+        border-bottom: none;
+    }
 
 
 </style>

@@ -7,6 +7,9 @@
 
     <title>Ntencity</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}"
+
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -110,6 +113,15 @@
             background-color: #8B6508; /* Even deeper gold for click */
         }
 
+        .logo {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
     </style>
 </head>
 
@@ -118,7 +130,9 @@
 <!-- Top Header -->
 <div class="top-header d-flex justify-content-between align-items-center px-3">
     <!-- Logo on the Left -->
+    <a href="{{ route('dashboard') }}">
     <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
+</a>
 
     <!-- User Profile and Name on the Right -->
     @auth
