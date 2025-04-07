@@ -28,7 +28,7 @@
                 <p><strong>Times per Week:</strong> x{{ $log->times_per_week }}</p>
                 <p><strong>Incline:</strong> {{ $log->incline }}°</p>
             </div>
-            <div class="swipe-container" data-id="{{ $log->id }}">
+            <div class="swipe-container" data-id="{{ $log->id }}" data-completed="0">
                 <div class="swipe-track">
                     <div class="swipe-thumb">➡️</div>
                     <span class="swipe-text">Slide to Complete</span>
@@ -64,6 +64,7 @@
     </nav>
 @endsection
 
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".swipe-container").forEach(container => {
@@ -73,14 +74,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const logId = container.dataset.id;
 
         let isDragging = false;
-        let startX, currentX;
-        const maxOffset = track.offsetWidth - thumb.offsetWidth - 4;
+        let startX = 0;
+        let currentX = 0;
+        let maxOffset = 0;
 
         thumb.addEventListener("touchstart", e => {
             isDragging = true;
             startX = e.touches[0].clientX;
             currentX = startX;
-            // recalculate width on interaction
             maxOffset = track.offsetWidth - thumb.offsetWidth - 4;
         });
 
@@ -96,12 +97,15 @@ document.addEventListener("DOMContentLoaded", () => {
             isDragging = false;
 
             let offset = parseFloat(thumb.style.transform.replace("translateX(", "").replace("px)", "")) || 0;
+            let threshold = maxOffset / 2;
+            let isCompleted = container.dataset.completed === "1";
 
-            if (offset >= maxOffset - 20) {
+            // Swipe right to complete
+            if (offset >= threshold && !isCompleted) {
                 thumb.style.transform = `translateX(${maxOffset}px)`;
                 text.textContent = "Completed ✅";
+                container.dataset.completed = "1";
 
-                // Fire API call
                 fetch(`/update-workout-log/${logId}`, {
                     method: "POST",
                     headers: {
@@ -112,8 +116,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 }).then(res => res.json())
                   .then(data => console.log(data.message))
                   .catch(err => console.error(err));
-            } else {
+
+            // Swipe left to reset
+            } else if (offset < threshold && isCompleted) {
                 thumb.style.transform = `translateX(0px)`;
+                text.textContent = "Slide to Complete";
+                container.dataset.completed = "0";
+
+                fetch(`/update-workout-log/${logId}`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ completed: 0 })
+                }).then(res => res.json())
+                  .then(data => console.log(data.message))
+                  .catch(err => console.error(err));
+
+            } else {
+                // Snap to correct position
+                thumb.style.transform = container.dataset.completed === "1" ? `translateX(${maxOffset}px)` : `translateX(0px)`;
             }
         });
     });
