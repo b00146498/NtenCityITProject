@@ -32,6 +32,12 @@
             </a>
         </li>
         <li>
+            <a href="{{ route('strava.authorize') }}">
+                <i class="fas fa-link"></i> Connect to Strava
+                <i class="fas fa-chevron-right chevron-icon"></i>
+            </a>
+        </li>
+        <li>
             <a href="{{ route('clients.about') }}">
                 <i class="fas fa-info-circle"></i> About
                 <i class="fas fa-chevron-right chevron-icon"></i>
@@ -231,5 +237,4 @@
         color: #C96E04;
     }
 
-    
 </style>
