@@ -169,10 +169,6 @@ html, body {
     margin-bottom: 15px;
 }
 
-.logo {
-    width: 135px;
-    height: auto;
-}
 .favicon-btn {
     display: flex;
     align-items: center;

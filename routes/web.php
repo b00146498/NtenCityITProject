@@ -24,6 +24,7 @@ use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\StravaController;
 
 
+
 /* |-------------------------------------------------------------------------- 
    | Web Routes 
    |-------------------------------------------------------------------------- */
@@ -228,6 +229,17 @@ Route::get('/client/help', function () {
 Route::get('/client/profile/edit', [ClientController::class, 'editClientProfile'])->name('client.editprofile');
 
 Route::patch('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
+
+//stava routes
+
+Route::get('/strava/connect', [StravaController::class, 'redirectToStrava'])->name('strava.connect');
+Route::get('/strava/callback', [StravaController::class, 'handleCallback'])->name('strava.callback');
+Route::get('/strava/authorize', [StravaController::class, 'redirectToStrava'])->name('strava.authorize');
+Route::get('/strava/activities', [\App\Http\Controllers\StravaController::class, 'fetchActivities'])
+    ->middleware('auth')
+    ->name('strava.activities');
+
+
 
 
 

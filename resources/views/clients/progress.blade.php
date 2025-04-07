@@ -19,6 +19,14 @@
 
 
     <h2 class="progress-heading">My Progress</h2>
+
+    <a href="{{ route('strava.authorize') }}" class="btn btn-warning">
+        Connect to Strava
+    </a>
+
+    <a href="{{ route('strava.activities') }}" class="btn btn-outline-primary mb-3">
+        🚴 View Strava Activities
+    </a>
     
 
     
