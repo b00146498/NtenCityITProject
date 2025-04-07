@@ -28,8 +28,12 @@ use App\Http\Controllers\StravaController;
    | Web Routes 
    |-------------------------------------------------------------------------- */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
+});*/
+
+Route::get('/', function () {
+    return redirect()->route('login');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -180,6 +184,7 @@ Route::get('/login', function () {
 })->name('login');
 
 require __DIR__.'/auth.php';
+
 
 Route::get('/client/clientdashboard', [App\Http\Controllers\ClientController::class, 'clientdashboard'])
     ->name('client.clientdashboard')
