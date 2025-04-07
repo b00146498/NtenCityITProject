@@ -87,8 +87,71 @@
 @endsection
 
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+    // === CHART.JS DATA ===
+    const dates = @json($dates ?? []);
+    const distances = @json($distances ?? []);
+    const speeds = @json($speeds ?? []);
+    const activityTypes = @json(array_values($activityTypes ?? []));
+    const activityLabels = @json(array_keys($activityTypes ?? []));
+
+    const chartOptions = {
+        animation: { duration: 1000, easing: 'easeOutQuart' },
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: true, position: 'bottom' } }
+    };
+
+    if (dates.length && distances.length) {
+        new Chart(document.getElementById('distanceChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Distance (km)',
+                    data: distances,
+                    fill: true,
+                    tension: 0.4,
+                    borderColor: '#C96E04',
+                    backgroundColor: 'rgba(201, 110, 4, 0.2)',
+                }]
+            },
+            options: chartOptions
+        });
+    }
+
+    if (dates.length && speeds.length) {
+        new Chart(document.getElementById('speedChart'), {
+            type: 'bar',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Avg Speed (km/h)',
+                    data: speeds,
+                    backgroundColor: '#5B9BD5'
+                }]
+            },
+            options: chartOptions
+        });
+    }
+
+    if (activityLabels.length && activityTypes.length) {
+        new Chart(document.getElementById('typeChart'), {
+            type: 'pie',
+            data: {
+                labels: activityLabels,
+                datasets: [{
+                    data: activityTypes,
+                    backgroundColor: ['#C96E04', '#5B9BD5', '#70AD47', '#ED7D31']
+                }]
+            },
+            options: chartOptions
+        });
+    }
+
+    // === SLIDE TO COMPLETE ===
     document.querySelectorAll(".swipe-container").forEach(container => {
         const thumb = container.querySelector(".swipe-thumb");
         const track = container.querySelector(".swipe-track");
@@ -160,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
+
 
 <style>
     html, body {
