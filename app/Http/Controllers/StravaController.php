@@ -116,7 +116,7 @@ class StravaController extends Controller
         $activities = $response->successful() ? $response->json() : [];
         
 
-        return view('clients.strava-connected', compact('activities'));
+        return redirect()->route('progress')->with('success', 'Strava connected!');
     }
 
     public function showActivities()
@@ -142,6 +142,27 @@ class StravaController extends Controller
 
         $activities = $response->json();
 
-        return view('clients.strava-connected', compact('activities'));
+        return redirect()->route('progress')->with('success', 'Strava connected!');
+    }
+    public function showProgressPage()
+    {
+        $client = \App\Models\Client::where('userid', Auth::id())->first();
+        $activities = [];
+
+        if ($client && $client->strava_access_token) {
+            $response = \Http::withOptions([
+                'verify' => false, // Dev only
+            ])->withToken($client->strava_access_token)
+            ->get('https://www.strava.com/api/v3/athlete/activities', [
+                'per_page' => 5,
+                'page' => 1,
+            ]);
+
+            if ($response->successful()) {
+                $activities = $response->json();
+            }
+        }
+
+        return view('clients.progress', compact('activities'));
     }
 }

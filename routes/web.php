@@ -238,6 +238,8 @@ Route::get('/strava/authorize', [StravaController::class, 'redirectToStrava'])->
 Route::get('/strava/activities', [\App\Http\Controllers\StravaController::class, 'fetchActivities'])
     ->middleware('auth')
     ->name('strava.activities');
+Route::get('/progress', [\App\Http\Controllers\StravaController::class, 'showProgressPage'])->name('progress');
+
 
 
 

@@ -17,12 +17,21 @@
         @endauth
     </div>
 
+    @if(!empty($activities))
+        <h3 class="mt-4 mb-2">🚴 Recent Strava Activities</h3>
+        @foreach($activities as $activity)
+            <div class="card my-3 p-3 shadow-sm">
+                <h5>{{ $activity['name'] }}</h5>
+                <p><strong>Distance:</strong> {{ round($activity['distance'] / 1000, 2) }} km</p>
+                <p><strong>Duration:</strong> {{ gmdate("H:i:s", $activity['elapsed_time']) }}</p>
+                <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($activity['start_date'])->format('d M Y') }}</p>
+            </div>
+        @endforeach
+    @else
+        <p class="text-muted">No recent Strava activities found.</p>
+    @endif
 
     <h2 class="progress-heading">My Progress</h2>
-
-    <a href="{{ route('strava.activities') }}" class="btn btn-outline-primary mb-3">
-        🚴 View Strava Activities
-    </a>
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
