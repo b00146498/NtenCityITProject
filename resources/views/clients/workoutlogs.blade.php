@@ -28,7 +28,7 @@
                 <p><strong>Times per Week:</strong> x{{ $log->times_per_week }}</p>
                 <p><strong>Incline:</strong> {{ $log->incline }}°</p>
             </div>
-            <div class="swipe-container" data-id="{{ $log->id }}" data-completed="0">
+            <div class="swipe-container" data-id="{{ $log->id }}" data-completed="{{ $log->completed }}">
                 <div class="swipe-track">
                     <div class="swipe-thumb">➡️</div>
                     <span class="swipe-text">Slide to Complete</span>
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ completed: 0 })
+                    body: JSON.stringify({ completed })
                 }).then(res => res.json())
                   .then(data => console.log(data.message))
                   .catch(err => console.error(err));

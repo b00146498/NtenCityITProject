@@ -22,12 +22,6 @@
             <div class="d-flex justify-content-end mt-3 no-print">
                 <a href="{!! route('tpelogs.index') !!}" class="btn btn-outline-dark px-4 py-2">Back</a>
             </div>
-
-            <div id="print-area">
-                @include('tpelogs.show_fields')
-            </div>
-
-            <button onclick="window.print()" class="btn btn-warning mt-3 no-print">Print / Save as PDF</button>
         </div>
     </div>
 </div>

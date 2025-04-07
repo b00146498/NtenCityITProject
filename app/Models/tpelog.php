@@ -44,7 +44,8 @@ class tpelog extends Model
         'minutes',
         'intensity',
         'incline',
-        'times_per_week'
+        'times_per_week',
+        'completed'
     ];
 
     /**
@@ -61,7 +62,8 @@ class tpelog extends Model
         'minutes' => 'integer',
         'intensity' => 'string',
         'incline' => 'decimal:2',
-        'times_per_week' => 'integer'
+        'times_per_week' => 'integer',
+        'completed' => 'boolean'
     ];
 
     /**
@@ -78,6 +80,7 @@ class tpelog extends Model
         'intensity' => 'nullable|string|max:50',
         'incline' => 'nullable|numeric',
         'times_per_week' => 'nullable|integer',
+        'completed' => 'nullable|boolean',
         'created_at' => 'nullable',
         'updated_at' => 'nullable',
         'deleted_at' => 'nullable'

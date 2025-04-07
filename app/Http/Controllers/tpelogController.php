@@ -212,4 +212,23 @@ class tpelogController extends AppBaseController
 
         return redirect(route('tpelogs.index'));
     }
+    /**
+     * Remove the specified tpelog from storage.
+     *
+     * @param int $id
+     *
+     * @throws \Exception
+     *
+     * @return Response
+     */
+    
+    
+    public function updateCompletion(Request $request, $id)
+    {
+        $log = Tpelog::findOrFail($id);
+        $log->completed = $request->completed; // expects 0 or 1
+        $log->save();
+     
+        return response()->json(['message' => 'Workout log updated']);
+    }
 }
