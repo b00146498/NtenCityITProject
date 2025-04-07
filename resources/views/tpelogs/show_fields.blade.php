@@ -32,5 +32,15 @@
             <th style="width: 30%;">Times Per Week</th>
             <td>{!! $tpelog->times_per_week !!}</td>
         </tr>
+        <tr>
+            <th style="width: 30%;">Completed</th>
+            <td>
+                @if ($tpelog->completed)
+                    <span class="text-success" title="Completed">✅</span>
+                @else
+                    <span class="text-danger" title="Not Completed">❌</span>
+                @endif
+            </td>
+        </tr>
     </tbody>
 </table>

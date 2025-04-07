@@ -8,6 +8,7 @@
         <th>Intensity Level</th>
         <th>Incline</th>
         <th>Times Per Week</th>
+        <th>Completed</th>
         <th colspan="3">Action</th>
     </thead>
     <tbody>
@@ -29,6 +30,13 @@
                 @endif
             </td>
             <td>{!! $tpelog->times_per_week !!}</td>
+            <td>
+                @if ($tpelog->completed)
+                    <span class="text-success">✅ Completed</span>
+                @else
+                    <span class="text-danger">❌ Not Completed</span>
+                @endif
+            </td>
             <td>
                 {!! Form::open(['route' => ['tpelogs.destroy', $tpelog->id], 'method' => 'delete']) !!}
                 <div class='btn-group'>
