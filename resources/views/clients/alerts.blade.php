@@ -5,7 +5,9 @@
 <!-- Dashboard Header -->
 <div class="dashboard-header">
     <!-- Logo on the Left -->
-    <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
+    <a href="{{ url('/client/clientdashboard') }}" class="favicon-btn">
+        <img src="{{ asset('ntencitylogo.png') }}" alt="Dashboard" class="favicon-img">
+    </a>
 
     <!-- User Name on the Right -->
     @auth
@@ -81,9 +83,23 @@
     margin-bottom: 15px;
 }
 
-.logo {
+.favicon-btn {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+    text-decoration: none;
+}
+
+.favicon-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.favicon-img {
     width: 135px;
     height: auto;
+    object-fit: contain;
 }
 
 .user-info {

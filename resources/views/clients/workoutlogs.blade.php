@@ -4,7 +4,9 @@
     <!-- Dashboard Header -->
     <div class="dashboard-header">
         <!-- Logo on the Left -->
-        <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
+        <a href="{{ url('/client/clientdashboard') }}" class="favicon-btn">
+            <img src="{{ asset('ntencitylogo.png') }}" alt="Dashboard" class="favicon-img">
+        </a>
 
         <!-- User Name on the Right -->
         @auth
@@ -17,30 +19,28 @@
     <!-- Workout Logs Heading -->
     <h2 class="workout-heading">To do:</h2>
 
-    @php
-        $startDate = \Carbon\Carbon::parse($log->trainingPlan->start_date ?? null);
-        $endDate = \Carbon\Carbon::parse($log->trainingPlan->end_date ?? null);
-        $dateString = 'Dates not set';
-
-        if ($startDate && $endDate) {
-            $dateString = $startDate->format('d');
-            if ($startDate->month !== $endDate->month || $startDate->year !== $endDate->year) {
-                $dateString .= ' ' . $startDate->format('M') . ' – ' . $endDate->format('d M Y');
-            } else {
-                $dateString .= '–' . $endDate->format('d M Y');
-            }
-        }
-    @endphp
-
-    <div class="date-range-wrapper">
-        <div class="date-range-pretty-centered">
-            📅 {{ $dateString }}
-        </div>
-    </div> <br>
-
     <div class="content">
     @forelse ($workoutLogs as $log)
         <div class="workout-card">
+            <!-- 📅 Date Range at the top of the card -->
+            @php
+                $startDate = \Carbon\Carbon::parse($log->trainingPlan->start_date ?? null);
+                $endDate = \Carbon\Carbon::parse($log->trainingPlan->end_date ?? null);
+                $dateString = 'Dates not set';
+                if ($startDate && $endDate) {
+                    $dateString = $startDate->format('d');
+                    if ($startDate->month !== $endDate->month || $startDate->year !== $endDate->year) {
+                        $dateString .= ' ' . $startDate->format('M') . ' – ' . $endDate->format('d M Y');
+                    } else {
+                        $dateString .= '–' . $endDate->format('d M Y');
+                    }
+                }
+            @endphp
+
+            <div class="date-pill">
+                📅 {{ $dateString }}
+            </div>
+
             <div class="workout-info">
                 <h3>{{ $log->standardExercise->exercise_name }}</h3>
                 <p><strong>Sets:</strong> {{ $log->num_sets }} | <strong>Reps:</strong> {{ $log->num_reps }}</p>
@@ -49,6 +49,7 @@
                 <p><strong>Times per Week:</strong> x{{ $log->times_per_week }}</p>
                 <p><strong>Incline:</strong> {{ $log->incline }}°</p>
             </div>
+
             <div class="swipe-container" data-id="{{ $log->id }}" data-completed="{{ $log->completed }}">
                 <div class="swipe-track">
                     <div class="swipe-thumb">➡️</div>
@@ -206,9 +207,23 @@ document.addEventListener("DOMContentLoaded", () => {
         margin-bottom: 15px;
     }
 
-    .logo {
+    .favicon-btn {
+        display: flex;
+        align-items: center;
+        padding: 4px;
+        border-radius: 8px;
+        transition: background 0.2s ease;
+        text-decoration: none;
+    }
+
+    .favicon-btn:hover {
+        background-color: #f0f0f0;
+    }
+
+    .favicon-img {
         width: 135px;
         height: auto;
+        object-fit: contain;
     }
 
     .user-info {
@@ -372,26 +387,18 @@ document.addEventListener("DOMContentLoaded", () => {
         margin-bottom: 3px;
     }
 
-    .date-range-pretty-centered {
-        display: block;
-        margin: 10px auto 0 auto; /* Top margin, center horizontally */
-        font-size: 15px;
+    .date-pill {
+        text-align: center;
+        margin: 0 auto 10px auto;
+        font-size: 14px;
         font-weight: 600;
         color: #333;
-        background: #fff;
-        padding: 8px 16px;
+        background: #ffffff;
+        padding: 6px 14px;
         border-radius: 20px;
-        border: 1px solid #ddd;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        text-align: center;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         width: fit-content;
-        max-width: 90%;
-    }
-    .date-center-wrapper {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
     }
 
 </style>
