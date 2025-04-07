@@ -2,43 +2,50 @@
 
 @section('content')
 <div class="container">
-    <h2 class="fw-bold">View Client Progress Notes</h2><br>
+    <!-- Heading and client info -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-3">📓 View Client Progress Notes</h2>
+        <p><strong>Client:</strong> {{ $diaryEntry->client->first_name }} {{ $diaryEntry->client->surname }}</p>
+    </div>
 
-    <p><strong>Client:</strong> {{ $diaryEntry->client->first_name }} {{ $diaryEntry->client->surname }}</p>
+    <!-- Form for diary entry -->
+    <form action="{{ route('diary-entries.update', $diaryEntry->id) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    <div class="row">
-        <!-- Left Column: Form -->
-        <div class="col-md-7">
-            <form action="{{ route('diary-entries.update', $diaryEntry->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-
-                <div class="form-group">
-                    <textarea name="content" class="form-control" rows="5" required>{{ $diaryEntry->content }}</textarea>
-                </div>
-
-                <div class="d-flex justify-content-start mt-3">
-                    <a href="{{ route('diary-entries.index', $diaryEntry->client->id) }}" class="btn btn-primary me-3">
-                        <i class="fas fa-arrow-left"></i> Back to Entries
-                    </a>
-                </div>
-            </form>
+        <div class="form-group mb-3">
+            <label for="content" class="form-label">Diary Entry</label>
+            <textarea name="content" class="form-control" rows="4" required>{{ $diaryEntry->content }}</textarea>
         </div>
 
-        <!-- Right Column: Strava Charts -->
-        <div class="col-md-5">
-            <h5 class="mb-4">📈 Strava Progress</h5>
+        <div class="d-flex justify-content-start mb-4">
+            <a href="{{ route('diary-entries.index', $diaryEntry->client->id) }}" class="btn btn-primary me-3">
+                <i class="fas fa-arrow-left"></i> Back to Entries
+            </a>
+        </div>
+    </form>
 
-            <div class="chart-box mb-4">
-                <canvas id="distanceChart"></canvas>
+    <!-- Strava Data Charts -->
+    <div class="strava-section mb-4">
+        <h4 class="mb-4">📈 Strava Progress Overview</h4>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="chart-box">
+                    <canvas id="distanceChart"></canvas>
+                </div>
             </div>
 
-            <div class="chart-box mb-4">
-                <canvas id="speedChart"></canvas>
+            <div class="col-md-4">
+                <div class="chart-box">
+                    <canvas id="speedChart"></canvas>
+                </div>
             </div>
 
-            <div class="chart-box mb-4">
-                <canvas id="typeChart"></canvas>
+            <div class="col-md-4">
+                <div class="chart-box">
+                    <canvas id="typeChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -53,6 +60,13 @@
     const activityTypes = @json(array_values($activityTypes ?? []));
     const activityLabels = @json(array_keys($activityTypes ?? []));
 
+    const chartOptions = {
+        animation: { duration: 1000, easing: 'easeOutQuart' },
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: true, position: 'bottom' } }
+    };
+
     if (dates.length && distances.length) {
         new Chart(document.getElementById('distanceChart'), {
             type: 'line',
@@ -62,22 +76,14 @@
                     label: 'Distance (km)',
                     data: distances,
                     fill: true,
-                    tension: 0.3,
+                    tension: 0.4,
                     borderColor: '#C96E04',
-                    backgroundColor: 'rgba(201, 110, 4, 0.1)',
+                    backgroundColor: 'rgba(201, 110, 4, 0.2)',
                 }]
             },
-            options: {
-                animation: {
-                    duration: 1000,
-                    easing: 'easeOutQuart'
-                },
-                responsive: true,
-                maintainAspectRatio: false
-            }
+            options: chartOptions
         });
     }
-
 
     if (dates.length && speeds.length) {
         new Chart(document.getElementById('speedChart'), {
@@ -85,19 +91,12 @@
             data: {
                 labels: dates,
                 datasets: [{
-                    label: 'Average Speed (km/h)',
+                    label: 'Avg Speed (km/h)',
                     data: speeds,
                     backgroundColor: '#5B9BD5'
                 }]
             },
-            options: {
-                animation: {
-                    duration: 1000,
-                    easing: 'easeOutQuart'
-                },
-                responsive: true,
-                maintainAspectRatio: false
-            }
+            options: chartOptions
         });
     }
 
@@ -111,59 +110,66 @@
                     backgroundColor: ['#C96E04', '#5B9BD5', '#70AD47', '#ED7D31']
                 }]
             },
-            options: {
-                animation: {
-                    duration: 1000,
-                    easing: 'easeOutQuart'
-                },
-                responsive: true,
-                maintainAspectRatio: false
-            }
+            options: chartOptions
         });
     }
 </script>
+
 <style>
-    /* Heading Styles */
-    h1, h2, h3, h4, h5, h6 {
-        font-weight: bold !important;
-        font-size: 2rem !important; /* Adjust size */
-    }
-
-    /* Common Button Styles  */
-    .btn-primary {
-        background-color: #C96E04 !important; /* Orange */
-        color: white !important;
-        font-weight: bold;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        font-size: 15px;
-        transition: 0.3s;
-        text-decoration: none;
-    }
-
-    /* Hover Effect */
-    .btn-primary:hover {
-        background-color: #A85C03 !important; /* Darker Orange */
-    }
-
-    /* Styled Textarea */
-    .form-control {
-        background-color: #FFF7ED !important; /* Soft Beige */
-    }
-
     .chart-box {
-        background-color: #ffffff;
-        border-radius: 10px;
+        background: #fff;
+        border-radius: 12px;
         padding: 15px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        text-align: center;
+        height: 280px;
     }
 
     canvas {
-        max-width: 100%;
-        height: 200px !important;
-        margin: auto;
+        width: 100% !important;
+        height: 220px !important;
+    }
+
+    .strava-section {
+        margin-top: 40px;
+        padding: 20px;
+        background-color: #FFF7ED;
+        border-radius: 10px;
+    }
+
+    .form-label {
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #C96E04;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #a65303;
+    }
+
+    /* Heading Styles - Larger & Consistent */
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 700 !important;
+        line-height: 1.3;
+        margin-bottom: 0.75rem;
+    }
+
+    h2 {
+        font-size: 2.2rem !important;
+    }
+
+    h3 {
+        font-size: 1.8rem !important;
+    }
+
+    h4 {
+        font-size: 1.6rem !important;
+    }
+    
+    .form-control {
+        background-color: #FFF7ED !important; /* Soft Beige */
     }
 </style>
 @endsection
