@@ -54,7 +54,10 @@ class client extends Model
         'password',
         'account_status',
         'practice_id',
-        'userid'
+        'userid', 
+        'strava_access_token',
+        'strava_refresh_token',
+        'strava_token_expires_at',
     ];
 
     /**
