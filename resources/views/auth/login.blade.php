@@ -96,6 +96,14 @@
                     {{ __('Forgot password?') }}
                 </a>
             @endif
+            <div class="register-link mt-3">
+                <span style="font-size: 14px; color: gray;">
+                    Don’t have an account?
+                    <a href="{{ route('register') }}" style="color: black; font-weight: 600; text-decoration: none;">
+                        Register here
+                    </a>
+                </span>
+            </div>
         </form>
     </div>
 </x-guest-layout>
