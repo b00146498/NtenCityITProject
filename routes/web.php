@@ -230,7 +230,7 @@ Route::get('/client/profile/edit', [ClientController::class, 'editClientProfile'
 
 Route::patch('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
 
-//stava routes
+//strava routes
 
 Route::get('/strava/connect', [StravaController::class, 'redirectToStrava'])->name('strava.connect');
 Route::get('/strava/callback', [StravaController::class, 'handleCallback'])->name('strava.callback');
@@ -238,7 +238,12 @@ Route::get('/strava/authorize', [StravaController::class, 'redirectToStrava'])->
 Route::get('/strava/activities', [\App\Http\Controllers\StravaController::class, 'fetchActivities'])
     ->middleware('auth')
     ->name('strava.activities');
-Route::get('/progress', [\App\Http\Controllers\StravaController::class, 'showProgressPage'])->name('progress');
+//Route::get('/progress', [\App\Http\Controllers\StravaController::class, 'showProgressPage'])->name('progress');
+//Route::get('/progress', [\App\Http\Controllers\StravaController::class, 'fetchActivities'])->name('progress');
+//Route::get('/progress', [StravaController::class, 'showProgressPage'])->name('progress');
+Route::get('/progress', [StravaController::class, 'showProgressPage'])->middleware('auth')->name('progress');
+
+
 
 
 

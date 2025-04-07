@@ -31,7 +31,25 @@
         <p class="text-muted">No recent Strava activities found.</p>
     @endif
 
+    @php
+        $activities = $activities ?? [];
+        $distances = $distances ?? [];
+        $dates = $dates ?? [];
+    @endphp
+
     <h2 class="progress-heading">My Progress</h2>
+
+    <div class="chart-container">
+        <canvas id="distanceChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="speedChart"></canvas>
+    </div>
+
+    <div class="chart-container pie-chart-container">
+        <canvas id="typeChart"></canvas>
+    </div>
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
@@ -42,6 +60,59 @@
         <a href="{{ url('/alerts') }}" class="nav-item"><i class="fas fa-comment"></i></a>
         <a href="{{ url('/clientprofile') }}" class="nav-item"><i class="fas fa-user"></i></a>
     </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dates = @json($dates);
+    const distances = @json($distances);
+    const speeds = @json($speeds);
+    const activityTypes = @json(array_values($activityTypes));
+    const activityLabels = @json(array_keys($activityTypes));
+
+    // Distance Over Time Chart
+    if (dates.length && distances.length) {
+        new Chart(document.getElementById('distanceChart'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Distance (km)',
+                    data: distances,
+                    fill: true,
+                    tension: 0.3,
+                    borderColor: '#C96E04',
+                    backgroundColor: 'rgba(201, 110, 4, 0.1)',
+                }]
+            }
+        });
+    }
+
+    // Speed Chart
+    new Chart(document.getElementById('speedChart'), {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Average Speed (km/h)',
+                data: speeds,
+                backgroundColor: '#5B9BD5'
+            }]
+        }
+    });
+
+    // Activity Type Chart
+    new Chart(document.getElementById('typeChart'), {
+        type: 'pie',
+        data: {
+            labels: activityLabels,
+            datasets: [{
+                data: activityTypes,
+                backgroundColor: ['#C96E04', '#5B9BD5', '#70AD47', '#ED7D31']
+            }]
+        }
+    });
+});
+</script>
 
 
 <style>
@@ -145,9 +216,18 @@ h1, h2, h3, h4, h5, h6 {
     color: gray;
     margin-top: 15px;
 }
+.chart-container {
+    width: 100%;
+    max-width: 340px;
+    margin: 30px auto;
+}
 
-
-
+.pie-chart-container canvas {
+    max-width: 220px;
+    max-height: 220px;
+    margin: 0 auto;
+    display: block;
+}
 </style>
 
 @endsection

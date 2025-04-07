@@ -99,13 +99,13 @@ class StravaController extends Controller
 
     public function fetchActivities()
     {
-        $client = Client::where('userid', Auth::id())->first();
-        
+        $client = \App\Models\Client::where('userid', Auth::id())->first();
+
         if (!$client || !$client->strava_access_token) {
             return redirect()->route('workoutlogs')->with('error', 'Strava not connected.');
         }
 
-        $response = Http::withOptions([
+        $response = \Http::withOptions([
             'verify' => false, // ⚠️ Local dev only
         ])->withToken($client->strava_access_token)
         ->get('https://www.strava.com/api/v3/athlete/activities', [
@@ -114,10 +114,19 @@ class StravaController extends Controller
         ]);
 
         $activities = $response->successful() ? $response->json() : [];
-        
 
-        return redirect()->route('progress')->with('success', 'Strava connected!');
+        // Build chart data
+        $distances = [];
+        $dates = [];
+
+        foreach ($activities as $activity) {
+            $distances[] = round($activity['distance'] / 1000, 2); // in km
+            $dates[] = \Carbon\Carbon::parse($activity['start_date'])->format('d M');
+        }
+
+        return view('clients.progress', compact('activities', 'distances', 'dates'));
     }
+
 
     public function showActivities()
     {
@@ -148,21 +157,45 @@ class StravaController extends Controller
     {
         $client = \App\Models\Client::where('userid', Auth::id())->first();
         $activities = [];
+        $distances = [];
+        $dates = [];
+        $speeds = [];
+        $activityTypes = [];
 
         if ($client && $client->strava_access_token) {
             $response = \Http::withOptions([
-                'verify' => false, // Dev only
+                'verify' => false, // ⚠️ DEV only
             ])->withToken($client->strava_access_token)
             ->get('https://www.strava.com/api/v3/athlete/activities', [
-                'per_page' => 5,
+                'per_page' => 10,
                 'page' => 1,
             ]);
 
             if ($response->successful()) {
                 $activities = $response->json();
+
+                foreach ($activities as $activity) {
+                    $distances[] = round($activity['distance'] / 1000, 2);
+                    $dates[] = Carbon::parse($activity['start_date'])->format('d M');
+                    
+                    // Speed in km/h
+                    $speed = $activity['distance'] / $activity['elapsed_time'];
+                    $speeds[] = round($speed * 3.6, 2);
+                
+                    // Count activity type
+                    $type = $activity['type'] ?? 'Other';
+                    $activityTypes[$type] = ($activityTypes[$type] ?? 0) + 1;
+                }
             }
         }
 
-        return view('clients.progress', compact('activities'));
+        return view('clients.progress', compact(
+            'activities',
+            'distances',
+            'dates',
+            'speeds',
+            'activityTypes'
+        ));
     }
+
 }
