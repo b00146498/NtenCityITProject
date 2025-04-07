@@ -290,7 +290,6 @@
         border-bottom: none;
     }
 
-
 </style>
 
 @endsection

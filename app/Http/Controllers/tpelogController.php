@@ -221,8 +221,6 @@ class tpelogController extends AppBaseController
      *
      * @return Response
      */
-    
-    
 
     public function updateCompletion(Request $request, $id)
     {
@@ -232,5 +230,4 @@ class tpelogController extends AppBaseController
 
         return response()->json(['message' => 'Workout log updated successfully']);
     }
-
 }

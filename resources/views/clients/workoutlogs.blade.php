@@ -17,6 +17,27 @@
     <!-- Workout Logs Heading -->
     <h2 class="workout-heading">To do:</h2>
 
+    @php
+        $startDate = \Carbon\Carbon::parse($log->trainingPlan->start_date ?? null);
+        $endDate = \Carbon\Carbon::parse($log->trainingPlan->end_date ?? null);
+        $dateString = 'Dates not set';
+
+        if ($startDate && $endDate) {
+            $dateString = $startDate->format('d');
+            if ($startDate->month !== $endDate->month || $startDate->year !== $endDate->year) {
+                $dateString .= ' ' . $startDate->format('M') . ' – ' . $endDate->format('d M Y');
+            } else {
+                $dateString .= '–' . $endDate->format('d M Y');
+            }
+        }
+    @endphp
+
+    <div class="date-range-wrapper">
+        <div class="date-range-pretty-centered">
+            📅 {{ $dateString }}
+        </div>
+    </div> <br>
+
     <div class="content">
     @forelse ($workoutLogs as $log)
         <div class="workout-card">
@@ -350,4 +371,27 @@ document.addEventListener("DOMContentLoaded", () => {
         font-size: 20px;
         margin-bottom: 3px;
     }
+
+    .date-range-pretty-centered {
+        display: block;
+        margin: 10px auto 0 auto; /* Top margin, center horizontally */
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        background: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        width: fit-content;
+        max-width: 90%;
+    }
+    .date-center-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
 </style>
