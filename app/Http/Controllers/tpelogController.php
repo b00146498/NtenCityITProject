@@ -223,12 +223,14 @@ class tpelogController extends AppBaseController
      */
     
     
+
     public function updateCompletion(Request $request, $id)
     {
-        $log = Tpelog::findOrFail($id);
-        $log->completed = $request->completed; // expects 0 or 1
+        $log = \App\Models\Tpelog::findOrFail($id); // make sure it's Tpelog not WorkoutLog
+        $log->completed = $request->completed;
         $log->save();
-     
-        return response()->json(['message' => 'Workout log updated']);
+
+        return response()->json(['message' => 'Workout log updated successfully']);
     }
+
 }

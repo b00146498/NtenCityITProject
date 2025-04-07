@@ -107,7 +107,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('tpelogs', tpelogController::class);
     Route::get('/tpelog/create/{plan_id}', [tpelogController::class, 'create'])->name('tpelog.create');
     Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.store');
-    Route::post('/update-workout-log/{id}', [tpelogController::class, 'updateCompletion']);
+    Route::post('/update-workout-log/{id}', [\App\Http\Controllers\tpelogController::class, 'updateCompletion']);
+
 
 
     // Standard Exercises

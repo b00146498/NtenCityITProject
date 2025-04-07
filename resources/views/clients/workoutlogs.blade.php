@@ -100,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
             let threshold = maxOffset / 2;
             let isCompleted = container.dataset.completed === "1";
 
-            // Swipe right to complete
             if (offset >= threshold && !isCompleted) {
                 thumb.style.transform = `translateX(${maxOffset}px)`;
                 text.textContent = "Completed ✅";
@@ -115,9 +114,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: JSON.stringify({ completed: 1 })
                 }).then(res => res.json())
                   .then(data => console.log(data.message))
-                  .catch(err => console.error(err));
+                  .catch(err => console.error("Error updating completion:", err));
 
-            // Swipe left to reset
             } else if (offset < threshold && isCompleted) {
                 thumb.style.transform = `translateX(0px)`;
                 text.textContent = "Slide to Complete";
@@ -129,13 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ completed })
+                    body: JSON.stringify({ completed: 0 })
                 }).then(res => res.json())
                   .then(data => console.log(data.message))
-                  .catch(err => console.error(err));
-
+                  .catch(err => console.error("Error resetting completion:", err));
             } else {
-                // Snap to correct position
                 thumb.style.transform = container.dataset.completed === "1" ? `translateX(${maxOffset}px)` : `translateX(0px)`;
             }
         });
