@@ -8,6 +8,8 @@ use App\Models\DiaryEntry;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class DiaryEntryController extends Controller
 {
@@ -78,12 +80,60 @@ class DiaryEntryController extends Controller
     /**
      * Display the specified diary entry.
      */
-    public function show($id)
+    /*public function show($id)
     {
         $diaryEntry = DiaryEntry::findOrFail($id);
         $client = $diaryEntry->client; // Fetch client details
 
         return view('diary_entries.show', compact('diaryEntry', 'client'));
+    }*/
+
+    public function show($id)
+    {
+        $diaryEntry = DiaryEntry::with(['employee', 'client'])->findOrFail($id);
+        $client = $diaryEntry->client;
+
+        // Default empty data
+        $activities = [];
+        $distances = [];
+        $dates = [];
+        $speeds = [];
+        $activityTypes = [];
+
+        if ($client && $client->strava_access_token) {
+            $response = Http::withOptions([
+                'verify' => false, // Dev only
+            ])->withToken($client->strava_access_token)
+            ->get('https://www.strava.com/api/v3/athlete/activities', [
+                'per_page' => 10,
+                'page' => 1,
+            ]);
+
+            if ($response->successful()) {
+                $activities = $response->json();
+
+                foreach ($activities as $activity) {
+                    $distances[] = round($activity['distance'] / 1000, 2);
+                    $dates[] = Carbon::parse($activity['start_date'])->format('d M');
+
+                    $speed = $activity['distance'] / $activity['elapsed_time'];
+                    $speeds[] = round($speed * 3.6, 2);
+
+                    $type = $activity['type'] ?? 'Other';
+                    $activityTypes[$type] = ($activityTypes[$type] ?? 0) + 1;
+                }
+            }
+        }
+
+        return view('diary_entries.show', compact(
+            'diaryEntry',
+            'client',
+            'activities',
+            'distances',
+            'dates',
+            'speeds',
+            'activityTypes'
+        ));
     }
 
     /**
