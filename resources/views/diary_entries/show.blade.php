@@ -3,9 +3,15 @@
 @section('content')
 <div class="container">
     <!-- Heading and client info -->
-    <div class="mb-4">
-        <h2 class="fw-bold mb-3">📓 View Client Progress Notes</h2>
-        <p><strong>Client:</strong> {{ $diaryEntry->client->first_name }} {{ $diaryEntry->client->surname }}</p>
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h2 class="fw-bold mb-2">📓 View Client Progress Notes</h2>
+            <p class="mt-2"><strong>Client:</strong> {{ $diaryEntry->client->first_name }} {{ $diaryEntry->client->surname }}</p>
+        </div>
+
+        <a href="{{ route('diary-entries.index', $diaryEntry->client->id) }}" class="btn btn-primary h-100 mt-1">
+            <i class="fas fa-arrow-left"></i> Back to Entries
+        </a>
     </div>
 
     <!-- Form for diary entry -->
@@ -14,15 +20,9 @@
         @method('PUT')
 
         <div class="form-group mb-3">
-            <label for="content" class="form-label">Diary Entry</label>
             <textarea name="content" class="form-control" rows="4" required>{{ $diaryEntry->content }}</textarea>
         </div>
 
-        <div class="d-flex justify-content-start mb-4">
-            <a href="{{ route('diary-entries.index', $diaryEntry->client->id) }}" class="btn btn-primary me-3">
-                <i class="fas fa-arrow-left"></i> Back to Entries
-            </a>
-        </div>
     </form>
 
     <!-- Strava Data Charts -->
@@ -167,7 +167,7 @@
     h4 {
         font-size: 1.6rem !important;
     }
-    
+
     .form-control {
         background-color: #FFF7ED !important; /* Soft Beige */
     }
