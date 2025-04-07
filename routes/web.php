@@ -20,6 +20,8 @@ use App\Models\TpeLog;
 use App\Models\Appointment;
 use App\Models\Employee;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\StravaController;
 
 
 /* |-------------------------------------------------------------------------- 
@@ -113,6 +115,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/progress', function () {
         return view('clients.progress');
     })->name('progress');
+
 
     Route::get('/workoutlogs', function () {
         $user = Auth::user();
@@ -217,3 +220,10 @@ Route::get('/client/help', function () {
 Route::get('/client/profile/edit', [ClientController::class, 'editClientProfile'])->name('client.editprofile');
 
 Route::patch('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
+
+
+
+
+
+
+

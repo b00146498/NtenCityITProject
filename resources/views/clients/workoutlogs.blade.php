@@ -28,8 +28,11 @@
                 <p><strong>Times per Week:</strong> x{{ $log->times_per_week }}</p>
                 <p><strong>Incline:</strong> {{ $log->incline }}°</p>
             </div>
-            <div class="checkbox-wrapper">
-                <input type="checkbox" class="completion-checkbox" data-id="{{ $log->id }}">
+            <div class="swipe-container" data-id="{{ $log->id }}">
+                <div class="swipe-track">
+                    <div class="swipe-thumb">➡️</div>
+                    <span class="swipe-text">Slide to Complete</span>
+                </div>
             </div>
         </div>
     @empty
@@ -62,27 +65,59 @@
 @endsection
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let checkboxes = document.querySelectorAll(".completion-checkbox");
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".swipe-container").forEach(container => {
+        const thumb = container.querySelector(".swipe-thumb");
+        const track = container.querySelector(".swipe-track");
+        const text = container.querySelector(".swipe-text");
+        const logId = container.dataset.id;
 
-        checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener("change", function () {
-                let logId = this.dataset.id;
-                let completed = this.checked ? 1 : 0;
+        let isDragging = false;
+        let startX, currentX;
+        const maxOffset = track.offsetWidth - thumb.offsetWidth - 4;
 
+        thumb.addEventListener("touchstart", e => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            currentX = startX;
+            // recalculate width on interaction
+            maxOffset = track.offsetWidth - thumb.offsetWidth - 4;
+        });
+
+        thumb.addEventListener("touchmove", e => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX;
+            let offset = Math.min(Math.max(0, currentX - startX), maxOffset);
+            thumb.style.transform = `translateX(${offset}px)`;
+        });
+
+        thumb.addEventListener("touchend", () => {
+            if (!isDragging) return;
+            isDragging = false;
+
+            let offset = parseFloat(thumb.style.transform.replace("translateX(", "").replace("px)", "")) || 0;
+
+            if (offset >= maxOffset - 20) {
+                thumb.style.transform = `translateX(${maxOffset}px)`;
+                text.textContent = "Completed ✅";
+
+                // Fire API call
                 fetch(`/update-workout-log/${logId}`, {
                     method: "POST",
                     headers: {
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ completed })
-                }).then(response => response.json())
+                    body: JSON.stringify({ completed: 1 })
+                }).then(res => res.json())
                   .then(data => console.log(data.message))
-                  .catch(error => console.error("Error:", error));
-            });
+                  .catch(err => console.error(err));
+            } else {
+                thumb.style.transform = `translateX(0px)`;
+            }
         });
     });
+});
 </script>
 
 <style>
@@ -156,30 +191,71 @@
     }
 
     .workout-card {
-    background: rgba(212, 175, 55, 0.15);
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* Ensures vertical centering */
-    position: relative;
-    }
-
-    /* Checkbox Wrapper: Aligns it to the Middle Right */
-    .checkbox-wrapper {
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        padding: 15px 15px 65px; /* Extra bottom padding for swipe */
+        border-radius: 10px;
+        margin-bottom: 20px;
         display: flex;
-        align-items: center; /* Centers checkbox vertically */
-        justify-content: center;
-        height: 100%; /* Ensure it takes full height of the card */
+        flex-direction: column; /* Stack content vertically */
+        align-items: flex-start;
+        position: relative;
     }
 
-    /* Styles for the Checkbox */
-    .completion-checkbox {
-        width: 22px;
-        height: 22px;
-        accent-color: #C96E04;
+    /* Slider container */
+    /* Swipe Container */
+    .swipe-container {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        z-index: 5;
+    }
+
+    /* Swipe Track */
+    .swipe-track {
+        position: relative;
+        width: 100%;
+        height: 42px;
+        background: #e0e0e0;
+        border-radius: 25px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Thumb (Draggable Button) */
+    .swipe-thumb {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 42px;
+        background-color: #C96E04;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: white;
+        cursor: pointer;
+        touch-action: pan-x;
+        transition: background 0.3s;
+        z-index: 2;
+    }
+
+    /* Swipe Text */
+    .swipe-text {
+        width: 100%;
+        text-align: center;
+        font-size: 15px;
+        font-weight: bold;
+        color: #555;
+        z-index: 1;
+        pointer-events: none;
     }
 
     .no-workout {

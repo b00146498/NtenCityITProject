@@ -128,4 +128,6 @@ class client extends Model
     public function trainingPlans() {
         return $this->hasMany(PersonalisedTrainingPlan::class, 'client_id');
     }
+
+
 }
