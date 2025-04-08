@@ -229,25 +229,26 @@
         </div>
 
         <!-- Exercise of the Moment Right -->
-        <div class="col-md-6">
+        <div class="col-md-6 d-flex justify-content-center align-items-start">
             @if(is_array($exercise))
-                <div class="card h-100 shadow">
-                    <div class="card-body">
-                        <h2 class="h5 fw-bold text-dark mb-3">🏋️ Exercise of the Moment</h2>
-                        <p><strong>Name:</strong> {{ ucfirst($exercise['name']) }}</p>
-                        <p><strong>Target:</strong> {{ $exercise['target'] }}</p>
-                        <p><strong>Equipment:</strong> {{ $exercise['equipment'] }}</p>
-                        <img src="{{ $exercise['gifUrl'] }}" alt="Exercise Demo" class="img-fluid rounded" style="max-height: 250px;">
-                        <div class="mt-3">
-                            <a href="{{ url()->current() }}" class="btn btn-outline-primary btn-sm">🔄 Refresh Exercise</a>
+                <div class="card shadow w-100" style="max-width: 420px;">
+                    <div class="card-body text-center">
+                        <h1 class="h4 fw-bold text-dark mb-3">🏋️ Highlighted Exercise</h1>
+                        <p class="mb-1"><strong>Name:</strong> {{ ucfirst($exercise['name']) }}</p>
+                        <p class="mb-1"><strong>Target:</strong> {{ $exercise['target'] }}</p>
+                        <p class="mb-3"><strong>Equipment:</strong> {{ $exercise['equipment'] }}</p>
+                        <div class="d-flex justify-content-center mb-3">
+                            <img src="{{ $exercise['gifUrl'] }}" alt="Exercise Demo" style="max-height: 200px; max-width: 100%;" class="rounded">
                         </div>
+                        <a href="{{ url()->current() }}" class="btn btn-outline-secondary btn-sm" title="Refresh">
+                            <i class="fas fa-sync-alt"></i>
+                        </a>
                     </div>
                 </div>
             @else
                 <p class="text-muted mt-3">No exercise data available at the moment.</p>
             @endif
         </div>
-
     </div>
 </div>
 
