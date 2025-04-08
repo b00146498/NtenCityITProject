@@ -17,11 +17,13 @@ RUN apt-get update && apt-get install -y \
 RUN a2enmod rewrite
 
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /var/www
 
-# Copy Laravel files to the container
+# Copy project files
 COPY . .
 
+# Move Laravel's public folder into Apache's web root
+RUN rm -rf /var/www/html && ln -s /var/www/public /var/www/html
 # Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
