@@ -2,8 +2,14 @@
 
 @section('content')
 <div class="container">
-    <h2>Client Progress Notes <i class="fa fa-paperclip"></i></h2>
-    <br>
+
+<div class="d-flex align-items-center mb-4">
+    <div class="icon-circle bg-info-subtle text-info me-3">
+        <img src="{{ asset('progress.png') }}" alt="Exercise Videos" class="progress-icon">
+    </div>
+    <h2> Client Progress Notes</h2>
+</div>
+
     <!-- Search Bar & Add New Note Button in One Line -->
     <div class="d-flex align-items-center gap-2 mb-3" style="max-width: 600px;">
         <div class="input-group" style="flex-grow: 1;">
@@ -93,6 +99,24 @@
 .btn-add-entry:hover {
     background-color: #A85C03 !important;
     border-color: #A85C03 !important;
+}
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff8e1;
+    border: 2px solid #e0c36c;
+    color: #a68c30;
+}
+
+.progress-icon {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
 }
 </style>
 
