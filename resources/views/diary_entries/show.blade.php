@@ -51,8 +51,13 @@
     </div>
 </div>
 
-<!-- ChartJS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@if($polyline)
+    <div class="map-box mt-4">
+        <h4 class="mb-3">📍 Activity Route Map</h4>
+        <div id="activityMap"></div>
+    </div>
+@endif
+
 <script>
     const dates = @json($dates ?? []);
     const distances = @json($distances ?? []);
@@ -114,6 +119,36 @@
         });
     }
 </script>
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Polyline Decoder -->
+<script src="https://unpkg.com/@mapbox/polyline"></script>
+
+@if($polyline)
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const encoded = @json($polyline);
+        const coords = L.Polyline.fromEncoded(encoded).getLatLngs();
+
+        const map = L.map('activityMap').setView(coords[0], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const route = L.polyline(coords, {
+            color: '#C96E04',
+            weight: 5,
+            opacity: 0.8,
+            lineJoin: 'round'
+        }).addTo(map);
+
+        map.fitBounds(route.getBounds());
+    });
+</script>
+@endif
 
 <style>
     .chart-box {
@@ -170,6 +205,20 @@
 
     .form-control {
         background-color: #FFF7ED !important; /* Soft Beige */
+    }
+    #activityMap {
+        height: 300px;
+        width: 100%;
+        border-radius: 10px;
+        border: 2px solid #C96E04;
+        z-index: 0;
+    }
+
+    .map-box {
+        background: none;
+        padding: 0;
+        box-shadow: none;
+        border: none;
     }
 </style>
 @endsection

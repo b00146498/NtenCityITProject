@@ -3,14 +3,23 @@
 @section('content')
     <section class="content-header">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <h1 class="pull-left">Employee Profiles</h1>
-        <h1 class="pull-right" style="display: flex; justify-content: flex-end;">
-            <a href="{{ route('employees.create') }}" class="btn btn-primary" 
-                style="background-color: #C96E04; border-color: #C96E04; color: white;">
-                <i class="glyphicon glyphicon-plus"></i> New Employee
-            </a>
-        </h1>
-    </section>
+
+        <div class="row">
+            <div class="col-sm-6 d-flex" style="display: flex; align-items: center;">
+                <div class="icon-circle bg-info-subtle text-info" style="margin-right: 15px;">
+                    <img src="{{ asset('empprofile.png') }}" alt="Employee Profiles" class="progress-icon">
+                </div>
+                <h1 class="m-0">Employee Profiles</h1>
+            </div>
+
+            <div class="col-sm-6 text-right">
+                <a href="{{ route('employees.create') }}" class="btn btn-primary" 
+                    style="background-color: #C96E04; border-color: #C96E04; color: white; margin-top: 10px;">
+                    <i class="glyphicon glyphicon-plus"></i> New Employee
+                </a>
+            </div>
+        </div>
+    </section><br>
     <div class="content">
         <div class="clearfix"></div>
 
@@ -27,6 +36,24 @@
     h1, h2, h3, h4, h5, h6 {
         font-weight: bold !important;
         font-size: 3rem !important; /* Adjust size */
+    }
+    .icon-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff8e1;
+        border: 2px solid #e0c36c;
+        color: #a68c30;
+    }
+
+    .progress-icon {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
     }
     </style>
 

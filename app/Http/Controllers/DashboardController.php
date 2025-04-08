@@ -9,6 +9,7 @@ use App\Models\Client;
 use App\Models\Employee;
 use App\Services\WeatherService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class DashboardController extends Controller
 {
@@ -45,6 +46,22 @@ class DashboardController extends Controller
 
     public function index(WeatherService $weatherService)
     {
+        $response = Http::withOptions([
+            'verify' => false
+        ])->withHeaders([
+            'X-RapidAPI-Key' => env('RAPIDAPI_KEY'),
+            'X-RapidAPI-Host' => 'exercisedb.p.rapidapi.com'
+        ])->get('https://exercisedb.p.rapidapi.com/exercises');
+        
+        $exercise = null;
+        
+        if ($response->successful()) {
+            $data = $response->json();
+            if (is_array($data) && count($data)) {
+                $exercise = collect($data)->random();
+            }
+        }
+
         $user = auth()->user();
 
         $employee = \App\Models\Employee::where('userid', $user->id)->first();
@@ -75,7 +92,8 @@ class DashboardController extends Controller
             'employee',
             'company_name',
             'activeClients',
-            'weather' 
+            'weather',
+            'exercise'
         ));
     }
 

@@ -145,52 +145,113 @@
     </button>
 </div>
 
-<!-- Quick Actions Section -->
+<!-- Quick Actions + Exercise Section -->
 <div class="container my-5">
-    <div class="row g-4 justify-content-center">
+    <div class="row g-4">
 
-        <!-- Add Client -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('clients.create') }}" class="action-card text-center">
-                <div class="icon-circle bg-primary-subtle text-primary">
-                    <img src="{{ asset('clients.png') }}" alt="Book" class="progress-icon">
+        <!-- Quick Actions Left (2x2 + 2x2 stacked) -->
+        <div class="col-md-6">
+            <div class="row g-4">
+                <!-- First 2x2 -->
+                <div class="col-6">
+                    <a href="{{ route('clients.create') }}" class="action-card text-center">
+                        <div class="icon-circle bg-primary-subtle text-primary">
+                            <img src="{{ asset('clients.png') }}" alt="Add Client" class="progress-icon">
+                        </div>
+                        <span class="action-text">Add Client</span>
+                    </a>
                 </div>
-                <span class="action-text">Add Client</span>
-            </a>
+
+                <div class="col-6">
+                    <a href="{{ route('diary-entries.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-success-subtle text-success">
+                            <img src="{{ asset('progress.png') }}" alt="Log Progress" class="progress-icon">
+                        </div>
+                        <span class="action-text">Log Progress</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('appointments.create') }}" class="action-card text-center">
+                        <div class="icon-circle bg-warning-subtle text-warning">
+                            <img src="{{ asset('booking.png') }}" alt="Book Appointment" class="progress-icon">
+                        </div>
+                        <span class="action-text">Book Appointment</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('personalisedTrainingPlans.create') }}" class="action-card text-center">
+                        <div class="icon-circle bg-danger-subtle text-danger">
+                            <img src="{{ asset('report.png') }}" alt="Create Plan" class="progress-icon">
+                        </div>
+                        <span class="action-text">Create Plan</span>
+                    </a>
+                </div>
+
+                <!-- Second 2x2 -->
+                <div class="col-6">
+                    <a href="{{ route('clients.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('clientprofile.png') }}" alt="Client Profiles" class="progress-icon">
+                        </div>
+                        <span class="action-text">View Client Profiles</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('employees.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('empprofile.png') }}" alt="Employee Profiles" class="progress-icon">
+                        </div>
+                        <span class="action-text">View Employee Profiles</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('standardexercises.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('videolink.png') }}" alt="Exercise Videos" class="progress-icon">
+                        </div>
+                        <span class="action-text">Exercise Videos</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('tpelogs.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('business-plan.png') }}" alt="Workout Plans" class="progress-icon">
+                        </div>
+                        <span class="action-text">Workout Plans</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <!-- Log Progress -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('diary-entries.index') }}" class="action-card text-center">
-                <div class="icon-circle bg-success-subtle text-success">
-                    <img src="{{ asset('progress.png') }}" alt="Book" class="progress-icon">
+        <!-- Exercise of the Moment Right -->
+        <div class="col-md-6 d-flex justify-content-center align-items-start">
+            @if(is_array($exercise))
+                <div class="card shadow w-100" style="max-width: 420px;">
+                    <div class="card-body text-center">
+                        <h1 class="h4 fw-bold text-dark mb-3">🏋️ Highlighted Exercise</h1>
+                        <p class="mb-1"><strong>Name:</strong> {{ ucfirst($exercise['name']) }}</p>
+                        <p class="mb-1"><strong>Target:</strong> {{ $exercise['target'] }}</p>
+                        <p class="mb-3"><strong>Equipment:</strong> {{ $exercise['equipment'] }}</p>
+                        <div class="d-flex justify-content-center mb-3">
+                            <img src="{{ $exercise['gifUrl'] }}" alt="Exercise Demo" style="max-height: 200px; max-width: 100%;" class="rounded">
+                        </div>
+                        <a href="{{ url()->current() }}" class="btn btn-outline-secondary btn-sm" title="Refresh">
+                            <i class="fas fa-sync-alt"></i>
+                        </a>
+                    </div>
                 </div>
-                <span class="action-text">Log Progress</span>
-            </a>
+            @else
+                <p class="text-muted mt-3">No exercise data available at the moment.</p>
+            @endif
         </div>
-
-        <!-- Book Appointment -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('appointments.create') }}" class="action-card text-center">
-                <div class="icon-circle bg-warning-subtle text-warning">
-                    <img src="{{ asset('booking.png') }}" alt="Book" class="progress-icon">
-                </div>
-                <span class="action-text">Book Appointment</span>
-            </a>
-        </div>
-
-        <!-- Create Plan -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('personalisedTrainingPlans.create') }}" class="action-card text-center">
-                <div class="icon-circle bg-danger-subtle text-danger">
-                    <img src="{{ asset('report.png') }}" alt="Book" class="progress-icon">
-                </div>
-                <span class="action-text">Create Plan</span>
-            </a>
-        </div>
-
     </div>
 </div>
+
 <style>
 .date-box {
         background: #f8f9fa;
