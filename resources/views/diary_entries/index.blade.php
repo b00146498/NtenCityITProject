@@ -5,7 +5,7 @@
 
 <div class="d-flex align-items-center mb-4">
     <div class="icon-circle bg-info-subtle text-info me-3">
-        <img src="{{ asset('progress.png') }}" alt="Exercise Videos" class="progress-icon">
+        <img src="{{ asset('progress.png') }}" alt="progress icon" class="progress-icon">
     </div>
     <h2> Client Progress Notes</h2>
 </div>
