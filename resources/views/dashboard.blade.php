@@ -207,9 +207,39 @@
                 <span class="action-text">View Employee Profiles</span>
             </a>
         </div>
-
+        <!-- View exercise -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('standardexercises.index') }}" class="action-card text-center">
+                <div class="icon-circle bg-info-subtle text-info">
+                    <img src="{{ asset('videolink.png') }}" alt="videoicon" class="progress-icon">
+                </div>
+                <span class="action-text">Exercise Videos</span>
+            </a>
+        </div>
+        <!-- View workout -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('tpelogs.index') }}" class="action-card text-center">
+                <div class="icon-circle bg-info-subtle text-info">
+                    <img src="{{ asset('business-plan.png') }}" alt="icon" class="progress-icon">
+                </div>
+                <span class="action-text">Workout Plans</span>
+            </a>
+        </div>
     </div>
 </div>
+@if(is_array($exercise))
+    <div class="card mt-4 shadow">
+        <div class="card-body">
+            <h5 class="card-title">🏋️ Exercise of the Moment</h5>
+            <p><strong>Name:</strong> {{ ucfirst($exercise['name']) }}</p>
+            <p><strong>Target:</strong> {{ $exercise['target'] }}</p>
+            <p><strong>Equipment:</strong> {{ $exercise['equipment'] }}</p>
+            <img src="{{ $exercise['gifUrl'] }}" alt="Exercise Demo" class="img-fluid rounded" style="max-height: 250px;">
+        </div>
+    </div>
+@else
+    <p class="text-muted mt-3">No exercise data available at the moment.</p>
+@endif
 <style>
 .date-box {
         background: #f8f9fa;
