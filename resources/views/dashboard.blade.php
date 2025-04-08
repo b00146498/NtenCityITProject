@@ -189,6 +189,25 @@
             </a>
         </div>
 
+        <!-- View Client Profiles -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('clients.index') }}" class="action-card text-center">
+                <div class="icon-circle bg-info-subtle text-info">
+                    <img src="{{ asset('clientprofile.png') }}" alt="Profiles" class="progress-icon">
+                </div>
+                <span class="action-text">View Client Profiles</span>
+            </a>
+        </div>
+        <!-- View employee Profiles -->
+        <div class="col-6 col-md-3">
+            <a href="{{ route('employees.index') }}" class="action-card text-center">
+                <div class="icon-circle bg-info-subtle text-info">
+                    <img src="{{ asset('empprofile.png') }}" alt="Profiles" class="progress-icon">
+                </div>
+                <span class="action-text">View Employee Profiles</span>
+            </a>
+        </div>
+
     </div>
 </div>
 <style>

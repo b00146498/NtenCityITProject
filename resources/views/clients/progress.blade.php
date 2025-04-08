@@ -194,7 +194,6 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 1.5rem !important; /* Adjust size */
 }
 
-
 /* Dashboard Header */
 .dashboard-header {
     display: flex;
@@ -231,8 +230,6 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 18px;
     margin-left: 10px;
 }
-
-
 
 .exercise-container {
     text-align: Left;

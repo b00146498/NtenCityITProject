@@ -99,6 +99,7 @@ class DiaryEntryController extends Controller
         $dates = [];
         $speeds = [];
         $activityTypes = [];
+        $polyline = null;
 
         if ($client && $client->strava_access_token) {
             $response = Http::withOptions([
@@ -122,6 +123,16 @@ class DiaryEntryController extends Controller
                     $type = $activity['type'] ?? 'Other';
                     $activityTypes[$type] = ($activityTypes[$type] ?? 0) + 1;
                 }
+                $first = $activities[0] ?? null;
+                if ($first) {
+                    $detail = Http::withOptions(['verify' => false])
+                        ->withToken($client->strava_access_token)
+                        ->get("https://www.strava.com/api/v3/activities/{$first['id']}");
+
+                    if ($detail->successful()) {
+                        $polyline = $detail['map']['summary_polyline'] ?? null;
+                    }
+                }
             }
         }
 
@@ -132,7 +143,8 @@ class DiaryEntryController extends Controller
             'distances',
             'dates',
             'speeds',
-            'activityTypes'
+            'activityTypes',
+            'polyline'
         ));
     }
 
