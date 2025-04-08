@@ -145,101 +145,112 @@
     </button>
 </div>
 
-<!-- Quick Actions Section -->
+<!-- Quick Actions + Exercise Section -->
 <div class="container my-5">
-    <div class="row g-4 justify-content-center">
+    <div class="row g-4">
 
-        <!-- Add Client -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('clients.create') }}" class="action-card text-center">
-                <div class="icon-circle bg-primary-subtle text-primary">
-                    <img src="{{ asset('clients.png') }}" alt="Book" class="progress-icon">
+        <!-- Quick Actions Left (2x2 + 2x2 stacked) -->
+        <div class="col-md-6">
+            <div class="row g-4">
+                <!-- First 2x2 -->
+                <div class="col-6">
+                    <a href="{{ route('clients.create') }}" class="action-card text-center">
+                        <div class="icon-circle bg-primary-subtle text-primary">
+                            <img src="{{ asset('clients.png') }}" alt="Add Client" class="progress-icon">
+                        </div>
+                        <span class="action-text">Add Client</span>
+                    </a>
                 </div>
-                <span class="action-text">Add Client</span>
-            </a>
+
+                <div class="col-6">
+                    <a href="{{ route('diary-entries.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-success-subtle text-success">
+                            <img src="{{ asset('progress.png') }}" alt="Log Progress" class="progress-icon">
+                        </div>
+                        <span class="action-text">Log Progress</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('appointments.create') }}" class="action-card text-center">
+                        <div class="icon-circle bg-warning-subtle text-warning">
+                            <img src="{{ asset('booking.png') }}" alt="Book Appointment" class="progress-icon">
+                        </div>
+                        <span class="action-text">Book Appointment</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('personalisedTrainingPlans.create') }}" class="action-card text-center">
+                        <div class="icon-circle bg-danger-subtle text-danger">
+                            <img src="{{ asset('report.png') }}" alt="Create Plan" class="progress-icon">
+                        </div>
+                        <span class="action-text">Create Plan</span>
+                    </a>
+                </div>
+
+                <!-- Second 2x2 -->
+                <div class="col-6">
+                    <a href="{{ route('clients.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('clientprofile.png') }}" alt="Client Profiles" class="progress-icon">
+                        </div>
+                        <span class="action-text">View Client Profiles</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('employees.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('empprofile.png') }}" alt="Employee Profiles" class="progress-icon">
+                        </div>
+                        <span class="action-text">View Employee Profiles</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('standardexercises.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('videolink.png') }}" alt="Exercise Videos" class="progress-icon">
+                        </div>
+                        <span class="action-text">Exercise Videos</span>
+                    </a>
+                </div>
+
+                <div class="col-6">
+                    <a href="{{ route('tpelogs.index') }}" class="action-card text-center">
+                        <div class="icon-circle bg-info-subtle text-info">
+                            <img src="{{ asset('business-plan.png') }}" alt="Workout Plans" class="progress-icon">
+                        </div>
+                        <span class="action-text">Workout Plans</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <!-- Log Progress -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('diary-entries.index') }}" class="action-card text-center">
-                <div class="icon-circle bg-success-subtle text-success">
-                    <img src="{{ asset('progress.png') }}" alt="Book" class="progress-icon">
+        <!-- Exercise of the Moment Right -->
+        <div class="col-md-6">
+            @if(is_array($exercise))
+                <div class="card h-100 shadow">
+                    <div class="card-body">
+                        <h2 class="h5 fw-bold text-dark mb-3">🏋️ Exercise of the Moment</h2>
+                        <p><strong>Name:</strong> {{ ucfirst($exercise['name']) }}</p>
+                        <p><strong>Target:</strong> {{ $exercise['target'] }}</p>
+                        <p><strong>Equipment:</strong> {{ $exercise['equipment'] }}</p>
+                        <img src="{{ $exercise['gifUrl'] }}" alt="Exercise Demo" class="img-fluid rounded" style="max-height: 250px;">
+                        <div class="mt-3">
+                            <a href="{{ url()->current() }}" class="btn btn-outline-primary btn-sm">🔄 Refresh Exercise</a>
+                        </div>
+                    </div>
                 </div>
-                <span class="action-text">Log Progress</span>
-            </a>
+            @else
+                <p class="text-muted mt-3">No exercise data available at the moment.</p>
+            @endif
         </div>
 
-        <!-- Book Appointment -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('appointments.create') }}" class="action-card text-center">
-                <div class="icon-circle bg-warning-subtle text-warning">
-                    <img src="{{ asset('booking.png') }}" alt="Book" class="progress-icon">
-                </div>
-                <span class="action-text">Book Appointment</span>
-            </a>
-        </div>
-
-        <!-- Create Plan -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('personalisedTrainingPlans.create') }}" class="action-card text-center">
-                <div class="icon-circle bg-danger-subtle text-danger">
-                    <img src="{{ asset('report.png') }}" alt="Book" class="progress-icon">
-                </div>
-                <span class="action-text">Create Plan</span>
-            </a>
-        </div>
-
-        <!-- View Client Profiles -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('clients.index') }}" class="action-card text-center">
-                <div class="icon-circle bg-info-subtle text-info">
-                    <img src="{{ asset('clientprofile.png') }}" alt="Profiles" class="progress-icon">
-                </div>
-                <span class="action-text">View Client Profiles</span>
-            </a>
-        </div>
-        <!-- View employee Profiles -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('employees.index') }}" class="action-card text-center">
-                <div class="icon-circle bg-info-subtle text-info">
-                    <img src="{{ asset('empprofile.png') }}" alt="Profiles" class="progress-icon">
-                </div>
-                <span class="action-text">View Employee Profiles</span>
-            </a>
-        </div>
-        <!-- View exercise -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('standardexercises.index') }}" class="action-card text-center">
-                <div class="icon-circle bg-info-subtle text-info">
-                    <img src="{{ asset('videolink.png') }}" alt="videoicon" class="progress-icon">
-                </div>
-                <span class="action-text">Exercise Videos</span>
-            </a>
-        </div>
-        <!-- View workout -->
-        <div class="col-6 col-md-3">
-            <a href="{{ route('tpelogs.index') }}" class="action-card text-center">
-                <div class="icon-circle bg-info-subtle text-info">
-                    <img src="{{ asset('business-plan.png') }}" alt="icon" class="progress-icon">
-                </div>
-                <span class="action-text">Workout Plans</span>
-            </a>
-        </div>
     </div>
 </div>
-@if(is_array($exercise))
-    <div class="card mt-4 shadow">
-        <div class="card-body">
-            <h5 class="card-title">🏋️ Exercise of the Moment</h5>
-            <p><strong>Name:</strong> {{ ucfirst($exercise['name']) }}</p>
-            <p><strong>Target:</strong> {{ $exercise['target'] }}</p>
-            <p><strong>Equipment:</strong> {{ $exercise['equipment'] }}</p>
-            <img src="{{ $exercise['gifUrl'] }}" alt="Exercise Demo" class="img-fluid rounded" style="max-height: 250px;">
-        </div>
-    </div>
-@else
-    <p class="text-muted mt-3">No exercise data available at the moment.</p>
-@endif
+
 <style>
 .date-box {
         background: #f8f9fa;
