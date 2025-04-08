@@ -39,5 +39,11 @@ RUN chown -R www-data:www-data storage bootstrap/cache
 # Expose port 80
 EXPOSE 80
 
+# Ensure required Laravel directories exist on mounted disk
+RUN mkdir -p storage/framework/{cache,sessions,views} \
+    && mkdir -p bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+
 # Set entrypoint to Apache
 CMD ["apache2-foreground"]
