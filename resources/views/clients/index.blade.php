@@ -51,8 +51,8 @@
     }
 
     .progress-icon {
-        width: 42px;
-        height: 42px;
+        width: 45px;
+        height: 45px;
         object-fit: contain;
     }
     </style>
