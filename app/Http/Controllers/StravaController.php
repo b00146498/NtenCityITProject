@@ -153,7 +153,8 @@ class StravaController extends Controller
 
         return redirect()->route('progress')->with('success', 'Strava connected!');
     }
-    public function showProgressPage()
+
+    /*public function showProgressPage()
     {
         $client = \App\Models\Client::where('userid', Auth::id())->first();
         $activities = [];
@@ -196,6 +197,69 @@ class StravaController extends Controller
             'speeds',
             'activityTypes'
         ));
+    }*/
+
+    public function showProgressPage()
+    {
+        $client = \App\Models\Client::where('userid', Auth::id())->first();
+        $activities = [];
+        $distances = [];
+        $dates = [];
+        $speeds = [];
+        $activityTypes = [];
+        $polyline = null;
+
+        if ($client && $client->strava_access_token) {
+            // 1. Get recent activities
+            $response = \Http::withOptions([
+                'verify' => false, // Dev only
+            ])->withToken($client->strava_access_token)
+            ->get('https://www.strava.com/api/v3/athlete/activities', [
+                'per_page' => 5,
+                'page' => 1,
+            ]);
+
+            if ($response->successful()) {
+                $activities = $response->json();
+
+                foreach ($activities as $activity) {
+                    $distances[] = round($activity['distance'] / 1000, 2);
+                    $dates[] = Carbon::parse($activity['start_date'])->format('d M');
+
+                    // Speed in km/h
+                    $speed = $activity['distance'] / $activity['elapsed_time'];
+                    $speeds[] = round($speed * 3.6, 2);
+
+                    // Count activity type
+                    $type = $activity['type'] ?? 'Other';
+                    $activityTypes[$type] = ($activityTypes[$type] ?? 0) + 1;
+                }
+
+                // 2. Get detailed data for the first activity
+                $firstActivity = $activities[0] ?? null;
+
+                if ($firstActivity) {
+                    $detail = Http::withOptions([
+                        'verify' => false,
+                    ])->withToken($client->strava_access_token)
+                    ->get("https://www.strava.com/api/v3/activities/{$firstActivity['id']}");
+
+                    if ($detail->successful()) {
+                        $polyline = $detail['map']['summary_polyline'] ?? null;
+                    }
+                }
+            }
+        }
+
+        return view('clients.progress', compact(
+            'activities',
+            'distances',
+            'dates',
+            'speeds',
+            'activityTypes',
+            'polyline'
+        ));
     }
+
 
 }

@@ -35,6 +35,8 @@
         $activities = $activities ?? [];
         $distances = $distances ?? [];
         $dates = $dates ?? [];
+        $speeds = $speeds ?? [];
+        $activityTypes = $activityTypes ?? [];
     @endphp
 
     <h2 class="progress-heading">My Progress</h2>
@@ -50,6 +52,10 @@
     <div class="chart-container pie-chart-container">
         <canvas id="typeChart"></canvas>
     </div>
+
+    @if ($polyline)
+        <div id="stravaMap" style="height: 300px; margin-top: 30px; border-radius: 10px;"></div>
+    @endif
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
@@ -112,6 +118,25 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+    document.addEventListener("DOMContentLoaded", function () {
+        @if ($polyline)
+            const encoded = "{{ $polyline }}";
+            const decoded = polyline.decode(encoded);
+
+            const map = L.map('stravaMap').setView(decoded[0], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            L.polyline(decoded, {
+                color: 'red',
+                weight: 4,
+                opacity: 0.8,
+                smoothFactor: 1
+            }).addTo(map);
+        @endif
+    });
 </script>
 
 
@@ -227,6 +252,12 @@ h1, h2, h3, h4, h5, h6 {
     max-height: 220px;
     margin: 0 auto;
     display: block;
+}
+
+#stravaMap {
+    width: 100%;
+    border: 2px solid #C96E04;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 </style>
 
