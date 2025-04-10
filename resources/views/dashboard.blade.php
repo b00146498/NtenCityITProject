@@ -234,7 +234,19 @@
         </div>
 
         <!-- Exercise of the Moment Right -->
-        <div class="col-md-6 d-flex justify-content-center align-items-start">
+        <div class="col-md-6 d-flex flex-column align-items-center">
+    
+            <!-- Search Bar -->
+            <div class="w-100 mb-3" style="max-width: 420px;">
+                <form action="{{ route('search.global') }}" method="GET" class="d-flex shadow-sm border rounded px-2 py-1 bg-white">
+                    <input type="text" name="q" class="form-control border-0 bg-transparent" placeholder="Search clients, employees, exercises..." required>
+                    <button type="submit" class="btn btn-link text-dark">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Exercise of the Moment Card -->
             @if(is_array($exercise))
                 <div class="card shadow w-100" style="max-width: 420px;">
                     <div class="card-body text-center">
@@ -357,8 +369,6 @@
         transition: transform 0.3s ease;
     }
 
-
-
     .stat-box-hover {
     position: relative;
     }
@@ -388,6 +398,18 @@
 
     .stat-preview-item:last-child {
         border-bottom: none;
+    }
+    form .btn i {
+        font-size: 1.1rem;
+    }
+    form.d-flex input[type="text"] {
+        border-radius: 0 !important;
+        background-color: #FFF7ED;
+        font-style: italic;
+    }
+
+    form.d-flex button {
+        border-left: 1px solid #ddd;
     }
 
 </style>

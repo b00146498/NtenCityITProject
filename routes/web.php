@@ -243,6 +243,9 @@ Route::get('/strava/activities', [\App\Http\Controllers\StravaController::class,
 //Route::get('/progress', [StravaController::class, 'showProgressPage'])->name('progress');
 Route::get('/progress', [StravaController::class, 'showProgressPage'])->middleware('auth')->name('progress');
 
+Route::get('/search', [App\Http\Controllers\SearchController::class, 'global'])->name('search.global');
+
+
 
 
 
