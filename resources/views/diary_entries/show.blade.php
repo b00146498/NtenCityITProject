@@ -24,6 +24,25 @@
         </div>
 
     </form>
+    @if(!empty($activities))
+        <div class="recent-strava mb-4">
+            <h4 class="mb-3">🚴 Recent Strava Activities</h4>
+            <div class="row">
+                @foreach($activities as $activity)
+                    <div class="col-md-6 mb-3">
+                        <div class="activity-card p-3 rounded shadow-sm">
+                            <h5 class="fw-bold mb-2">{{ $activity['name'] }}</h5>
+                            <p class="mb-1"><strong>Distance:</strong> {{ round($activity['distance'] / 1000, 2) }} km</p>
+                            <p class="mb-1"><strong>Duration:</strong> {{ gmdate("H:i:s", $activity['elapsed_time']) }}</p>
+                            <p class="mb-0"><strong>Date:</strong> {{ \Carbon\Carbon::parse($activity['start_date'])->format('d M Y') }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @else
+        <p class="text-muted text-center mb-4">No recent Strava activities found.</p>
+    @endif
 
     <!-- Strava Data Charts -->
     <div class="strava-section mb-4">
@@ -51,12 +70,6 @@
     </div>
 </div>
 
-@if($polyline)
-    <div class="map-box mt-4">
-        <h4 class="mb-3">📍 Activity Route Map</h4>
-        <div id="activityMap"></div>
-    </div>
-@endif
 
 <script>
     const dates = @json($dates ?? []);
@@ -119,36 +132,7 @@
         });
     }
 </script>
-<!-- Leaflet CSS & JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Polyline Decoder -->
-<script src="https://unpkg.com/@mapbox/polyline"></script>
-
-@if($polyline)
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const encoded = @json($polyline);
-        const coords = L.Polyline.fromEncoded(encoded).getLatLngs();
-
-        const map = L.map('activityMap').setView(coords[0], 13);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        const route = L.polyline(coords, {
-            color: '#C96E04',
-            weight: 5,
-            opacity: 0.8,
-            lineJoin: 'round'
-        }).addTo(map);
-
-        map.fitBounds(route.getBounds());
-    });
-</script>
-@endif
 
 <style>
     .chart-box {
@@ -206,19 +190,22 @@
     .form-control {
         background-color: #FFF7ED !important; /* Soft Beige */
     }
-    #activityMap {
-        height: 300px;
-        width: 100%;
+    .recent-strava {
+        background-color: #FFF7ED;
+        padding: 20px;
         border-radius: 10px;
-        border: 2px solid #C96E04;
-        z-index: 0;
     }
 
-    .map-box {
-        background: none;
-        padding: 0;
-        box-shadow: none;
-        border: none;
+    .activity-card {
+        background: #ffffff;
+        border-left: 5px solid #C96E04;
+        border-radius: 8px;
+        transition: box-shadow 0.3s ease;
     }
+
+    .activity-card:hover {
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
 </style>
 @endsection
