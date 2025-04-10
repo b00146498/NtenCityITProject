@@ -7,7 +7,7 @@
     @if ($weather)
     <div class="card shadow mb-3" style="border-left: 5px solid #C9A86A;">
         <div class="card-body">
-            <h5 class="card-title">🌤 Weather in {{ $weather['name'] }}</h5>
+            <h5 class="h6 fw-bold text-dark mb-3">🌤 Weather in {{ $weather['name'] }}</h5>
             <p>
                 Temperature: <strong>{{ $weather['main']['temp'] }}°C</strong><br>
                 Condition: {{ ucfirst($weather['weather'][0]['description']) }}<br>
@@ -20,10 +20,10 @@
 
     <div>
         <h2 class="h4 fw-bold text-dark mb-1">
-            Welcome to your Dashboard, {{ $employee->emp_first_name }}!
+            Welcome back, {{ $employee->emp_first_name }}!
         </h2>
         <p class="text-muted mb-0">
-            You’re currently working as a <strong>{{ $employee->role }}</strong> at <strong>{{ $company_name }}</strong>.
+                Role: <strong>{{ $employee->role }}</strong> | Practice: <strong>{{ $company_name }}</strong>.
         </p>
     </div>
 
@@ -31,11 +31,16 @@
     <!-- Stats Boxes -->
     <div class="d-flex gap-3 flex-wrap">
         <!-- Today’s Date -->
-        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center stat-box">
+        <div class="bg-light p-3 rounded shadow-sm d-flex align-items-center position-relative stat-box-hover">
             <i class="fas fa-calendar-day text-primary me-2 fs-5"></i>
             <div class="d-flex flex-column">
                 <span class="fw-bold text-muted">Today</span>
                 <span class="fw-bold">{{ now()->format('d/m/Y') }}</span>
+            </div>
+
+            <!-- Hidden Flatpickr calendar -->
+            <div class="calendar-container" id="calendarContainer">
+                <input type="text" id="miniCalendar" class="form-control" style="opacity: 0; height: 0; pointer-events: none;">
             </div>
         </div>
 
@@ -251,6 +256,40 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendar = flatpickr("#miniCalendar", {
+            inline: true,
+            static: true,
+            disableMobile: true,
+        });
+
+        // Show on hover
+        const hoverBox = document.querySelector('.stat-box-hover');
+        const calendarContainer = document.getElementById('calendarContainer');
+
+        hoverBox.addEventListener('mouseenter', () => {
+            calendarContainer.style.display = 'block';
+        });
+
+        hoverBox.addEventListener('mouseleave', () => {
+            calendarContainer.style.display = 'none';
+        });
+
+        // Initially hide
+        calendarContainer.style.display = 'none';
+        calendarContainer.style.position = 'absolute';
+        calendarContainer.style.top = '100%';
+        calendarContainer.style.left = '0';
+        calendarContainer.style.zIndex = '99';
+        calendarContainer.style.backgroundColor = '#fff';
+        calendarContainer.style.border = '1px solid #ddd';
+        calendarContainer.style.borderRadius = '8px';
+        calendarContainer.style.boxShadow = '0 8px 16px rgba(0,0,0,0.1)';
+    });
+</script>
+
 
 <style>
 .date-box {
