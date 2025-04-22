@@ -84,8 +84,8 @@
     </div>
     <!-- Centered Buttons -->
     <div class="d-flex justify-content-center mt-3">
-        <a href="{{ route('employees.index') }}" class="btn btn-primary me-3">
-            <i class="fas fa-arrow-left"></i> Back to Employees
+        <a href="{{ route('clients.index') }}" class="btn btn-primary me-3">
+            <i class="fas fa-arrow-left"></i> Back to Clients
         </a>
         <button type="submit" class="btn btn-primary">Save Details</button>
     </div>

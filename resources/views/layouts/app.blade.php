@@ -135,7 +135,19 @@
         .logo:hover {
             transform: scale(1.05);
         }
+        form.d-flex input[type="text"] {
+            border-radius: 0 !important;
+            background-color: #FFF7ED;
+            font-style: italic;
+        }
 
+        form.d-flex button {
+            border-left: 1px solid #ddd;
+        }
+
+        form .btn i {
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 
@@ -147,6 +159,21 @@
     <a href="{{ route('dashboard') }}">
     <img src="{{ asset('ntencitylogo.png') }}" alt="Ntencity Logo" class="logo">
 </a>
+
+<!-- Search Bar -->
+<div class="flex-grow-1 d-flex justify-content-center">
+    <form action="{{ route('search.global') }}" method="GET" 
+          class="d-flex shadow-sm border rounded px-2 py-1 bg-white"
+          style="max-width: 420px; width: 100%;">
+        <input type="text" name="q" 
+               class="form-control border-0 bg-transparent" 
+               placeholder="Search clients, employees, exercises..." 
+               required>
+        <button type="submit" class="btn btn-link text-dark">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+</div>
 
     <!-- User Profile and Name on the Right -->
     @auth
