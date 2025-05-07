@@ -27,36 +27,6 @@ class StravaController extends Controller
         return redirect()->away("https://www.strava.com/oauth/authorize?client_id={$clientId}&response_type=code&redirect_uri={$redirectUri}&approval_prompt=auto&scope={$scope}");
     }
 
-    /*public function handleCallback(Request $request)
-    {
-        $code = $request->input('code');
-
-        $response = Http::withOptions([
-            'verify' => false, // ⚠️ Local dev only
-        ])->post('https://www.strava.com/oauth/token', [
-            'client_id' => config('services.strava.client_id'),
-            'client_secret' => config('services.strava.client_secret'),
-            'code' => $code,
-            'grant_type' => 'authorization_code',
-        ]);
-
-        $data = $response->json();
-
-        $client = Client::where('userid', Auth::id())->first();
-
-        if ($client && isset($data['access_token'])) {
-            $client->update([
-                'strava_access_token' => $data['access_token'],
-                'strava_refresh_token' => $data['refresh_token'],
-                'strava_token_expires_at' => Carbon::createFromTimestamp($data['expires_at']),
-            ]);
-
-            return redirect()->route('strava.activities')->with('success', 'Strava connected!');
-        }
-
-        return redirect()->route('workoutlogs')->with('error', 'Strava connection failed.');
-    }*/
-
     public function handleCallback(Request $request)
     {
         $code = $request->input('code');
@@ -93,7 +63,7 @@ class StravaController extends Controller
             'strava_token_expires_at' => Carbon::createFromTimestamp($data['expires_at']),
         ]);
 
-        return redirect()->route('strava.activities')->with('success', 'Strava connected successfully!');
+        return redirect()->route('progress')->with('success', 'Strava connected successfully!');
     }
 
 
