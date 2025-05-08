@@ -15,46 +15,61 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\PracticeController;
 use App\Http\Controllers\StandardExercisesController;
-use App\Models\Client;
-use App\Models\TpeLog;
-use App\Models\Appointment;
-use App\Models\Employee;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\StravaController;
+use App\Http\Controllers\SearchController;
+use App\Models\Client;
+use App\Models\TpeLog;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
 
-
-/* |-------------------------------------------------------------------------- 
-   | Web Routes 
-   |-------------------------------------------------------------------------- */
-
-/*Route::get('/', function () {
-    return view('welcome');
-});*/
-
+// Redirect root to login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
+<<<<<<< HEAD
 // Make available-slots public
 Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-slots');
 
+=======
+// Public Routes
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+
+require __DIR__.'/auth.php';
+
+// Routes requiring authentication
+>>>>>>> a099e71 (fixed app)
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/client/new/{userid}', 'App\Http\Controllers\clientController@new')->name('client.new');
+    // Client Routes
+    Route::get('/client/new/{userid}', [ClientController::class, 'new'])->name('client.new');
     Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::get('/client/clientdashboard', [ClientController::class, 'clientdashboard'])->name('client.clientdashboard');
+    Route::get('/client/help', function () {
+        return view('clients.clienthelp');
+    })->name('client.help');
+    Route::get('/client/profile/edit', [ClientController::class, 'editClientProfile'])->name('client.editprofile');
 
-
-    Route::get('/employee/new/{userid}', [EmployeeController::class, 'new'])
-    ->name('employee.new');
-
+    // Employee Routes
+    Route::get('/employee/new/{userid}', [EmployeeController::class, 'new'])->name('employee.new');
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
 
-    // Logout Route
+    // Logout
     Route::post('/logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
@@ -62,19 +77,35 @@ Route::middleware(['auth'])->group(function () {
         return redirect()->route('login');
     })->name('logout');
 
-    // Clients About Page
+    // About Pages
     Route::get('/clients/about', function () {
         return view('clients.about');
     })->name('clients.about');
 
-    // CRUD Routes for Employees, Clients, and Practices
+    // CRUD Resources
     Route::resource('employees', EmployeeController::class);
     Route::resource('clients', ClientController::class);
     Route::resource('practices', PracticeController::class);
+    Route::resource('standardexercises', StandardExercisesController::class);
 
+<<<<<<< HEAD
     // FullCalendar Appointment Routes
     Route::resource('appointments', AppointmentController::class);
     Route::post('/appointments/{id}/pay', [AppointmentController::class, 'payAppointment'])->name('appointments.pay');
+=======
+    // Appointment Routes
+    // Exclude the default "show" so we don’t need a show() method:
+    Route::resource('appointments', AppointmentController::class)
+         ->except(['show']);
+    Route::post('/appointments/{id}/pay', [AppointmentController::class, 'processPayment'])->name('appointments.pay');
+    Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
+    Route::get('/appointments/available-time-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-time-slots');
+    Route::get('/appointments/upcoming', [AppointmentController::class, 'upcoming'])->name('appointments.upcoming');
+    Route::post('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
+    Route::patch('/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
+    Route::post('/appointments/{id}/process-payment', [AppointmentController::class, 'processPayment'])->name('appointments.process-payment');
+    Route::get('/appointment/json', [AppointmentController::class, 'index'])->name('appointment.json');
+>>>>>>> a099e71 (fixed app)
 
     // Diary Entry Routes
     Route::resource('diary-entries', DiaryEntryController::class);
@@ -84,7 +115,7 @@ Route::middleware(['auth'])->group(function () {
     // Notifications
     Route::resource('notifications', NotificationController::class);
     Route::put('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-    Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::put('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAsReadAll');
     Route::get('notifications/create-test', [NotificationController::class, 'createTestNotification'])->name('notifications.test');
 
     // Profile Routes
@@ -94,15 +125,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/about', [ProfileController::class, 'about'])->name('profile.about');
     Route::get('/profile/help', [ProfileController::class, 'help'])->name('profile.help');
     Route::post('/profile/personal-details', [ProfileController::class, 'updatePersonalDetails'])->name('profile.update-details');
-// pp routes
-    Route::post('/profile/upload-picture', [ProfileController::class, 'uploadProfilePicture'])
-    ->name('profile.upload-picture');
+    Route::post('/profile/upload-picture', [ProfileController::class, 'uploadProfilePicture'])->name('profile.upload-picture');
+
+    // Client Profile
+    Route::get('/clientprofile', [ClientProfileController::class, 'index'])->name('clientprofile');
 
     // Search Routes
     Route::get('/search-clients', [ClientController::class, 'searchClients'])->name('search.clients');
     Route::get('/search-employees', [EmployeeController::class, 'searchEmployees'])->name('search.employees');
+    Route::get('/search', [SearchController::class, 'global'])->name('search.global');
 
-    // Calendar Display Route
+    // Calendar Display
     Route::get('/calendar/display', [CalendarController::class, 'display'])->name('calendar.display');
 
     // Personalised Training Plans
@@ -114,47 +147,45 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('tpelogs', tpelogController::class);
     Route::get('/tpelog/create/{plan_id}', [tpelogController::class, 'create'])->name('tpelog.create');
     Route::post('/tpelog/store', [tpelogController::class, 'store'])->name('tpelog.store');
-    Route::post('/update-workout-log/{id}', [\App\Http\Controllers\tpelogController::class, 'updateCompletion']);
-
-
-
-    // Standard Exercises
-    Route::resource('standardexercises', StandardExercisesController::class);
+    Route::post('/update-workout-log/{id}', [tpelogController::class, 'updateCompletion']);
 
     // Progress and Workout Logs
-    Route::get('/progress', function () {
-        return view('clients.progress');
-    })->name('progress');
-
-
+    Route::get('/progress', [StravaController::class, 'showProgressPage'])->name('progress');
     Route::get('/workoutlogs', function () {
         $user = Auth::user();
-        if (!$user) return redirect('/login');
+        if (!$user) {
+            return redirect('/login');
+        }
         $client = Client::where('userid', $user->id)->first();
-        if (!$client) return redirect('/clientdashboard')->with('error', 'Client not found.');
-        $workoutLogs = TpeLog::whereHas('trainingPlan', function ($query) use ($client) {
-            $query->where('client_id', $client->id);
-        })->with('standardExercise')->get();
+        if (!$client) {
+            return redirect('/clientdashboard')->with('error', 'Client not found.');
+        }
+        $workoutLogs = TpeLog::whereHas('trainingPlan', fn($q) => $q->where('client_id', $client->id))
+            ->with('standardExercise')
+            ->get();
         return view('clients.workoutlogs', compact('workoutLogs'));
     })->name('workoutlogs');
 
-    // Client Profile
-    Route::get('/clientprofile', [ClientProfileController::class, 'index'])->name('clientprofile');
+    // Alerts
+    Route::get('/alerts', [AppointmentController::class, 'upcoming'])->name('alerts');
 
-    // Appointment API
-    Route::get('/api/appointments', [AppointmentController::class, 'index']);
+    // Strava Routes
+    Route::get('/strava/connect', [StravaController::class, 'redirectToStrava'])->name('strava.connect');
+    Route::get('/strava/callback', [StravaController::class, 'handleCallback'])->name('strava.callback');
+    Route::get('/strava/authorize', [StravaController::class, 'redirectToStrava'])->name('strava.authorize');
+    Route::get('/strava/activities', [StravaController::class, 'fetchActivities'])->name('strava.activities');
 
-    // Appointment Notifications
+    // Test Routes
     Route::get('/test-appointment-notification', function () {
         $user = Auth::user();
         if (!$user) return 'Not logged in';
         try {
             $appointment = (object)[
-                'id' => 123,
+                'id'           => 123,
                 'booking_date' => date('Y-m-d'),
-                'status' => 'confirmed',
-                'notes' => 'Test appointment from route',
-                'doctor_name' => 'Dr. Smith'
+                'status'       => 'confirmed',
+                'notes'        => 'Test appointment from route',
+                'doctor_name'  => 'Dr. Smith',
             ];
             $user->notify(new \App\Notifications\SimpleAppointmentNotification($appointment));
             return 'Appointment notification sent! Go check your notifications page.';
@@ -162,9 +193,8 @@ Route::middleware(['auth'])->group(function () {
             \Log::error('Error creating appointment notification: ' . $e->getMessage());
             return 'Error: ' . $e->getMessage();
         }
-    })->middleware('auth');
+    });
 
-    // Simple Test Notification
     Route::get('/simple-test', function () {
         $user = Auth::user();
         if (!$user) return 'Not logged in';
@@ -177,9 +207,10 @@ Route::middleware(['auth'])->group(function () {
         }
     });
 
-    // Appointment JSON API
-    Route::get('/appointment/json', [AppointmentController::class, 'getAppointments'])->name('appointment.json');
+    // API Routes
+    Route::get('/api/appointments', [AppointmentController::class, 'index']);
 });
+<<<<<<< HEAD
 
 // Public Routes
 Route::get('/login', function () {
@@ -269,3 +300,5 @@ Route::get('/debug-employee', function() {
         'asset_path' => $employee->profile_picture ? asset($employee->profile_picture) : 'null',
     ];
 })->middleware('auth');
+=======
+>>>>>>> a099e71 (fixed app)

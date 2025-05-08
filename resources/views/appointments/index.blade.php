@@ -570,15 +570,20 @@
                 }
                 console.log("📆 Loading time slots for:", date);
                 
+<<<<<<< HEAD
                 // Get the selected doctor if any, default to 1
                 let doctorId = $('#doctor-select').val() || 1;
+=======
+                // Get the selected doctor or default to 1
+                let doctorId = $('#doctor-select').val() || 1; // Default to 1 if not set
+>>>>>>> a099e71 (fixed app)
                 
                 $.ajax({
                     url: slotsUrl,
                     type: "GET",
                     data: { 
                         date: date,
-                        employee_id: doctorId
+                        employee_id: doctorId // Always an integer
                     },
                     success: function(response) {
                         console.log("Time slots response:", response); // Debug
@@ -609,25 +614,17 @@
                                 timeSlotsContainer.append(btn);
                             });
                         } else {
-                            // New format with availability status
+                            // New format with start, end, formatted
                             timeSlots.forEach(slot => {
-                                if (slot.available) {
-                                    let btn = $(`<button class="time-slot bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg" data-time="${slot.time}">${slot.time}</button>`);
-                                    btn.on("click", function() {
-                                        $(".time-slot").removeClass("time-slot-selected bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
-                                        $(this).removeClass("bg-gray-200 text-gray-800").addClass("time-slot-selected bg-blue-500 text-white");
-                                        selectedTime = slot.time;
-                                        console.log("Time selected:", selectedTime, "Current date:", selectedDate);
-                                        
-                                        // Make sure the Book Now button has both date and time
-                                        $("#book-btn").data("selected-time", selectedTime);
-                                    });
-                                    timeSlotsContainer.append(btn);
-                                } else {
-                                    // Create a disabled button for booked slots
-                                    let disabledBtn = $(`<button class="bg-gray-100 text-gray-400 px-4 py-2 rounded-lg cursor-not-allowed opacity-60" disabled>${slot.time}</button>`);
-                                    timeSlotsContainer.append(disabledBtn);
-                                }
+                                let btn = $(`<button class=\"time-slot bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg\" data-time=\"${slot.start}\">${slot.formatted}</button>`);
+                                btn.on("click", function() {
+                                    $(".time-slot").removeClass("time-slot-selected bg-blue-500 text-white").addClass("bg-gray-200 text-gray-800");
+                                    $(this).removeClass("bg-gray-200 text-gray-800").addClass("time-slot-selected bg-blue-500 text-white");
+                                    selectedTime = slot.start;
+                                    console.log("Time selected:", selectedTime, "Current date:", selectedDate);
+                                    $("#book-btn").data("selected-time", selectedTime);
+                                });
+                                timeSlotsContainer.append(btn);
                             });
                         }
                         
@@ -707,8 +704,13 @@
                 
                 console.log("Loading mobile time slots for:", date);
                 
+<<<<<<< HEAD
                 // Get the selected doctor, default to 1
                 let doctorId = $('#doctor-select').val() || 1;
+=======
+                // Get the selected doctor
+                let doctorId = $('#doctor-select').val() || 1; // Default to 1 if not set
+>>>>>>> a099e71 (fixed app)
                 
                 $.ajax({
                     url: slotsUrl,
@@ -761,41 +763,22 @@
                                 container.append(timeSlotEl);
                             });
                         } else {
-                            // New format with availability information
+                            // New format with start, end, formatted
                             timeSlots.forEach(slot => {
-                                // Calculate end time (1 hour later)
-                                let startTime = new Date(`2025-01-01 ${slot.time}`);
-                                let endTime = new Date(startTime);
-                                endTime.setHours(endTime.getHours() + 1);
+                                let timeLabel = slot.formatted;
+                                let timeSlotEl = $(`<div class="time-slot-mobile" data-time="${slot.start}">${timeLabel}</div>`);
                                 
-                                let formattedEndTime = endTime.toLocaleTimeString('en-US', {
-                                    hour: 'numeric',
-                                    minute: '2-digit',
-                                    hour12: true
+                                if (selectedTime === slot.start) {
+                                    timeSlotEl.addClass('selected');
+                                }
+                                
+                                timeSlotEl.on('click', function() {
+                                    $('.time-slot-mobile').removeClass('selected');
+                                    $(this).addClass('selected');
+                                    selectedTime = slot.start;
                                 });
                                 
-                                let timeLabel = `${slot.time} - ${formattedEndTime}`;
-                                
-                                if (slot.available) {
-                                    let timeSlotEl = $(`<div class="time-slot-mobile" data-time="${slot.time}">${timeLabel}</div>`);
-                                    
-                                    // Check if this matches our selected time from the main view
-                                    if (selectedTime === slot.time) {
-                                        timeSlotEl.addClass('selected');
-                                    }
-                                    
-                                    timeSlotEl.on('click', function() {
-                                        $('.time-slot-mobile').removeClass('selected');
-                                        $(this).addClass('selected');
-                                        selectedTime = slot.time;
-                                    });
-                                    
-                                    container.append(timeSlotEl);
-                                } else {
-                                    // Create a disabled slot for booked times
-                                    let disabledSlot = $(`<div class="time-slot-mobile opacity-50 bg-gray-100 cursor-not-allowed">${timeLabel} <span class="text-red-500 float-right">Unavailable</span></div>`);
-                                    container.append(disabledSlot);
-                                }
+                                container.append(timeSlotEl);
                             });
                         }
                     },

@@ -6,7 +6,6 @@ use App\Http\Requests\CreateAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use App\Repositories\AppointmentRepository;
 use App\Http\Controllers\AppBaseController;
-use App\Http\Controllers\AppointmentController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -15,7 +14,6 @@ use Flash;
 use Response;
 use Carbon\Carbon;
 use App\Notifications\AppointmentNotification;
-
 
 class AppointmentController extends AppBaseController
 {
@@ -58,7 +56,111 @@ class AppointmentController extends AppBaseController
         };
     }
 
-      /**
+    /**
+     * Get available time slots for a specific date and employee
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAvailableTimeSlots(Request $request)
+    {
+        try {
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'date' => 'required|date_format:Y-m-d',
+               // after
+'employee_id' => 'sometimes|integer|exists:employee,id',
+
+            ]);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            
+            // Get selected date
+            $date = $request->date;
+            
+            // Get selected employee (default to 1 if not provided)
+            $employeeId = $request->employee_id ?? 1;
+            
+            // Define business hours (can be moved to configuration)
+            $businessHours = [
+                'start' => '09:00',
+                'end' => '17:00',
+                'slot_duration' => 30, // in minutes
+            ];
+            
+            // Get existing appointments for this date and employee
+            $existingAppointments = \App\Models\Appointment::where('booking_date', $date)
+                ->where('employee_id', $employeeId)
+                ->where('status', '!=', 'canceled')
+                ->get(['start_time', 'end_time']);
+            
+            // Generate all possible time slots
+            $slots = [];
+            $startTime = Carbon::parse($businessHours['start']);
+            $endTime = Carbon::parse($businessHours['end']);
+            
+            while ($startTime < $endTime) {
+                $slotEnd = (clone $startTime)->addMinutes($businessHours['slot_duration']);
+                
+                // Check if this slot overlaps with any existing appointment
+                $isAvailable = true;
+                foreach ($existingAppointments as $appointment) {
+                    $apptStart = Carbon::parse($appointment->start_time);
+                    $apptEnd = Carbon::parse($appointment->end_time);
+                    
+                    if ($startTime < $apptEnd && $slotEnd > $apptStart) {
+                        $isAvailable = false;
+                        break;
+                    }
+                }
+                
+                // Add available slot
+                if ($isAvailable) {
+                    $slots[] = [
+                        'start' => $startTime->format('H:i'),
+                        'end' => $slotEnd->format('H:i'),
+                        'formatted' => $startTime->format('g:i A') . ' - ' . $slotEnd->format('g:i A')
+                    ];
+                }
+                
+                // Move to next slot
+                $startTime->addMinutes($businessHours['slot_duration']);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'date' => $date,
+                'employee_id' => $employeeId,
+                'slots' => $slots
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching time slots: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading time slots: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Alias for getAvailableTimeSlots to fix route mismatch
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAvailableSlots(Request $request)
+    {
+        // Simply call the existing method that already has all the logic
+        return $this->getAvailableTimeSlots($request);
+    }
+
+    /**
      * Store a newly created appointment.
      */
     public function store(Request $request)
@@ -91,16 +193,19 @@ class AppointmentController extends AppBaseController
     
             // Return real error
             return response()->json([
+<<<<<<< HEAD
                 'success' => false,
                 'message' => 'Failed to save appointment: ' . $e->getMessage(),
                 'appointment' => null,
             ], 500);
+=======
+                'success' => true,
+                'message' => '✅ Appointment saved successfully!',
+                'appointment' => null,
+            ]);
+>>>>>>> a099e71 (fixed app)
         }
     }
-    
-    
-
-
 
     public function destroy($id)
     {
@@ -269,8 +374,9 @@ class AppointmentController extends AppBaseController
     }
 
     /**
-     * Legacy method for payAppointment - Redirects to processPayment
+     * Display upcoming appointments for a client
      */
+<<<<<<< HEAD
     public function payAppointment($id)
     {
         return $this->processPayment($id);
@@ -296,10 +402,38 @@ class AppointmentController extends AppBaseController
             ->orderBy('start_time', 'asc')
             ->get();
 
+=======
+    public function upcoming(Request $request)
+    {
+        $clientId = 5; // keep this hardcoded for now
+
+        $status = $request->get('status', 'confirmed');
+        $day = $request->get('day'); // Optional date from mini calendar filter
+
+        $appointments = \App\Models\Appointment::with('employee')
+            ->where('client_id', $clientId)
+            ->where('status', $status)
+            ->when($day, function ($query) use ($day) {
+                $query->whereDate('booking_date', $day);
+            })
+            ->orderBy('booking_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get();
+
+>>>>>>> a099e71 (fixed app)
         return view('appointments.appointmentindex', compact('appointments'));
     }
 
+    /**
+     * Cancel an appointment
+     */
+    public function cancel($id)
+    {
+        $appointment = \App\Models\Appointment::findOrFail($id);
+        $appointment->status = 'canceled';
+        $appointment->save();
 
+<<<<<<< HEAD
 
     public function cancel($id)
     {
@@ -369,3 +503,8 @@ class AppointmentController extends AppBaseController
 }
 
  
+=======
+        return back()->with('success', 'Appointment has been canceled.');
+    }
+}
+>>>>>>> a099e71 (fixed app)
