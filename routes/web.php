@@ -38,20 +38,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-<<<<<<< HEAD
 // Make available-slots public
 Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-slots');
 
-=======
-// Public Routes
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
-require __DIR__.'/auth.php';
-
-// Routes requiring authentication
->>>>>>> a099e71 (fixed app)
 Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -88,24 +77,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('practices', PracticeController::class);
     Route::resource('standardexercises', StandardExercisesController::class);
 
-<<<<<<< HEAD
     // FullCalendar Appointment Routes
     Route::resource('appointments', AppointmentController::class);
-    Route::post('/appointments/{id}/pay', [AppointmentController::class, 'payAppointment'])->name('appointments.pay');
-=======
-    // Appointment Routes
-    // Exclude the default "show" so we don’t need a show() method:
-    Route::resource('appointments', AppointmentController::class)
-         ->except(['show']);
     Route::post('/appointments/{id}/pay', [AppointmentController::class, 'processPayment'])->name('appointments.pay');
-    Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
-    Route::get('/appointments/available-time-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-time-slots');
-    Route::get('/appointments/upcoming', [AppointmentController::class, 'upcoming'])->name('appointments.upcoming');
-    Route::post('/appointments/{id}/cancel', [AppointmentController::class, 'cancel'])->name('appointments.cancel');
-    Route::patch('/appointments/{id}/cancel', [AppointmentController::class, 'cancel']);
-    Route::post('/appointments/{id}/process-payment', [AppointmentController::class, 'processPayment'])->name('appointments.process-payment');
-    Route::get('/appointment/json', [AppointmentController::class, 'index'])->name('appointment.json');
->>>>>>> a099e71 (fixed app)
 
     // Diary Entry Routes
     Route::resource('diary-entries', DiaryEntryController::class);
@@ -210,95 +184,3 @@ Route::middleware(['auth'])->group(function () {
     // API Routes
     Route::get('/api/appointments', [AppointmentController::class, 'index']);
 });
-<<<<<<< HEAD
-
-// Public Routes
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-
-require __DIR__.'/auth.php';
-
-
-Route::get('/client/clientdashboard', [App\Http\Controllers\ClientController::class, 'clientdashboard'])
-    ->name('client.clientdashboard')
-    ->middleware('auth');
-
-Route::get('/alerts', function () {
-    return view('clients.alerts');
-})->name('alerts');
-
-
-Route::get('/alerts', [AppointmentController::class, 'upcoming'])->name('alerts');
-
-Route::get('/dashboard', function () {
-    $userId = Auth::id();
-
-    $employee = \App\Models\Employee::where('userid', $userId)->first();
-
-    if (!$employee) {
-        return redirect('/')->with('error', 'Employee record not found for this user.');
-    }
-
-    $appointments = \App\Models\Appointment::where('employee_id', $employee->id)
-        ->whereDate('start_time', '>=', now())
-        ->get();
-
-    $activeClients = \App\Models\Client::where('practice_id', $employee->practice_id)
-        ->where('account_status', 'Active')
-        ->count();
-
-    return view('dashboard', compact('appointments', 'activeClients'));
-});
-
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth'])
-    ->name('dashboard');
-
-Route::get('/client/help', function () {
-    return view('clients.clienthelp');
-})->name('client.help');
-
-Route::get('/client/profile/edit', [ClientController::class, 'editClientProfile'])->name('client.editprofile');
-
-Route::patch('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
-
-//strava routes
-
-Route::get('/strava/connect', [StravaController::class, 'redirectToStrava'])->name('strava.connect');
-Route::get('/strava/callback', [StravaController::class, 'handleCallback'])->name('strava.callback');
-Route::get('/strava/authorize', [StravaController::class, 'redirectToStrava'])->name('strava.authorize');
-/*Route::get('/strava/activities', [\App\Http\Controllers\StravaController::class, 'fetchActivities'])
-    ->middleware('auth')
-    ->name('strava.activities');*/
-//Route::get('/progress', [\App\Http\Controllers\StravaController::class, 'showProgressPage'])->name('progress');
-//Route::get('/progress', [\App\Http\Controllers\StravaController::class, 'fetchActivities'])->name('progress');
-//Route::get('/progress', [StravaController::class, 'showProgressPage'])->name('progress');
-Route::get('/progress', [StravaController::class, 'showProgressPage'])->middleware('auth')->name('progress');
-
-Route::get('/search', [App\Http\Controllers\SearchController::class, 'global'])->name('search.global');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Route::get('/debug-employee', function() {
-    $user = Auth::user();
-    $employee = \App\Models\Employee::where('userid', $user->id)->first();
-    return [
-        'employee_id' => $employee->id ?? 'null',
-        'profile_picture' => $employee->profile_picture ?? 'null',
-        'asset_path' => $employee->profile_picture ? asset($employee->profile_picture) : 'null',
-    ];
-})->middleware('auth');
-=======
->>>>>>> a099e71 (fixed app)

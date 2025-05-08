@@ -570,13 +570,8 @@
                 }
                 console.log("📆 Loading time slots for:", date);
                 
-<<<<<<< HEAD
                 // Get the selected doctor if any, default to 1
                 let doctorId = $('#doctor-select').val() || 1;
-=======
-                // Get the selected doctor or default to 1
-                let doctorId = $('#doctor-select').val() || 1; // Default to 1 if not set
->>>>>>> a099e71 (fixed app)
                 
                 $.ajax({
                     url: slotsUrl,
@@ -704,13 +699,8 @@
                 
                 console.log("Loading mobile time slots for:", date);
                 
-<<<<<<< HEAD
                 // Get the selected doctor, default to 1
                 let doctorId = $('#doctor-select').val() || 1;
-=======
-                // Get the selected doctor
-                let doctorId = $('#doctor-select').val() || 1; // Default to 1 if not set
->>>>>>> a099e71 (fixed app)
                 
                 $.ajax({
                     url: slotsUrl,
