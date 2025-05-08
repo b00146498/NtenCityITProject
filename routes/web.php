@@ -184,3 +184,6 @@ Route::middleware(['auth'])->group(function () {
     // API Routes
     Route::get('/api/appointments', [AppointmentController::class, 'index']);
 });
+
+// Ensure Laravel auth routes are loaded
+require __DIR__.'/auth.php';
