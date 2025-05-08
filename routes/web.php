@@ -37,6 +37,9 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// Make available-slots public
+Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-slots');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -72,7 +75,6 @@ Route::middleware(['auth'])->group(function () {
     // FullCalendar Appointment Routes
     Route::resource('appointments', AppointmentController::class);
     Route::post('/appointments/{id}/pay', [AppointmentController::class, 'payAppointment'])->name('appointments.pay');
-    Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableSlots'])->name('appointments.available-slots');
 
     // Diary Entry Routes
     Route::resource('diary-entries', DiaryEntryController::class);
@@ -257,3 +259,13 @@ Route::get('/search', [App\Http\Controllers\SearchController::class, 'global'])-
 
 
 
+
+Route::get('/debug-employee', function() {
+    $user = Auth::user();
+    $employee = \App\Models\Employee::where('userid', $user->id)->first();
+    return [
+        'employee_id' => $employee->id ?? 'null',
+        'profile_picture' => $employee->profile_picture ?? 'null',
+        'asset_path' => $employee->profile_picture ? asset($employee->profile_picture) : 'null',
+    ];
+})->middleware('auth');

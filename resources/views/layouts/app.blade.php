@@ -135,19 +135,7 @@
         .logo:hover {
             transform: scale(1.05);
         }
-        form.d-flex input[type="text"] {
-            border-radius: 0 !important;
-            background-color: #FFF7ED;
-            font-style: italic;
-        }
 
-        form.d-flex button {
-            border-left: 1px solid #ddd;
-        }
-
-        form .btn i {
-            font-size: 1.1rem;
-        }
     </style>
 </head>
 
@@ -178,8 +166,27 @@
     <!-- User Profile and Name on the Right -->
     @auth
         <div class="user-info dropdown">
-            <a class="dropdown-toggle text-decoration-none text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user"></i> {{ Auth::user()->name }}
+            <a class="dropdown-toggle text-decoration-none text-dark d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                @php
+                    $employee = null;
+                    $client = null;
+                    if (Auth::user()->role === 'employee') {
+                        $employee = App\Models\Employee::where('userid', Auth::id())->first();
+                    } elseif (Auth::user()->role === 'client') {
+                        $client = App\Models\Client::where('userid', Auth::id())->first();
+                    }
+                @endphp
+                
+                @if($employee && $employee->profile_picture)
+                    <img src="{{ asset($employee->profile_picture) }}" alt="Profile" class="user-profile-pic">
+                @elseif($client && $client->profile_picture)
+                    <img src="{{ asset($client->profile_picture) }}" alt="Profile" class="user-profile-pic">
+                @else
+                    <div class="profile-placeholder">
+                        <i class="fas fa-user" style="font-size: 14px; color: white;"></i>
+                    </div>
+                @endif
+                {{ Auth::user()->name }}
             </a>
             <ul class="dropdown-menu custom-dropdown dropdown-menu-end" aria-labelledby="userDropdown">
                 <li><a class="dropdown-item custom-dropdown-item" href="{{ route('profile') }}"><i class="fas fa-id-card me-2"></i> My Profile</a></li>

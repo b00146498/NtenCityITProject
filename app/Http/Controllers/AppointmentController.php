@@ -83,16 +83,18 @@ class AppointmentController extends AppBaseController
             return response()->json([
                 'success' => true,
                 'message' => '✅ Appointment saved successfully!',
+                'appointment' => $appointment,
             ]);
     
         } catch (\Exception $e) {
             Log::error('❌ Exception Forcing Appointment Save: ' . $e->getMessage());
     
-            // 🚀 **Even if an error happens, still return "success"**
+            // Return real error
             return response()->json([
-                'success' => true,
-                'message' => '✅ Appointment saved successfully!',
-            ]);
+                'success' => false,
+                'message' => 'Failed to save appointment: ' . $e->getMessage(),
+                'appointment' => null,
+            ], 500);
         }
     }
     
@@ -269,36 +271,100 @@ class AppointmentController extends AppBaseController
     /**
      * Legacy method for payAppointment - Redirects to processPayment
      */
-public function upcoming(Request $request)
-{
-    $clientId = 5; // keep this hardcoded for now
+    public function payAppointment($id)
+    {
+        return $this->processPayment($id);
+    }
 
-    $status = $request->get('status', 'confirmed');
-    $day = $request->get('day'); // Optional date from mini calendar filter
+    /**
+     * Legacy method for payAppointment - Redirects to processPayment
+     */
+    public function upcoming(Request $request)
+    {
+        $clientId = 5; // keep this hardcoded for now
 
-    $appointments = \App\Models\Appointment::with('employee')
-        ->where('client_id', $clientId)
-        ->where('status', $status)
-        ->when($day, function ($query) use ($day) {
-            $query->whereDate('booking_date', $day);
-        })
-        ->orderBy('booking_date', 'asc')
-        ->orderBy('start_time', 'asc')
-        ->get();
+        $status = $request->get('status', 'confirmed');
+        $day = $request->get('day'); // Optional date from mini calendar filter
 
-    return view('appointments.appointmentindex', compact('appointments'));
-}
+        $appointments = \App\Models\Appointment::with('employee')
+            ->where('client_id', $clientId)
+            ->where('status', $status)
+            ->when($day, function ($query) use ($day) {
+                $query->whereDate('booking_date', $day);
+            })
+            ->orderBy('booking_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get();
+
+        return view('appointments.appointmentindex', compact('appointments'));
+    }
 
 
 
-public function cancel($id)
-{
-    $appointment = \App\Models\Appointment::findOrFail($id);
-    $appointment->status = 'canceled';
-    $appointment->save();
+    public function cancel($id)
+    {
+        $appointment = \App\Models\Appointment::findOrFail($id);
+        $appointment->status = 'canceled';
+        $appointment->save();
 
-    return back()->with('success', 'Appointment has been canceled.');
-}
+        return back()->with('success', 'Appointment has been canceled.');
+    }
+
+    /**
+     * Display the specified appointment (not implemented).
+     */
+    public function show($id)
+    {
+        return response()->json(['error' => 'Not implemented'], 404);
+    }
+
+    /**
+     * Returns available time slots for a given date and employee.
+     */
+    public function getAvailableTimeSlots(Request $request)
+    {
+        // Example logic for available slots (replace with your real logic if needed)
+        $date = $request->input('date');
+        $employeeId = $request->input('employee_id');
+
+        // Validate input
+        if (!$date || !$employeeId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Missing date or employee_id',
+                'slots' => []
+            ], 400);
+        }
+
+        // Example: generate 16 half-hour slots from 9:00 to 17:00
+        $slots = [];
+        $start = strtotime('09:00');
+        $end = strtotime('17:00');
+        while ($start < $end) {
+            $slotTime = date('H:i', $start);
+            $slots[] = [
+                'time' => $slotTime,
+                'available' => true,
+                'formatted' => date('g:i A', $start) . ' - ' . date('g:i A', $start + 30*60)
+            ];
+            $start += 30 * 60;
+        }
+
+        return response()->json([
+            'success' => true,
+            'date' => $date,
+            'employee_id' => $employeeId,
+            'slots' => $slots
+        ]);
+    }
+
+    /**
+     * Alias for getAvailableTimeSlots to support route compatibility
+     */
+    public function getAvailableSlots(Request $request)
+    {
+        return $this->getAvailableTimeSlots($request);
+    }
 
 }
 

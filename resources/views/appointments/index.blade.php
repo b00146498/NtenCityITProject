@@ -25,6 +25,7 @@
         var deleteAppointmentUrl = @json(route('appointments.destroy', ':id'));
         var csrfToken = @json(csrf_token());
         var getAvailableSlotsUrl = @json(route('appointments.available-slots'));
+        var slotsUrl = @json(route('appointments.available-slots'));
         var listClientsUrl = @json(route('clients.index', ['format' => 'json']));
         var listEmployeesUrl = @json(route('employees.index', ['format' => 'json']));
         var listPracticesUrl = @json(route('practices.index', ['format' => 'json']));
@@ -306,10 +307,10 @@
                         <select id="doctor-select" class="w-full border rounded p-2">
                             <option value="">Select Doctor</option>
                             <option value="1">Dr. John Smith</option>
-                            <option value="2">Dr. Sarah Johnson</option>
-                            <option value="3">Dr. Michael Lee</option>
-                            <option value="4">Dr. Emily Rodriguez</option>
-                            <option value="5">Dr. Robert Chen</option>
+                            <option value="30">Dr. Sarah Johnson</option>
+                            <option value="31">Dr. Michael Lee</option>
+                            <option value="32">Dr. Emily Rodriguez</option>
+                            <option value="33">Dr. Robert Chen</option>
                         </select>
                     </div>
                     
@@ -569,11 +570,11 @@
                 }
                 console.log("📆 Loading time slots for:", date);
                 
-                // Get the selected doctor if any
-                let doctorId = $('#doctor-select').val() || null;
+                // Get the selected doctor if any, default to 1
+                let doctorId = $('#doctor-select').val() || 1;
                 
                 $.ajax({
-                    url: getAvailableSlotsUrl,
+                    url: slotsUrl,
                     type: "GET",
                     data: { 
                         date: date,
@@ -582,7 +583,7 @@
                     success: function(response) {
                         console.log("Time slots response:", response); // Debug
                         
-                        let timeSlots = response.timeSlots;
+                        let timeSlots = response.slots;
                         let timeSlotsContainer = $("#time-slots");
                         timeSlotsContainer.empty();
                         
@@ -706,11 +707,11 @@
                 
                 console.log("Loading mobile time slots for:", date);
                 
-                // Get the selected doctor
-                let doctorId = $('#doctor-select').val() || null;
+                // Get the selected doctor, default to 1
+                let doctorId = $('#doctor-select').val() || 1;
                 
                 $.ajax({
-                    url: getAvailableSlotsUrl,
+                    url: slotsUrl,
                     type: "GET",
                     data: { 
                         date: date,
@@ -719,7 +720,7 @@
                     success: function(response) {
                         console.log("Mobile time slots response:", response); // Debug
                         
-                        let timeSlots = response.timeSlots;
+                        let timeSlots = response.slots;
                         let container = $("#mobile-time-slots");
                         container.empty();
                         
@@ -1042,7 +1043,7 @@
                         notes: notes
                     },
                     success: function(response) {
-                        if (response.success) {
+                        if (response.success && response.appointment) {
                             // Store the appointment ID in the confirmation view
                             $('#confirmation-view').data('appointment-id', response.appointment.id);
                             
@@ -1058,7 +1059,8 @@
                             
                             calendar.refetchEvents();
                         } else {
-                            showNotification("❌ Failed to save appointment.", "error");
+                            let errorMsg = response.message || "Failed to save appointment.";
+                            showNotification("❌ " + errorMsg, "error");
                         }
                     },
                     error: function(xhr) {

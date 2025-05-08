@@ -12,12 +12,12 @@
                         <input type="file" id="profile-picture-input" name="profile_picture" style="display: none;" accept="image/*">
                         
                         @if(isset($employee) && $employee && $employee->profile_picture)
-                            <img src="{{ asset('storage/' . $employee->profile_picture) }}" 
+                            <img src="{{ asset($employee->profile_picture) }}" 
                                  id="profile-picture-preview"
                                  alt="Profile Picture" 
                                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
                         @elseif(isset($client) && $client && $client->profile_picture)
-                            <img src="{{ asset('storage/' . $client->profile_picture) }}" 
+                            <img src="{{ asset($client->profile_picture) }}" 
                                  id="profile-picture-preview"
                                  alt="Profile Picture" 
                                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
@@ -90,6 +90,24 @@
     @csrf
 </form>
 
+<!-- You can keep or remove the test forms as needed -->
+<div style="margin: 20px; padding: 20px; border: 1px solid #ccc;">
+    <h4>Test Upload Form</h4>
+    <form id="test-upload-form" enctype="multipart/form-data">
+        @csrf
+        <input type="file" name="profile_picture" id="test-profile-picture">
+        <button type="submit">Upload (Regular Form)</button>
+    </form>
+    
+    <hr>
+    
+    <h4>Test Upload with Fetch</h4>
+    <input type="file" id="test-fetch-input">
+    <button id="test-fetch-button">Upload with Fetch</button>
+    
+    <div id="upload-result" style="margin-top: 10px; padding: 10px; background-color: #f5f5f5;"></div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -119,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle file selection
+    // Handle file selection - UPDATED WITH WORKING CODE
     if (profilePictureInput) {
         profilePictureInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -127,116 +145,123 @@ document.addEventListener('DOMContentLoaded', function() {
             
             console.log('File selected:', file.name, file.type, file.size);
             
-            // Validate file type
-            const validImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg', 'image/webp'];
-            if (!validImageTypes.includes(file.type)) {
-                alert('Please select a valid image file (JPEG, PNG, GIF, WebP)');
-                return;
-            }
-            
+            // Show the image preview immediately
             const reader = new FileReader();
-            
             reader.onload = function(e) {
-                try {
-                    // Preview the image
-                    if (profilePicturePreview && profilePicturePreview.tagName && profilePicturePreview.tagName.toLowerCase() === 'div') {
-                        // Create a new image element
-                        const img = document.createElement('img');
-                        img.src = e.target.result;
-                        img.id = 'profile-picture-preview';
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.borderRadius = '50%';
-                        img.style.objectFit = 'cover';
-                        
-                        // Replace the div with the new image
-                        if (profilePicturePreview.parentNode) {
-                            profilePicturePreview.parentNode.replaceChild(img, profilePicturePreview);
-                            profilePicturePreview = img; // Update the reference
-                        } else {
-                            console.error('Cannot replace profile picture: parent node is null');
-                        }
-                    } else if (profilePicturePreview) {
-                        // Just update the src of the existing image
-                        profilePicturePreview.src = e.target.result;
-                    } else {
-                        console.error('Profile picture preview element not found');
+                if (profilePicturePreview.tagName.toLowerCase() === 'div') {
+                    // If it's the default icon, replace with an img
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.id = 'profile-picture-preview';
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.borderRadius = '50%';
+                    img.style.objectFit = 'cover';
+                    
+                    if (profilePicturePreview.parentNode) {
+                        profilePicturePreview.parentNode.replaceChild(img, profilePicturePreview);
+                        profilePicturePreview = img;
                     }
-                } catch (error) {
-                    console.error('Error updating preview image:', error);
+                } else {
+                    profilePicturePreview.src = e.target.result;
                 }
-                
-                // Prepare FormData for upload
-                const formData = new FormData();
-                formData.append('profile_picture', file);
-                formData.append('_token', csrfToken);
-                
-                console.log('Sending request to:', '{{ route("profile.upload-picture") }}');
-                
-                // Send AJAX request to upload
-                fetch('{{ route("profile.upload-picture") }}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                })
-                .then(response => {
-                    console.log('Response status:', response.status);
-                    if (!response.ok) {
-                        throw new Error('Server returned ' + response.status + ' ' + response.statusText);
-                    }
-                    return response.text().then(text => {
-                        try {
-                            return text ? JSON.parse(text) : {};
-                        } catch (e) {
-                            console.error('Error parsing response as JSON:', e);
-                            console.log('Raw response:', text);
-                            throw new Error('Invalid JSON response from server');
-                        }
-                    });
-                })
-                .then(data => {
-                    console.log('Upload response:', data);
-                    if (data.success) {
-                        console.log('Profile picture updated successfully');
-                        console.log('Path returned:', data.path);
-                        
-                        // Update the image source with the server-side path
-                        const img = document.getElementById('profile-picture-preview');
-                        if (img) {
-                            img.src = data.path;
-                            console.log('Updated image source to:', img.src);
-                            
-                            // Save the path to localStorage
-                            localStorage.setItem('profilePicturePath', data.path);
-                        }
-                    } else {
-                        console.error('Upload failed:', data.errors || data.message || 'Unknown error');
-                        alert('Failed to upload profile picture: ' + (data.errors || data.message || 'Unknown error'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Upload error:', error);
-                    alert('Error uploading profile picture. Please try again. ' + error.message);
-                });
             };
-            
-            reader.onerror = function(e) {
-                console.error('FileReader error:', e);
-                alert('Error reading the image file. Please try again.');
-            };
-
             reader.readAsDataURL(file);
+            
+            // Use the working FormData pattern from the test
+            const formData = new FormData();
+            formData.append('profile_picture', file);
+            formData.append('_token', csrfToken);
+            
+            fetch('{{ route("profile.upload-picture") }}', {
+                method: 'POST',
+                body: formData,
+                // Don't include any Content-Type header - browser sets it with boundary
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Upload response:', data);
+                if (data.success) {
+                    console.log('Profile picture updated successfully');
+                    
+                    // Update the image with the returned path from server
+                    if (profilePicturePreview) {
+                        profilePicturePreview.src = data.path;
+                    }
+                } else {
+                    console.error('Upload failed:', data.message || 'Unknown error');
+                    alert('Failed to upload profile picture: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                alert('Error uploading profile picture. Please try again.');
+            });
         });
     }
+
+    // Regular form submission test
+    document.getElementById('test-upload-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        
+        fetch('{{ route("profile.upload-picture") }}', {
+            method: 'POST',
+            body: new FormData(form)
+        })
+        .then(response => {
+            document.getElementById('upload-result').innerHTML = 'Response status: ' + response.status;
+            return response.text();
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                document.getElementById('upload-result').innerHTML += '<br>Response: ' + JSON.stringify(data);
+            } catch (e) {
+                document.getElementById('upload-result').innerHTML += '<br>Raw response: ' + text;
+            }
+        })
+        .catch(error => {
+            document.getElementById('upload-result').innerHTML += '<br>Error: ' + error.message;
+        });
+    });
     
-    // Check if we have a saved path in localStorage
-    const savedPath = localStorage.getItem('profilePicturePath');
-    if (savedPath && profilePicturePreview && profilePicturePreview.tagName && profilePicturePreview.tagName.toLowerCase() === 'img') {
-        console.log('Restoring profile picture from saved path:', savedPath);
-        profilePicturePreview.src = savedPath;
-    }
+    // Fetch API test
+    document.getElementById('test-fetch-button').addEventListener('click', function() {
+        const file = document.getElementById('test-fetch-input').files[0];
+        if (!file) {
+            alert('Please select a file first');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        formData.append('_token', csrfToken);
+        
+        fetch('{{ route("profile.upload-picture") }}', {
+            method: 'POST',
+            body: formData
+            // No headers - let browser set the Content-Type with boundary
+        })
+        .then(response => {
+            document.getElementById('upload-result').innerHTML = 'Fetch Response status: ' + response.status;
+            return response.text();
+        })
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                document.getElementById('upload-result').innerHTML += '<br>Fetch Response: ' + JSON.stringify(data);
+            } catch (e) {
+                document.getElementById('upload-result').innerHTML += '<br>Fetch Raw response: ' + text;
+            }
+        })
+        .catch(error => {
+            document.getElementById('upload-result').innerHTML += '<br>Fetch Error: ' + error.message;
+        });
+    });
 });
 
 function confirmLogout(event) {
