@@ -111,6 +111,17 @@
         </div>
     </div>
 
+    
+    <!-- Recovery Interval -->
+    <div class="col-12 mb-3">
+        {!! Form::label('recovery_interval', 'Recovery Interval:', ['class' => 'form-label fw-bold']) !!}
+        <div class="d-flex gap-2 align-items-center">
+            {!! Form::number('recovery_minutes', null, ['class' => 'form-control text-center', 'style' => 'max-width: 80px;', 'min' => 0, 'placeholder' => 'Min']) !!}
+            <span>:</span>
+            {!! Form::number('recovery_seconds', null, ['class' => 'form-control text-center', 'style' => 'max-width: 80px;', 'min' => 0, 'max' => 59, 'placeholder' => 'Sec']) !!}
+        </div>
+    </div>
+
     <!-- Hidden Input to Store Final Incline/Decline Value -->
     <input type="hidden" name="incline" id="final_incline" value="0">
 

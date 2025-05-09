@@ -1,6 +1,17 @@
-<div class="mobile-container">
-    <input type="hidden" name="userid" value="{{ $userid }}"/>
-    <div class="row">
+@section('content')
+<div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+    <div>
+        <section class="content-header">
+            <h2 class="text-center" style="font-weight: bold; margin-bottom: 15px; color: #AD8A18;">Create Account</h2>
+        </section>
+
+        <div class="mobile-container">
+            @include('basic-template::common.errors')
+
+            {!! Form::open(['route' => 'clients.store']) !!}
+        <input type="hidden" name="userid" value="{{ $userid }}"/>
+        <div class="row">
 
         <!-- First Name -->
         <div class="col-12 mb-3">
@@ -133,3 +144,5 @@
     }
     
 </style>
+
+@endsection

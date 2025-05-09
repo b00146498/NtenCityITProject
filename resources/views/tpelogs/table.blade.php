@@ -8,6 +8,7 @@
         <th>Intensity Level</th>
         <th>Incline</th>
         <th>Times Per Week</th>
+        <th>Recovery Interval</th>
         <th>Completed</th>
         <th colspan="3">Action</th>
     </thead>
@@ -30,6 +31,14 @@
                 @endif
             </td>
             <td>{!! $tpelog->times_per_week !!}</td>
+            <td>
+                @php
+                    $recoverySeconds = $tpelog->recovery_interval ?? 0;
+                    $mins = floor($recoverySeconds / 60);
+                    $secs = $recoverySeconds % 60;
+                @endphp
+                {{ $mins }}m {{ str_pad($secs, 2, '0', STR_PAD_LEFT) }}s
+            </td>
             <td>
                 @if ($tpelog->completed)
                     <span class="text-success">✅ Completed</span>

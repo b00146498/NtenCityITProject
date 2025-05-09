@@ -47,6 +47,12 @@
                 <p><strong>Intensity:</strong> {{ $log->intensity }}</p>
                 <p><strong>Duration:</strong> {{ $log->minutes }} minutes</p>
                 <p><strong>Times per Week:</strong> x{{ $log->times_per_week }}</p>
+                @php
+                    $recoverySeconds = $log->recovery_interval ?? 0;
+                    $mins = floor($recoverySeconds / 60);
+                    $secs = $recoverySeconds % 60;
+                @endphp
+                <p><strong>Recovery Interval:</strong> {{ $mins }}m {{ str_pad($secs, 2, '0', STR_PAD_LEFT) }}s</p>
                 <p><strong>Incline:</strong> {{ $log->incline }}°</p>
             </div>
 

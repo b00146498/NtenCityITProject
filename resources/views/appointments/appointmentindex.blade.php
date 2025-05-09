@@ -45,15 +45,6 @@
     </div>
 </div>
 
-<nav class="bottom-nav">
-    <a href="{{ url('/client/clientdashboard') }}" class="nav-item"><i class="fas fa-home"></i></a>
-    <a href="{{ url('/progress') }}" class="nav-item"><i class="fas fa-list"></i></a>
-    <a href="{{ url('/appointments') }}" class="nav-item active"><i class="fas fa-clock"></i></a>
-    <a href="{{ url('/workoutlogs') }}" class="nav-item"><i class="far fa-check-circle"></i></a>
-    <a href="{{ url('/alerts') }}" class="nav-item"><i class="fas fa-comment"></i></a>
-    <a href="{{ url('/clientprofile') }}" class="nav-item"><i class="fas fa-user"></i></a>
-</nav>
-
 <!-- Modal for booking confirmation -->
 <div id="bookingModal" class="modal-overlay">
     <div class="modal-content">

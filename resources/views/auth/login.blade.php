@@ -1,5 +1,8 @@
 <x-guest-layout>
     <head>
+        <!-- ✅ Load Font Awesome for the eye icon -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
         <style>
             html, body {
                 height: 100%;
@@ -75,11 +78,24 @@
                 <x-input id="email" class="block w-full" type="email" name="email" :value="old('email')" required autofocus placeholder="Username" />
             </div>
 
-            <div class="mt-4">
+            <!-- ✅ Password field with eye icon -->
+            <div class="password-wrapper" style="position: relative;">
                 <x-input id="password" class="block w-full"
                          type="password"
                          name="password"
                          required autocomplete="current-password" placeholder="Password" />
+
+                <span onclick="togglePassword()" style="
+                    position: absolute;
+                    right: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    font-size: 18px;
+                    color: gray;
+                ">
+                    <i class="fas fa-eye" id="toggleIcon"></i>
+                </span>
             </div>
 
             <div class="block mt-4 text-left">
@@ -96,6 +112,7 @@
                     {{ __('Forgot password?') }}
                 </a>
             @endif
+
             <div class="register-link mt-3">
                 <span style="font-size: 14px; color: gray;">
                     Don’t have an account?
@@ -106,4 +123,22 @@
             </div>
         </form>
     </div>
+
+    <!-- ✅ JavaScript for toggling password visibility -->
+    <script>
+        function togglePassword() {
+            const input = document.getElementById("password");
+            const icon = document.getElementById("toggleIcon");
+
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
 </x-guest-layout>

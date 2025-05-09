@@ -1,5 +1,8 @@
 <x-guest-layout>
     <head>
+        <!-- ✅ Font Awesome for the eye icon -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
         <style>
             html, body {
                 height: 100%;
@@ -25,14 +28,6 @@
                 margin-bottom: 20px;
             }
 
-            .title {
-                font-size: 24px;
-                font-weight: bold;
-                margin-bottom: 20px;
-                color: #333;
-                text-align: center;
-            }
-
             .form-title {
                 font-size: 18px;
                 font-weight: bold;
@@ -50,9 +45,24 @@
                 box-sizing: border-box;
             }
 
-            input::placeholder {
+            .password-wrapper {
+                position: relative;
+            }
+
+            .toggle-password {
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                font-size: 18px;
                 color: gray;
+            }
+
+            .password-strength {
                 font-size: 14px;
+                text-align: left;
+                margin-top: 4px;
             }
 
             button {
@@ -64,10 +74,6 @@
                 cursor: pointer;
                 width: 100%;
                 margin-top: 10px;
-            }
-
-            button:hover {
-                opacity: 0.8;
             }
 
             .already-registered {
@@ -95,6 +101,7 @@
             @csrf
 
             <div class="form-title">Sign Up</div>
+
             <div>
                 <x-input id="name" class="block w-full" type="text" name="name" :value="old('name')" required autofocus placeholder="Full Name" />
             </div>
@@ -103,13 +110,19 @@
                 <x-input id="email" class="block w-full" type="email" name="email" :value="old('email')" required placeholder="Email" />
             </div>
 
-            <div class="mt-4">
+            <!-- Password + Visibility + Strength -->
+            <div class="mt-4 password-wrapper">
                 <x-input id="password" class="block w-full" type="password" name="password" required autocomplete="new-password" placeholder="Password" />
+                <span class="toggle-password" onclick="togglePassword()">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                </span>
+                <div id="strengthMessage" class="password-strength text-muted"></div>
             </div>
 
             <div class="mt-4">
                 <x-input id="password_confirmation" class="block w-full" type="password" name="password_confirmation" required placeholder="Confirm Password" />
             </div>
+
             <!-- Role Dropdown -->
             <div class="mt-4">
                 <label for="role" class="block font-medium text-sm text-gray-700">Role:</label>
@@ -126,4 +139,37 @@
             </a>
         </form>
     </div>
+
+    <!-- ✅ Password toggle + strength script -->
+    <script>
+        function togglePassword() {
+            const input = document.getElementById("password");
+            const icon = document.getElementById("eyeIcon");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+
+        document.getElementById("password").addEventListener("input", function () {
+            const strengthMessage = document.getElementById("strengthMessage");
+            const value = this.value;
+
+            if (value.length < 6) {
+                strengthMessage.textContent = "Too short (min 6 characters)";
+                strengthMessage.style.color = "red";
+            } else if (!/[A-Z]/.test(value) || !/[0-9]/.test(value)) {
+                strengthMessage.textContent = "Add a number and uppercase letter";
+                strengthMessage.style.color = "orange";
+            } else {
+                strengthMessage.textContent = "Strong password";
+                strengthMessage.style.color = "green";
+            }
+        });
+    </script>
 </x-guest-layout>

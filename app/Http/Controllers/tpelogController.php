@@ -32,10 +32,6 @@ class tpelogController extends AppBaseController
      */
     public function index(Request $request)
     {
-        //$tpelogs = $this->tpelogRepository->all();
-
-        //return view('tpelogs.index')
-            //->with('tpelogs', $tpelogs);
         $tpelogs = Tpelog::with('trainingPlan.client', 'exercise')->get();
 
         return view('tpelogs.index', compact('tpelogs'));
@@ -46,13 +42,6 @@ class tpelogController extends AppBaseController
      *
      * @return Response
      */
-    /*public function create()
-    {
-        $exercises = standardexercises::all();
-        $trainingPlans = PersonalisedTrainingPlan::with('client')->get();
-        //return view('tpelogs.create');
-        return view('tpelogs.create', compact('exercises', 'trainingPlans'));
-    }*/
 
     public function create(Request $request)
     {
@@ -76,30 +65,33 @@ class tpelogController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreatetpelogRequest $request)
+    public function store(Request $request)
     {
-        //$input = $request->all();
-
-        //$tpelog = $this->tpelogRepository->create($input);
-
-        //Flash::success('Tpelog saved successfully.');
-
-        //return redirect(route('tpelogs.index'));
         $validated = $request->validate([
             'plan_id' => 'required|exists:personalisedtrainingplan,id',
             'exercise_id' => 'required|exists:standardexercises,id',
             'num_sets' => 'required|integer|min:0',
             'num_reps' => 'required|integer|min:0',
             'minutes' => 'nullable|integer|min:0',
-            'intensity' => 'required|string',
-            'incline' => 'required|numeric|min:-20|max:20', // Allow decline (negative values)
-            'times_per_week' => 'required|integer|min:1|max:7'
+            'intensity' => 'required|string|max:50',
+            'incline' => 'required|numeric|min:-20|max:20',
+            'times_per_week' => 'required|integer|min:1|max:7',
+            'recovery_minutes' => 'nullable|integer|min:0',
+            'recovery_seconds' => 'nullable|integer|min:0|max:59',
         ]);
-    
-        Tpelog::create($validated);
-    
-        return redirect()->route('tpelogs.index')->with('success', 'Exercise added successfully!');
+
+        // Combine minutes and seconds into total seconds
+        $minutes = (int) $request->input('recovery_minutes', 0);
+        $seconds = (int) $request->input('recovery_seconds', 0);
+        $validated['recovery_interval'] = ($minutes * 60) + $seconds;
+
+        // Save the record
+        TpeLog::create($validated);
+
+        return redirect()->route('tpelogs.index')->with('success', 'Workout log created successfully.');
     }
+
+
 
     /**
      * Display the specified tpelog.
@@ -110,16 +102,6 @@ class tpelogController extends AppBaseController
      */
     public function show($id)
     {
-        /*$tpelog = $this->tpelogRepository->find($id);
-
-        if (empty($tpelog)) {
-            Flash::error('Tpelog not found');
-
-            return redirect(route('tpelogs.index'));
-        }
-
-        return view('tpelogs.show')->with('tpelog', $tpelog);*/
-
         $tpelog = Tpelog::with(['trainingPlan.client', 'exercise'])->find($id);
 
         if (empty($tpelog)) {
@@ -139,16 +121,6 @@ class tpelogController extends AppBaseController
      */
     public function edit($id)
     {
-        /*$tpelog = $this->tpelogRepository->find($id);
-
-        if (empty($tpelog)) {
-            Flash::error('Tpelog not found');
-
-            return redirect(route('tpelogs.index'));
-        }
-
-        return view('tpelogs.edit')->with('tpelog', $tpelog);*/
-
         $tpelog = $this->tpelogRepository->find($id);
 
         if (empty($tpelog)) {
