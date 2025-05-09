@@ -267,7 +267,7 @@ function openModal(id) {
         document.getElementById('modalPractice').innerText = selected.practice ? selected.practice.name : 'N/A';
         document.getElementById('modalDate').innerText = selected.booking_date;
         document.getElementById('modalTime').innerText = selected.start_time + " - " + selected.end_time;
-    
+   
         document.getElementById('appointmentModal').style.display = 'block';
     }
 }
@@ -283,3 +283,4 @@ function filterAppointments(type) {
     });
 }
 </script>
+
