@@ -33,6 +33,10 @@
             <td>{!! $tpelog->times_per_week !!}</td>
         </tr>
         <tr>
+            <th style="width: 30%;">Recovery interval</th>
+            <td>{!! $tpelog->recovery_interval !!}</td>
+        </tr>
+        <tr>
             <th style="width: 30%;">Completed</th>
             <td>
                 @if ($tpelog->completed)
