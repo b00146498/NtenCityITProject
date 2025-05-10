@@ -31,6 +31,11 @@ class practiceController extends AppBaseController
     {
         $practices = $this->practiceRepository->all();
 
+        // Return JSON if requested (for AJAX dropdown)
+        if ($request->get('format') === 'json') {
+            return response()->json($practices);
+        }
+
         return view('practices.index')
             ->with('practices', $practices);
     }

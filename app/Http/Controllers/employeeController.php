@@ -30,45 +30,24 @@ class employeeController extends AppBaseController
      *
      * @return Response
      */
-    /*public function index(Request $request)
+    public function index(Request $request)
     {
-        $employee = Employee::with('practice')->where('userid', Auth::id())->first();
-
-        if (!$employee) {
-            return redirect()->route('login')->with('error', 'Employee not found.');
+        // If AJAX/JSON request, return all employees as JSON
+        if ($request->get('format') === 'json') {
+            return response()->json(\App\Models\Employee::all());
         }
 
-        return view('dashboard', [
-            'employee' => $employee,
-            'practice' => $employee->practice
-        ]);
-    }*/
-
-
-    /*public function index()
-    {
-        $employees = Employee::with('practice')->get();
-
-        return view('employees.index', compact('employees'));
-    }*/
-
-    public function index()
-    {
         $user = auth()->user();
-
-        // Get the currently logged-in employee
         $employee = \App\Models\Employee::where('userid', $user->id)->first();
 
         if (!$employee) {
             return redirect()->route('login')->with('error', 'Only employees can view this page.');
         }
 
-        // Fetch only employees in the same practice
         $employees = \App\Models\Employee::where('practice_id', $employee->practice_id)->get();
 
         return view('employees.index', compact('employees'));
     }
-
 
     /**
      * Show the form for creating a new employee.
