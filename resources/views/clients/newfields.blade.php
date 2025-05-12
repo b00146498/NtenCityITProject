@@ -1,6 +1,5 @@
 @section('content')
 <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
-
     <div>
         <section class="content-header">
             <h2 class="text-center" style="font-weight: bold; margin-bottom: 15px; color: #AD8A18;">Create Account</h2>

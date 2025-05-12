@@ -30,27 +30,6 @@ class employeeController extends AppBaseController
      *
      * @return Response
      */
-    /*public function index(Request $request)
-    {
-        $employee = Employee::with('practice')->where('userid', Auth::id())->first();
-
-        if (!$employee) {
-            return redirect()->route('login')->with('error', 'Employee not found.');
-        }
-
-        return view('dashboard', [
-            'employee' => $employee,
-            'practice' => $employee->practice
-        ]);
-    }*/
-
-
-    /*public function index()
-    {
-        $employees = Employee::with('practice')->get();
-
-        return view('employees.index', compact('employees'));
-    }*/
 
     public function index()
     {

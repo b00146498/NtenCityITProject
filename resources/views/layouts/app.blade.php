@@ -8,7 +8,7 @@
     <title>Ntencity</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}"
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
 
 
     <!-- Bootstrap 5 -->

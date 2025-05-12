@@ -77,16 +77,6 @@ class DiaryEntryController extends Controller
         return redirect()->route('diary-entries.index')->with('success', 'Diary entry added.');
     }
      
-    /**
-     * Display the specified diary entry.
-     */
-    /*public function show($id)
-    {
-        $diaryEntry = DiaryEntry::findOrFail($id);
-        $client = $diaryEntry->client; // Fetch client details
-
-        return view('diary_entries.show', compact('diaryEntry', 'client'));
-    }*/
 
     public function show($id)
     {

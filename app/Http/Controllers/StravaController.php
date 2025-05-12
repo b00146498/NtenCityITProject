@@ -10,13 +10,6 @@ use App\Models\Client;
 
 class StravaController extends Controller
 {
-    /*public function redirectToStrava()
-    {
-        $clientId = config('services.strava.client_id');
-        $redirectUri = config('services.strava.redirect');
-
-        return redirect()->away("https://www.strava.com/oauth/authorize?client_id={$clientId}&response_type=code&redirect_uri={$redirectUri}&approval_prompt=auto&scope=read,activity:read");
-    }*/
 
     public function redirectToStrava()
     {
@@ -123,51 +116,6 @@ class StravaController extends Controller
 
         return redirect()->route('progress')->with('success', 'Strava connected!');
     }
-
-    /*public function showProgressPage()
-    {
-        $client = \App\Models\Client::where('userid', Auth::id())->first();
-        $activities = [];
-        $distances = [];
-        $dates = [];
-        $speeds = [];
-        $activityTypes = [];
-
-        if ($client && $client->strava_access_token) {
-            $response = \Http::withOptions([
-                'verify' => false, // ⚠️ DEV only
-            ])->withToken($client->strava_access_token)
-            ->get('https://www.strava.com/api/v3/athlete/activities', [
-                'per_page' => 10,
-                'page' => 1,
-            ]);
-
-            if ($response->successful()) {
-                $activities = $response->json();
-
-                foreach ($activities as $activity) {
-                    $distances[] = round($activity['distance'] / 1000, 2);
-                    $dates[] = Carbon::parse($activity['start_date'])->format('d M');
-                    
-                    // Speed in km/h
-                    $speed = $activity['distance'] / $activity['elapsed_time'];
-                    $speeds[] = round($speed * 3.6, 2);
-                
-                    // Count activity type
-                    $type = $activity['type'] ?? 'Other';
-                    $activityTypes[$type] = ($activityTypes[$type] ?? 0) + 1;
-                }
-            }
-        }
-
-        return view('clients.progress', compact(
-            'activities',
-            'distances',
-            'dates',
-            'speeds',
-            'activityTypes'
-        ));
-    }*/
 
     public function showProgressPage()
     {

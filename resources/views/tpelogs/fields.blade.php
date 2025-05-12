@@ -111,7 +111,6 @@
         </div>
     </div>
 
-    
     <!-- Recovery Interval -->
     <div class="col-12 mb-3">
         {!! Form::label('recovery_interval', 'Recovery Interval:', ['class' => 'form-label fw-bold']) !!}
