@@ -305,23 +305,31 @@
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
-    max-width: 500px;
+    max-width: 350px;
     background: white;
     display: flex;
     justify-content: space-around;
     padding: 12px 0;
     box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
-    border-radius: 15px 15px 0 0;
+    border-top: 1px solid #ccc;
     z-index: 1000;
+    border-radius: 0 0 15px 15px;
 }
 
 .nav-item {
+    text-align: center;
+    font-size: 14px;
+    color: black;
+    text-decoration: none;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: #777;
-    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-item i {
     font-size: 20px;
+    margin-bottom: 3px;
 }
 
 .nav-item.active {

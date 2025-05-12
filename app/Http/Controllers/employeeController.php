@@ -30,11 +30,6 @@ class employeeController extends AppBaseController
      *
      * @return Response
      */
-<<<<<<< HEAD
-
-    public function index()
-    {
-=======
     public function index(Request $request)
     {
         // If AJAX/JSON request, return all employees as JSON
@@ -42,7 +37,6 @@ class employeeController extends AppBaseController
             return response()->json(\App\Models\Employee::all());
         }
 
->>>>>>> dc1fe35a028bf085efa8052c3232ecfddf877891
         $user = auth()->user();
         $employee = \App\Models\Employee::where('userid', $user->id)->first();
 
