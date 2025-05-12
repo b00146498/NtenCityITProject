@@ -306,14 +306,14 @@
                         <label class="block text-sm text-gray-700 mb-1">Doctor</label>
                         <select id="doctor-select" class="w-full border rounded p-2">
                             <option value="">Select Doctor</option>
-                            <option value="1">Dr. John Smith</option>
-                            <option value="30">Dr. Sarah Johnson</option>
-                            <option value="31">Dr. Michael Lee</option>
-                            <option value="32">Dr. Emily Rodriguez</option>
-                            <option value="33">Dr. Robert Chen</option>
                         </select>
                     </div>
-                    
+                    <div>
+                        <label class="block text-sm text-gray-700 mb-1">Practice</label>
+                        <select id="practice-select" class="w-full border rounded p-2">
+                            <option value="">Select Practice</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-sm text-gray-700 mb-1">Notes</label>
                         <textarea id="notes-input" class="w-full border rounded p-2" rows="2"></textarea>
@@ -480,7 +480,28 @@
             // Initial setup
             setTimeout(updateCalendarCellEvents, 1000);
 
-            // No need to load dropdown options as we're using static doctors list
+            // Populate employees dropdown on page load
+            $.ajax({
+                url: listEmployeesUrl,
+                type: "GET",
+                success: function(response) {
+                    let doctorSelect = $('#doctor-select');
+                    doctorSelect.empty();
+                    doctorSelect.append('<option value="">Select Doctor</option>');
+                    if (Array.isArray(response)) {
+                        response.forEach(function(emp) {
+                            doctorSelect.append(`<option value="${emp.id}">${emp.emp_first_name} ${emp.emp_surname}</option>`);
+                        });
+                    } else if (response.data) {
+                        response.data.forEach(function(emp) {
+                            doctorSelect.append(`<option value="${emp.id}">${emp.emp_first_name} ${emp.emp_surname}</option>`);
+                        });
+                    }
+                },
+                error: function() {
+                    $('#doctor-select').append('<option value="">Could not load doctors</option>');
+                }
+            });
 
             // After calendar renders, add class to all calendar day cells for better selection
             setTimeout(() => {
@@ -941,10 +962,14 @@
                         // Show success message
                         showNotification("✅ Payment successful!", "success");
                         
+                        // Redirect to upcoming appointments if redirect URL is present
+                        if (data.redirect) {
+                            window.location.href = data.redirect;
+                            return;
+                        }
                         // Hide confirmation view and return to calendar
                         $('#confirmation-view').addClass('hidden');
                         $('#calendar-view').removeClass('hidden');
-                        
                         // Refresh calendar events
                         calendar.refetchEvents();
                     } else {
@@ -960,6 +985,7 @@
             // ✅ Save Appointment
             $("#save-btn").on("click", function() {
                 let doctor_id = $('#doctor-select').val();
+                let practice_id = $('#practice-select').val();
                 let notes = $('#notes-input').val();
                 
                 if (!doctor_id) {
@@ -980,6 +1006,11 @@
                 }
                 
                 let selectedDateStr = selectedDayEl.data('date');
+                // Fallback to global selectedDate if not found
+                if (!selectedDateStr && typeof selectedDate !== 'undefined' && selectedDate) {
+                    selectedDateStr = selectedDate;
+                }
+                console.log("Booking appointment with date:", selectedDateStr);
                 let timeRange = selectedTimeEl.text().split(' - ');
                 let startTime = timeRange[0].trim();
                 
@@ -994,13 +1025,6 @@
                     hour12: true
                 });
                 
-                console.log("Submitting appointment:", {
-                    date: selectedDateStr,
-                    start: startTime,
-                    end: endTime,
-                    doctor: doctor_id
-                });
-                
                 $.ajax({
                     url: storeAppointmentUrl,
                     type: "POST",
@@ -1008,7 +1032,7 @@
                         _token: csrfToken,
                         client_id: 1, // Default client ID
                         employee_id: doctor_id,
-                        practice_id: 1, // Default practice ID
+                        practice_id: practice_id,
                         booking_date: selectedDateStr,
                         start_time: startTime,
                         end_time: endTime,
@@ -1047,6 +1071,29 @@
                         showNotification("❌ Error: " + errorMessage, "error");
                     }
                 });
+            });
+
+            // Populate practices dropdown on page load
+            $.ajax({
+                url: listPracticesUrl,
+                type: "GET",
+                success: function(response) {
+                    let practiceSelect = $('#practice-select');
+                    practiceSelect.empty();
+                    practiceSelect.append('<option value="">Select Practice</option>');
+                    if (Array.isArray(response)) {
+                        response.forEach(function(practice) {
+                            practiceSelect.append(`<option value="${practice.id}">${practice.company_name}</option>`);
+                        });
+                    } else if (response.data) {
+                        response.data.forEach(function(practice) {
+                            practiceSelect.append(`<option value="${practice.id}">${practice.company_name}</option>`);
+                        });
+                    }
+                },
+                error: function() {
+                    $('#practice-select').append('<option value="">Could not load practices</option>');
+                }
             });
         });
     </script>

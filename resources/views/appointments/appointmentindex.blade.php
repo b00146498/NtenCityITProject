@@ -65,7 +65,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     // Pull the correct URL from your named route:
-    const slotsUrl = @json(route('appointments.available-time-slots'));
+    const slotsUrl = @json(route('appointments.available-slots'));
 
     // Global variables
     let selectedDate = null;

@@ -10,10 +10,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Flash;
 use Response;
 use Carbon\Carbon;
 use App\Notifications\AppointmentNotification;
+use App\Models\Client;
 
 class AppointmentController extends AppBaseController
 {
@@ -68,9 +70,7 @@ class AppointmentController extends AppBaseController
             // Validate request
             $validator = Validator::make($request->all(), [
                 'date' => 'required|date_format:Y-m-d',
-               // after
-'employee_id' => 'sometimes|integer|exists:employee,id',
-
+                'employee_id' => 'sometimes|integer|exists:employee,id',
             ]);
             
             if ($validator->fails()) {
@@ -343,7 +343,8 @@ class AppointmentController extends AppBaseController
                 'success' => true,
                 'message' => 'Payment processed successfully',
                 'appointment' => $updatedAppointment,
-                'receipt' => $receipt
+                'receipt' => $receipt,
+                'redirect' => route('alerts', ['status' => 'confirmed'])
             ]);
         } catch (\Exception $e) {
             Log::error('❌ Mock payment processing error: ' . $e->getMessage());
@@ -359,12 +360,28 @@ class AppointmentController extends AppBaseController
      */
     public function upcoming(Request $request)
     {
-        $clientId = 5; // keep this hardcoded for now
-
+        // Get the authenticated user
+        $user = Auth::user();
+        if (!$user) {
+            return redirect('/login');
+        }
+        
+        // Find the client associated with this user
+        $client = Client::where('userid', $user->id)->first();
+        if (!$client) {
+            return redirect('/client/clientdashboard')->with('error', 'Client profile not found.');
+        }
+        
+        $clientId = $client->id;
+        
+        // Get filter status (default to 'upcoming')
         $status = $request->get('status', 'confirmed');
-        $day = $request->get('day'); // Optional date from mini calendar filter
+        
+        // Get optional date filter from mini calendar
+        $day = $request->get('day'); 
 
-        $appointments = \App\Models\Appointment::with('employee')
+        // Get appointments for this client with the requested status
+        $appointments = \App\Models\Appointment::with(['employee', 'practice'])
             ->where('client_id', $clientId)
             ->where('status', $status)
             ->when($day, function ($query) use ($day) {
@@ -374,7 +391,8 @@ class AppointmentController extends AppBaseController
             ->orderBy('start_time', 'asc')
             ->get();
 
-        return view('appointments.appointmentindex', compact('appointments'));
+        // Return the alerts view with the appointments
+        return view('clients.alerts', compact('appointments'));
     }
 
     /**

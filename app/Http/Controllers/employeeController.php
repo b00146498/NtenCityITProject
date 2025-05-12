@@ -30,24 +30,30 @@ class employeeController extends AppBaseController
      *
      * @return Response
      */
+<<<<<<< HEAD
 
     public function index()
     {
-        $user = auth()->user();
+=======
+    public function index(Request $request)
+    {
+        // If AJAX/JSON request, return all employees as JSON
+        if ($request->get('format') === 'json') {
+            return response()->json(\App\Models\Employee::all());
+        }
 
-        // Get the currently logged-in employee
+>>>>>>> dc1fe35a028bf085efa8052c3232ecfddf877891
+        $user = auth()->user();
         $employee = \App\Models\Employee::where('userid', $user->id)->first();
 
         if (!$employee) {
             return redirect()->route('login')->with('error', 'Only employees can view this page.');
         }
 
-        // Fetch only employees in the same practice
         $employees = \App\Models\Employee::where('practice_id', $employee->practice_id)->get();
 
         return view('employees.index', compact('employees'));
     }
-
 
     /**
      * Show the form for creating a new employee.
