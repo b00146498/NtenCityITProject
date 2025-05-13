@@ -212,6 +212,8 @@ Route::middleware(['auth'])->group(function () {
             return 'Error: ' . $e->getMessage();
         }
     });
+    Route::get('/appointments/json', [AppointmentController::class, 'getAppointments'])->name('appointment.json');
+
 
     Route::get('/simple-test', function () {
         $user = Auth::user();
