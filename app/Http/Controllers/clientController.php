@@ -22,218 +22,230 @@ class clientController extends AppBaseController
         $this->clientRepository = $clientRepo;
     }
 
+    // ... [Keep all your existing web methods unchanged] ...
+
     /**
-     * Display a listing of the client.
+     * API: Get all clients (JSON response)
      *
      * @param Request $request
-     *
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    /*public function index(Request $request)
-    {
-        $clients = $this->clientRepository->all();
-
-        return view('clients.index')
-            ->with('clients', $clients);
-
-    }*/
-
-    public function index()
+    public function apiIndex(Request $request)
     {
         $user = auth()->user();
-
-        // Get the logged-in employee
-        $employee = \App\Models\Employee::where('userid', $user->id)->first();
-
-        if (!$employee) {
-            return redirect()->route('login')->with('error', 'Only employees can view clients.');
+        
+        // For employees - return only clients from their practice
+        if ($user->role === 'employee') {
+            $employee = \App\Models\Employee::where('userid', $user->id)->first();
+            $clients = Client::where('practice_id', $employee->practice_id)
+                ->select(['id', 'first_name', 'surname', 'email', 'account_status', 'practice_id'])
+                ->get();
+        } 
+        // For clients - return only their own data
+        elseif ($user->role === 'client') {
+            $clients = Client::where('userid', $user->id)
+                ->select(['id', 'first_name', 'surname', 'email', 'account_status', 'practice_id'])
+                ->get();
+        }
+        // Admin/other cases
+        else {
+            $clients = Client::query()
+                ->select(['id', 'first_name', 'surname', 'email', 'account_status', 'practice_id'])
+                ->get();
         }
 
-        // Only fetch clients tied to the same practice as the logged-in employee
-        $clients = \App\Models\Client::where('practice_id', $employee->practice_id)->get();
-
-        return view('clients.index', compact('clients'));
-    }
-
-    /**
-     * Show the form for creating a new client.
-     *
-     * @return Response
-     */
-    public function create()
-    {
-        $practices = \App\Models\Practice::all();
-        
-        $practice_id = $practices->first()->id;
-
-        //$client = new \App\Models\Client();
-        
-        return view('clients.create')->with([
-            //'client' => $client, 
-            'practices' => $practices, 
-            //'practice_id' => $practice_id 
+        return response()->json([
+            'success' => true,
+            'data' => $clients
         ]);
-        //return view('clients.create');
-    }
-
-    public function new($userid)
-    {
-        $practices = \App\Models\Practice::all();
-        
-        $practice_id = $practices->first()->id;
-        
-        return view('clients.new')->with([
-            //'client' => $client, 
-            'practices' => $practices, 
-            'userid' => $userid 
-        ]);
-        //return view('clients.create');
-    }
-    /**
-     * Store a newly created client in storage.
-     *
-     * @param CreateclientRequest $request
-     *
-     * @return Response
-     */
-    public function store(CreateclientRequest $request)
-    {
-        $input = $request->all();
-
-        $client = $this->clientRepository->create($input);
-
-        Flash::success('Client saved successfully.');
-
-        return redirect()->route('client.clientdashboard');
     }
 
     /**
-     * Display the specified client.
+     * API: Get single client (JSON response)
      *
      * @param int $id
-     *
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function apiShow($id)
     {
-        $client = $this->clientRepository->find($id);
-
-        if (empty($client)) {
-            Flash::error('Client not found');
-
-            return redirect(route('clients.index'));
-        }
-
-        return view('clients.show')->with('client', $client);
-    }
-
-    /**
-     * Show the form for editing the specified client.
-     *
-     * @param int $id
-     *
-     * @return Response
-     */
-    public function edit($id)
-    {
-        $client = $this->clientRepository->find($id);
-
-        if (empty($client)) {
-            Flash::error('Client not found');
-
-            return redirect(route('clients.index'));
-        }
-
-        $practices = Practice::all();
-
-        return view('clients.edit', compact('client', 'practices'));
-    }
-
-
-    /**
-     * Update the specified client in storage.
-     *
-     * @param int $id
-     * @param UpdateclientRequest $request
-     *
-     * @return Response
-     */
-    public function update($id, UpdateclientRequest $request)
-    {
-        $client = $this->clientRepository->find($id);
-
-        if (empty($client)) {
-            Flash::error('Client not found');
-
-            return redirect(route('clients.index'));
-        }
-
-        $client = $this->clientRepository->update($request->all(), $id);
-
-        Flash::success('Client updated successfully.');
-
-        return redirect(route('clients.index'));
-    }
-
-    /**
-     * Remove the specified client from storage.
-     *
-     * @param int $id
-     *
-     * @throws \Exception
-     *
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        $client = $this->clientRepository->find($id);
-
-        if (empty($client)) {
-            Flash::error('Client not found');
-
-            return redirect(route('clients.index'));
-        }
-
-        $this->clientRepository->delete($id);
-
-        Flash::success('Client deleted successfully.');
-
-        return redirect(route('clients.index'));
-    }
-    public function searchClients(Request $request)
-    {
-        $query = $request->query('query');
-
-        // Fetch clients matching the search query
-        $clients = Client::where('first_name', 'LIKE', "%{$query}%")
-                        ->orWhere('surname', 'LIKE', "%{$query}%")
-                        ->orderBy('first_name', 'asc')
-                        ->get(['id', 'first_name', 'surname']);
-
-        return response()->json($clients);
-    }
-    public function clientdashboard()
-    {
-        // Get the logged-in client
-        $client = auth()->user()->client;
+        $user = auth()->user();
+        $client = Client::find($id);
 
         if (!$client) {
-            return redirect()->route('login')->with('error', 'You must be logged in as a client.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Client not found'
+            ], 404);
         }
 
-        // Get employees who work at the same practice as the client
-        $employees = \App\Models\Employee::where('practice_id', $client->practice_id)->get();
+        // Authorization check
+        if ($user->role === 'employee') {
+            $employee = \App\Models\Employee::where('userid', $user->id)->first();
+            if ($client->practice_id !== $employee->practice_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 403);
+            }
+        } 
+        elseif ($user->role === 'client' && $client->userid !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
-        return view('clients.clientdashboard', compact('employees'));
+        return response()->json([
+            'success' => true,
+            'data' => $client
+        ]);
     }
 
-    public function editClientProfile()
+    /**
+     * API: Search clients (JSON response)
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiSearch(Request $request)
     {
-        $client = auth()->user(); // or fetch client by ID if needed
-        $practices = Practice::all();
-        
-        return view('clients.clienteditprofile', compact('client', 'practices'));
+        $query = $request->query('query');
+        $user = auth()->user();
+
+        $clientsQuery = Client::query()
+            ->select(['id', 'first_name', 'surname', 'email', 'account_status']);
+
+        // For employees - limit to their practice
+        if ($user->role === 'employee') {
+            $employee = \App\Models\Employee::where('userid', $user->id)->first();
+            $clientsQuery->where('practice_id', $employee->practice_id);
+        }
+
+        if ($query) {
+            $clientsQuery->where(function($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                  ->orWhere('surname', 'LIKE', "%{$query}%")
+                  ->orWhere('email', 'LIKE', "%{$query}%");
+            });
+        }
+
+        $clients = $clientsQuery->orderBy('first_name', 'asc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $clients
+        ]);
     }
 
+    /**
+     * API: Create new client (JSON response)
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:50',
+            'surname' => 'required|string|max:50',
+            'email' => 'required|email|unique:clients,email',
+            'practice_id' => 'required|exists:practices,id',
+            // Add other validation rules as needed
+        ]);
 
+        try {
+            $client = $this->clientRepository->create($validated);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $client,
+                'message' => 'Client created successfully'
+            ], 201);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create client',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Update client (JSON response)
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiUpdate(Request $request, $id)
+    {
+        $client = $this->clientRepository->find($id);
+
+        if (!$client) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Client not found'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'first_name' => 'sometimes|string|max:50',
+            'surname' => 'sometimes|string|max:50',
+            'email' => 'sometimes|email|unique:clients,email,'.$client->id,
+            'practice_id' => 'sometimes|exists:practices,id',
+            // Add other validation rules as needed
+        ]);
+
+        try {
+            $client = $this->clientRepository->update($validated, $id);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $client,
+                'message' => 'Client updated successfully'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update client',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * API: Delete client (JSON response)
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiDestroy($id)
+    {
+        $client = $this->clientRepository->find($id);
+
+        if (!$client) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Client not found'
+            ], 404);
+        }
+
+        try {
+            $this->clientRepository->delete($id);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Client deleted successfully'
+            ], 204);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete client',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
