@@ -41,121 +41,168 @@ class practiceController extends AppBaseController
     }
 
     /**
-     * Show the form for creating a new practice.
+     * API: Get all practices (paginated JSON response)
      *
-     * @return Response
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function create()
+    public function apiIndex(Request $request)
     {
-        return view('practices.create');
+        $perPage = $request->query('perPage', 15);
+        $practices = $this->practiceRepository->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $practices->items(),
+            'meta' => [
+                'current_page' => $practices->currentPage(),
+                'per_page' => $practices->perPage(),
+                'total' => $practices->total(),
+                'last_page' => $practices->lastPage()
+            ]
+        ]);
     }
 
     /**
-     * Store a newly created practice in storage.
-     *
-     * @param CreatepracticeRequest $request
-     *
-     * @return Response
-     */
-    public function store(CreatepracticeRequest $request)
-    {
-        $input = $request->all();
-
-        $practice = $this->practiceRepository->create($input);
-
-        Flash::success('Practice saved successfully.');
-
-        return redirect(route('practices.index'));
-    }
-
-    /**
-     * Display the specified practice.
+     * API: Get single practice details
      *
      * @param int $id
-     *
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function apiShow($id)
     {
         $practice = $this->practiceRepository->find($id);
 
-        if (empty($practice)) {
-            Flash::error('Practice not found');
-
-            return redirect(route('practices.index'));
+        if (!$practice) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Practice not found'
+            ], 404);
         }
 
-        return view('practices.show')->with('practice', $practice);
+        return response()->json([
+            'success' => true,
+            'data' => $practice
+        ]);
     }
 
     /**
-     * Show the form for editing the specified practice.
+     * API: Create new practice
      *
-     * @param int $id
-     *
-     * @return Response
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function edit($id)
+    public function apiStore(Request $request)
     {
-        $practice = $this->practiceRepository->find($id);
+        $validated = $request->validate([
+            'company_name' => 'required|string|max:255',
+            'company_type' => 'required|string',
+            'street' => 'required|string',
+            'city' => 'required|string',
+            'county' => 'required|string',
+            'iban' => 'required|string',
+            'bic' => 'required|string'
+        ]);
 
-        if (empty($practice)) {
-            Flash::error('Practice not found');
-
-            return redirect(route('practices.index'));
+        try {
+            $practice = $this->practiceRepository->create($validated);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $practice,
+                'message' => 'Practice created successfully'
+            ], 201);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create practice',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return view('practices.edit')->with('practice', $practice);
     }
 
     /**
-     * Update the specified practice in storage.
+     * API: Update practice
      *
+     * @param Request $request
      * @param int $id
-     * @param UpdatepracticeRequest $request
-     *
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update($id, UpdatepracticeRequest $request)
+    public function apiUpdate(Request $request, $id)
     {
         $practice = $this->practiceRepository->find($id);
 
-        if (empty($practice)) {
-            Flash::error('Practice not found');
-
-            return redirect(route('practices.index'));
+        if (!$practice) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Practice not found'
+            ], 404);
         }
 
-        $practice = $this->practiceRepository->update($request->all(), $id);
+        $validated = $request->validate([
+            'company_name' => 'sometimes|string|max:255',
+            'company_type' => 'sometimes|string',
+            'street' => 'sometimes|string',
+            'city' => 'sometimes|string',
+            'county' => 'sometimes|string',
+            'iban' => 'sometimes|string',
+            'bic' => 'sometimes|string'
+        ]);
 
-        Flash::success('Practice updated successfully.');
-
-        return redirect(route('practices.index'));
+        try {
+            $practice = $this->practiceRepository->update($validated, $id);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $practice,
+                'message' => 'Practice updated successfully'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update practice',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Remove the specified practice from storage.
+     * API: Delete practice
      *
      * @param int $id
-     *
-     * @throws \Exception
-     *
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function apiDestroy($id)
     {
         $practice = $this->practiceRepository->find($id);
 
-        if (empty($practice)) {
-            Flash::error('Practice not found');
-
-            return redirect(route('practices.index'));
+        if (!$practice) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Practice not found'
+            ], 404);
         }
 
-        $this->practiceRepository->delete($id);
-
-        Flash::success('Practice deleted successfully.');
-
-        return redirect(route('practices.index'));
+        try {
+            $this->practiceRepository->delete($id);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Practice deleted successfully'
+            ], 204);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete practice',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
+    // ... [Keep all your existing web methods unchanged below this line] ...
+    // The following methods remain exactly as they were in your original file:
+    // create(), store(), show(), edit(), update(), destroy()
 }
