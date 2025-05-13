@@ -41,50 +41,6 @@ Route::get('/', function () {
 // Make available-slots public
 Route::get('/appointments/available-slots', [AppointmentController::class, 'getAvailableTimeSlots'])->name('appointments.available-slots');
 
-// Practice JSON endpoints (public)
-Route::get('/practices', function (Request $request) {
-    try {
-        $practices = app(\App\Repositories\practiceRepository::class)->all();
-        
-        // Return JSON if requested
-        if ($request->wantsJson() || $request->is('api/*')) {
-            return response()->json($practices);
-        }
-        
-        // Default web behavior
-        return view('practices.index', ['practices' => $practices]);
-    } catch (\Exception $e) {
-        \Log::error('Error in practices route: ' . $e->getMessage());
-        
-        if ($request->wantsJson() || $request->is('api/*')) {
-            return response()->json([
-                'error' => 'Failed to fetch practices',
-                'message' => $e->getMessage()
-            ], 500);
-        }
-        
-        return back()->with('error', 'Failed to fetch practices');
-    }
-});
-
-Route::get('/api/public/practices', function () {
-    try {
-        $practices = app(\App\Repositories\practiceRepository::class)->all();
-        
-        return response()->json([
-            'success' => true,
-            'data' => $practices
-        ]);
-    } catch (\Exception $e) {
-        \Log::error('Error in public practices API: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to fetch practices',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-});
-
 Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -118,7 +74,7 @@ Route::middleware(['auth'])->group(function () {
     // CRUD Resources
     Route::resource('employees', EmployeeController::class);
     Route::resource('clients', ClientController::class);
-    Route::resource('practices', PracticeController::class)->except(['index']);
+    Route::resource('practices', PracticeController::class);
     Route::resource('standardexercises', StandardExercisesController::class);
 
     // FullCalendar Appointment Routes
@@ -212,8 +168,6 @@ Route::middleware(['auth'])->group(function () {
             return 'Error: ' . $e->getMessage();
         }
     });
-    Route::get('/appointments/json', [AppointmentController::class, 'getAppointments'])->name('appointment.json');
-
 
     Route::get('/simple-test', function () {
         $user = Auth::user();
