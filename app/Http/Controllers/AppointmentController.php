@@ -344,7 +344,7 @@ class AppointmentController extends AppBaseController
                 'message' => 'Payment processed successfully',
                 'appointment' => $updatedAppointment,
                 'receipt' => $receipt,
-                'redirect' => route('alerts', ['status' => 'confirmed'])
+                'redirect' => route('alerts', ['status' => 'confirmed', 'highlight' => $updatedAppointment->id])
             ]);
         } catch (\Exception $e) {
             Log::error('❌ Mock payment processing error: ' . $e->getMessage());
@@ -382,7 +382,6 @@ class AppointmentController extends AppBaseController
 
         // Get appointments for this client with the requested status
         $appointments = \App\Models\Appointment::with(['employee', 'practice'])
-            ->where('client_id', $clientId)
             ->where('status', $status)
             ->when($day, function ($query) use ($day) {
                 $query->whereDate('booking_date', $day);

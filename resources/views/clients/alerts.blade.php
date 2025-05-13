@@ -44,9 +44,12 @@
 
     <!-- Appointment List -->
     <div class="appointment-list">
+        @php
+            $highlightId = request('highlight');
+        @endphp
         @if($appointments->isNotEmpty())
             @foreach($appointments as $appointment)
-                <div class="appointment-card">
+                <div class="appointment-card {{ $highlightId == $appointment->id ? 'highlighted' : '' }}">
                     <div class="appointment-info">
                         <h3>
                             @if($appointment->employee)
@@ -405,6 +408,10 @@
         gap: 6px;
     }
 }
+.highlighted {
+    border: 2px solid #c9a86a;
+    background: #fffbe6;
+}
 </style>
 
 <script>
@@ -413,11 +420,22 @@ function openModal(id) {
     let selected = appointment.find(a => a.id === id);
 
     if (selected) {
-        document.getElementById('modalEmployee').innerText = selected.employee ? selected.employee.name : 'N/A';
-        document.getElementById('modalPractice').innerText = selected.practice ? selected.practice.name : 'N/A';
+        // Show doctor name (employee)
+        let doctorName = selected.employee
+            ? (selected.employee.emp_first_name + ' ' + selected.employee.emp_surname)
+            : 'N/A';
+        document.getElementById('modalEmployee').innerText = doctorName;
+
+        // Show practice name
+        let practiceName = selected.practice
+            ? selected.practice.company_name
+            : 'N/A';
+        document.getElementById('modalPractice').innerText = practiceName;
+
+        // Date and time
         document.getElementById('modalDate').innerText = new Date(selected.booking_date).toLocaleDateString();
         document.getElementById('modalTime').innerText = selected.start_time + " - " + selected.end_time;
-   
+
         document.getElementById('appointmentModal').style.display = 'block';
     }
 }
@@ -503,6 +521,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     updateMonthDisplay(); // Initial display
+
+    var highlighted = document.querySelector('.appointment-card.highlighted');
+    if (highlighted) {
+        highlighted.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 });
 </script>
 

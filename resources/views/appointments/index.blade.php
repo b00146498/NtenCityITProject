@@ -30,6 +30,7 @@
         var listEmployeesUrl = @json(route('employees.index', ['format' => 'json']));
         var listPracticesUrl = @json(route('practices.index', ['format' => 'json']));
         var paymentUrl = @json(route('appointments.pay', ['id' => ':id']));
+        var currentClientId = @json(auth()->user()->client->id ?? 1);
     </script>
 
     <style>
@@ -1030,7 +1031,7 @@
                     type: "POST",
                     data: {
                         _token: csrfToken,
-                        client_id: 1, // Default client ID
+                        client_id: currentClientId,
                         employee_id: doctor_id,
                         practice_id: practice_id,
                         booking_date: selectedDateStr,
