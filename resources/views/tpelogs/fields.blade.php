@@ -102,7 +102,7 @@
     </div>
 
     <!-- Incline/Decline Percentage Input -->
-    <div class="form-group col-sm-6">
+    <div class="col-md-6 mb-3">
         {!! Form::label('incline_value', 'Incline/Decline Percentage:', ['class' => 'form-label fw-bold']) !!}
         <div class="input-group">
             <button type="button" class="btn btn-outline-secondary" onclick="changeValue(-1)">-</button>
@@ -111,8 +111,8 @@
         </div>
     </div>
 
-    <!-- Recovery Interval -->
-    <div class="col-12 mb-3">
+    <!-- Recovery Interval (Placed beside Incline % as requested) -->
+    <div class="col-md-6 mb-3">
         {!! Form::label('recovery_interval', 'Recovery Interval:', ['class' => 'form-label fw-bold']) !!}
         <div class="d-flex gap-2 align-items-center">
             {!! Form::number('recovery_minutes', null, ['class' => 'form-control text-center', 'style' => 'max-width: 80px;', 'min' => 0, 'placeholder' => 'Min']) !!}

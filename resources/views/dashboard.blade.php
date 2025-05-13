@@ -177,7 +177,7 @@
                 </div>
 
                 <div class="col-6">
-                    <a href="{{ route('appointments.create') }}" class="action-card text-center">
+                    <a href="{{ url('/calendar/display') }}" class="action-card text-center">
                         <div class="icon-circle bg-warning-subtle text-warning">
                             <img src="{{ asset('booking.png') }}" alt="Book Appointment" class="progress-icon">
                         </div>
