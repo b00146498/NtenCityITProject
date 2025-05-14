@@ -168,6 +168,7 @@ Route::middleware(['auth'])->group(function () {
             return 'Error: ' . $e->getMessage();
         }
     });
+Route::get('/appointments/json', [\App\Http\Controllers\AppointmentController::class, 'getAppointments'])->name('appointment.json');
 
     Route::get('/simple-test', function () {
         $user = Auth::user();
@@ -184,6 +185,8 @@ Route::middleware(['auth'])->group(function () {
     // API Routes
     Route::get('/api/appointments', [AppointmentController::class, 'index']);
 });
+Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+
 
 // Ensure Laravel auth routes are loaded
 require __DIR__.'/auth.php';
